@@ -774,6 +774,7 @@ let addCarriersToDatabase = () => {
 };
 
 let allCarriers = (req, res) => {
+  console.log("FROM NEW PULLL");
   Carrier.find()
     .populate("plans")
     .then(carriers => {
