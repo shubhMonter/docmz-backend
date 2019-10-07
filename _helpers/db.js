@@ -1,10 +1,20 @@
 const mongoose = require("mongoose");
 
-mongoose.connect("mongodb://dev:admin123@ds217208.mlab.com:17208/docmz", {
-  useNewUrlParser: true,
-  user: process.env.DB_USER,
-  pass: process.env.DB_PASSWORD
-});
+mongoose.connect(
+  "mongodb://dev:dev123@docmz-shard-00-00-fdoxl.mongodb.net:27017,docmz-shard-00-01-fdoxl.mongodb.net:27017,docmz-shard-00-02-fdoxl.mongodb.net:27017/docmz?ssl=true&replicaSet=DocMz-shard-0&authSource=admin&retryWrites=true&w=majority",
+  {
+    useNewUrlParser: true
+  }
+);
+
+// const MongoClient = require('mongoose')
+// const uri = "mongodb+srv://dev:dev123@docmz-fdoxl.mongodb.net/admin?retryWrites=true&w=majority";
+// const client = new MongoClient(uri, { useNewUrlParser: true });
+// client.connect(err => {
+//   const collection = client.db("test").collection("devices");
+//   // perform actions on the collection object
+//   client.close();
+// });
 
 const db = mongoose.connection;
 

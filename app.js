@@ -3,7 +3,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
 const expressValidator = require("express-validator");
-app.use(expressValidator());
+// app.use(expressValidator());
 const cors = require("cors");
 
 const jwt = require("_helpers/jwt");
@@ -11,7 +11,6 @@ const errorHandler = require("_helpers/error-handler");
 const cookieparser = require("cookie-parser");
 const session = require("express-session");
 const morgan = require("morgan");
-
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -65,15 +64,12 @@ app.use(
 // use JWT auth to secure the api
 app.use(jwt());
 
-
 // NPI
 app.use("/doctors", require("./routes/doctor_routes.js"));
 //Codes
 app.use("/codes", require("./routes/codes_routes"));
 //Insurance
-app.use("/insurance", require("./routes/insurance_routes"))
+app.use("/insurance", require("./routes/insurance_routes"));
 app.use(errorHandler);
-
-
 
 module.exports = app;
