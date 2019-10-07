@@ -66,10 +66,16 @@ app.use(jwt());
 
 // NPI
 app.use("/doctors", require("./routes/doctor_routes.js"));
+
 //Codes
 app.use("/codes", require("./routes/codes_routes"));
+
 //Insurance
 app.use("/insurance", require("./routes/insurance_routes"));
+
+//User Routes
+app.use("/user", require("../routes/user_routes"));
+
 app.use(errorHandler);
 
 module.exports = app;
