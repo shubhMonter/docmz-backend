@@ -16,7 +16,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(morgan("dev"));
 app.use(cookieparser());
-app.use(cors({ origin: process.env.CLIENT_URL }));
+// app.use(cors({ origin: process.env.CLIENT_URL }));
+app.use(cors({ origin: "http://localhost:3000" }));
 
 // initialize express-session to allow us track the logged-in user across sessions.
 app.use(
@@ -74,7 +75,7 @@ app.use("/codes", require("./routes/codes_routes"));
 app.use("/insurance", require("./routes/insurance_routes"));
 
 //User Routes
-app.use("/user", require("../routes/user_routes"));
+app.use("/user", require("./routes/user_routes"));
 
 app.use(errorHandler);
 
