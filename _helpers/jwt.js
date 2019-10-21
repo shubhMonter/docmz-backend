@@ -28,7 +28,8 @@ function jwt() {
       "/doctors/upload/procedures",
       "/doctors/get/procedures",
       "/doctors/upload/specialties",
-      "/doctors/get/specialties"
+      "/doctors/get/specialties",
+      "/doctors/register"
     ]
   });
 }

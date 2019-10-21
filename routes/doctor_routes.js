@@ -3,27 +3,29 @@ const doctorController = require("../doctor/doctor.controller");
 const express = require("express");
 const router = express.Router();
 
-// Fetch info about an doctor through a NPI Number 
+// Fetch info about an doctor through a NPI Number
 router.get("/getInfo/:npi", npiController.getNpiInfo);
 
 //Upload Doctors to the database through a list of NPI
 router.get("/upload", npiController.addDoctors);
 
 //Get all the doctors
-router.get("/get", npiController.getAllDoctors
-)
+router.get("/get", npiController.getAllDoctors);
 
 //Get all procedures
-router.get("/get/procedures", doctorController.getProcedures)
+router.get("/get/procedures", doctorController.getProcedures);
 
 //Add all Procedures
-router.get("/upload/procedures", doctorController.addProcedures )
+router.get("/upload/procedures", doctorController.addProcedures);
 
 //Upload Specialties
-router.get("/upload/specialties", doctorController.addSpecialities)
+router.get("/upload/specialties", doctorController.addSpecialities);
 
 //Get Specialities
-router.get("/get/specialties", doctorController.getSpecialty)
+router.get("/get/specialties", doctorController.getSpecialty);
+
+//register a Doctor
+router.post("/register", npiController.signUpDoc);
 
 // exporting them
 module.exports = router;

@@ -230,9 +230,23 @@ function getAllDoctors(req, res) {
     .catch(error => res.json({ status: false, error }));
 }
 
+//Sign up new doctor through API
+signUpDoc = (req, res) => {
+  let practise = new Practise(req.body);
+  practise
+    .save()
+    .then(doc => {
+      res.json({ status: true, doc });
+    })
+    .catch(error => {
+      res.status(200).json({ status: false, error });
+    });
+};
+
 //Exporting all the functions
 module.exports = {
   getNpiInfo,
   addDoctors,
-  getAllDoctors
+  getAllDoctors,
+  signUpDoc
 };
