@@ -27,5 +27,7 @@ router.get("/get/specialties", doctorController.getSpecialty);
 //register a Doctor
 router.post("/register", npiController.signUpDoc);
 
+router.post("/authenticate", npiController.authenticateDoctor);
+
 // exporting them
 module.exports = router;

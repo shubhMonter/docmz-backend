@@ -4,7 +4,9 @@ const db = require("_helpers/db"),
   request = require("request");
 (csvParser = require("csv-parse")), (fs = require("fs"));
 (Practise = db.Practise), (Taxonomy = db.Taxonomy), (Address = db.Address);
-
+(crypto = require("crypto")), (algorithm = "aes-256-cbc");
+let key = "abcdefghijklmnopqrstuvwxyztgbhgf";
+let iv = "1234567891234567";
 let filePathForDoctors = "./doctor/doctors.csv";
 
 //Function to upload the CPT codes from the CSV file to the MongoDb Database
@@ -103,56 +105,56 @@ function addDoctors(req, res) {
                     });
                   }
 
-                  basic = {};
+                  let basic = {};
                   let doctorInfoBasic = doctorInfo.basic;
-                  (basic.organization_name = doctorInfoBasic.organization_name
+                  basic.organization_name = doctorInfoBasic.organization_name
                     ? doctorInfoBasic.organization_name
-                    : "not found"),
-                    (basic.organizational_subpart = doctorInfoBasic.organizational_subpart
-                      ? doctorInfoBasic.organizational_subpart
-                      : "not found"),
-                    (basic.enumeration_date = doctorInfoBasic.enumeration_date
-                      ? doctorInfoBasic.enumeration_date
-                      : "not found"),
-                    (basic.last_updated = doctorInfoBasic.last_updated
-                      ? doctorInfoBasic.last_updated
-                      : "not found"),
-                    (basic.status = doctorInfoBasic.status
-                      ? doctorInfoBasic.status
-                      : "not found"),
-                    (basic.credential = doctorInfoBasic.authorized_official_credential
-                      ? doctorInfoBasic.authorized_official_credential
-                      : doctorInfoBasic.credential),
-                    (basic.first_name = doctorInfoBasic.authorized_official_first_name
-                      ? doctorInfoBasic.authorized_official_first_name
-                      : doctorInfoBasic.first_name),
-                    (basic.last_name = doctorInfoBasic.authorized_official_last_name
-                      ? doctorInfoBasic.authorized_official_last_name
-                      : doctorInfoBasic.last_name),
-                    (basic.middle_name = doctorInfoBasic.authorized_official_middle_name
-                      ? doctorInfoBasic.authorized_official_middle_name
-                      : doctorInfoBasic.middle_name),
-                    (basic.telephone_number = doctorInfoBasic.authorized_official_telephone_number
-                      ? doctorInfoBasic.authorized_official_telephone_number
-                      : "not found"),
-                    (basic.title_or_position = doctorInfoBasic.authorized_official_title_or_position
-                      ? doctorInfoBasic.authorized_official_title_or_position
-                      : "not found"),
-                    (basic.name_prefix = doctorInfoBasic.name_prefix
-                      ? doctorInfoBasic.name_prefix
-                      : "not found"),
-                    (basic.name_suffix = doctorInfoBasic.name_suffix
-                      ? doctorInfoBasic.name_suffix
-                      : "not found"),
-                    (basic.sole_proprietor = doctorInfoBasic.sole_proprietor
-                      ? doctorInfoBasic.sole_proprietor
-                      : "not found"),
-                    (basic.gender = doctorInfoBasic.gender
-                      ? doctorInfoBasic.gender
-                      : "not found"),
-                    (basic.name = doctorInfoBasic.name
-                      ? doctorInfoBasic.name
-                      : "not found");
+                    : "not found";
+                  basic.organizational_subpart = doctorInfoBasic.organizational_subpart
+                    ? doctorInfoBasic.organizational_subpart
+                    : "not found";
+                  basic.enumeration_date = doctorInfoBasic.enumeration_date
+                    ? doctorInfoBasic.enumeration_date
+                    : "not found";
+                  basic.last_updated = doctorInfoBasic.last_updated
+                    ? doctorInfoBasic.last_updated
+                    : "not found";
+                  basic.status = doctorInfoBasic.status
+                    ? doctorInfoBasic.status
+                    : "not found";
+                  basic.credential = doctorInfoBasic.authorized_official_credential
+                    ? doctorInfoBasic.authorized_official_credential
+                    : doctorInfoBasic.credential;
+                  basic.first_name = doctorInfoBasic.authorized_official_first_name
+                    ? doctorInfoBasic.authorized_official_first_name
+                    : doctorInfoBasic.first_name;
+                  basic.last_name = doctorInfoBasic.authorized_official_last_name
+                    ? doctorInfoBasic.authorized_official_last_name
+                    : doctorInfoBasic.last_name;
+                  basic.middle_name = doctorInfoBasic.authorized_official_middle_name
+                    ? doctorInfoBasic.authorized_official_middle_name
+                    : doctorInfoBasic.middle_name;
+                  basic.telephone_number = doctorInfoBasic.authorized_official_telephone_number
+                    ? doctorInfoBasic.authorized_official_telephone_number
+                    : "not found";
+                  basic.title_or_position = doctorInfoBasic.authorized_official_title_or_position
+                    ? doctorInfoBasic.authorized_official_title_or_position
+                    : "not found";
+                  basic.name_prefix = doctorInfoBasic.name_prefix
+                    ? doctorInfoBasic.name_prefix
+                    : "not found";
+                  basic.name_suffix = doctorInfoBasic.name_suffix
+                    ? doctorInfoBasic.name_suffix
+                    : "not found";
+                  basic.sole_proprietor = doctorInfoBasic.sole_proprietor
+                    ? doctorInfoBasic.sole_proprietor
+                    : "not found";
+                  basic.gender = doctorInfoBasic.gender
+                    ? doctorInfoBasic.gender
+                    : "not found";
+                  basic.name = doctorInfoBasic.name
+                    ? doctorInfoBasic.name
+                    : "not found";
 
                   setTimeout(function() {
                     let practise = new Practise({
@@ -167,6 +169,7 @@ function addDoctors(req, res) {
                       practiceLocation: practiceLocationsArray,
                       identifiers: doctorInfo.identifiers
                     });
+
                     //Saving the Doctor Info
                     practise.save(function(err) {
                       if (err) {
@@ -232,15 +235,195 @@ function getAllDoctors(req, res) {
 
 //Sign up new doctor through API
 signUpDoc = (req, res) => {
-  let practise = new Practise(req.body);
-  practise
-    .save()
-    .then(doc => {
-      res.json({ status: true, doc });
-    })
-    .catch(error => {
-      res.status(200).json({ status: false, error });
+  let addressArray = [];
+  if (req.body.addresses) {
+    req.body.addresses.map(el => {
+      let address = new Address({
+        country_code: el.country_code,
+        country_name: el.country_name,
+        address_purpose: el.address_purpose,
+        address_type: el.address_type,
+        address_1: el.address_1,
+        address_2: el.address_2,
+        city: el.city,
+        state: el.state,
+        postal_code: el.postal_code,
+        telephone_number: el.telephone_number
+      });
+      address.save().catch(console.log);
+      addressArray.push(address._id);
     });
+  }
+
+  let practiceLocationsArray = [];
+  if (req.body.practiceLocations) {
+    req.body.practiceLocations.map(el => {
+      let address = new Address({
+        country_code: el.country_code,
+        country_name: el.country_name,
+        address_purpose: el.address_purpose,
+        address_type: el.address_type,
+        address_1: el.address_1,
+        address_2: el.address_2,
+        city: el.city,
+        state: el.state,
+        postal_code: el.postal_code,
+        telephone_number: el.telephone_number
+      });
+      address.save().catch(console.log);
+      practiceLocationsArray.push(address._id);
+    });
+  }
+
+  let taxonomiesArray = [];
+  if (req.body.taxonomies) {
+    req.body.taxonomies.map(el => {
+      let taxonomies = new Taxonomy({
+        code: el.code,
+        desc: el.desc,
+        primary: el.primary,
+        state: el.state,
+        licence: el.licence,
+        taxonomy_group: el.taxonomy_group
+      });
+      taxonomies.save().catch(console.log);
+      taxonomiesArray.push(taxonomies._id);
+    });
+  }
+
+  let basic = {};
+  let doctorInfoBasic = req.body.basic;
+  basic.organization_name = doctorInfoBasic.organization_name
+    ? doctorInfoBasic.organization_name
+    : "not found";
+  basic.organizational_subpart = doctorInfoBasic.organizational_subpart
+    ? doctorInfoBasic.organizational_subpart
+    : "not found";
+  basic.enumeration_date = doctorInfoBasic.enumeration_date
+    ? doctorInfoBasic.enumeration_date
+    : "not found";
+  basic.last_updated = doctorInfoBasic.last_updated
+    ? doctorInfoBasic.last_updated
+    : "not found";
+  basic.status = doctorInfoBasic.status ? doctorInfoBasic.status : "not found";
+  basic.credential = doctorInfoBasic.authorized_official_credential
+    ? doctorInfoBasic.authorized_official_credential
+    : doctorInfoBasic.credential;
+  basic.first_name = doctorInfoBasic.authorized_official_first_name
+    ? doctorInfoBasic.authorized_official_first_name
+    : doctorInfoBasic.first_name;
+  basic.last_name = doctorInfoBasic.authorized_official_last_name
+    ? doctorInfoBasic.authorized_official_last_name
+    : doctorInfoBasic.last_name;
+  basic.middle_name = doctorInfoBasic.authorized_official_middle_name
+    ? doctorInfoBasic.authorized_official_middle_name
+    : doctorInfoBasic.middle_name;
+  basic.telephone_number = doctorInfoBasic.authorized_official_telephone_number
+    ? doctorInfoBasic.authorized_official_telephone_number
+    : "not found";
+  basic.title_or_position = doctorInfoBasic.authorized_official_title_or_position
+    ? doctorInfoBasic.authorized_official_title_or_position
+    : "not found";
+  basic.name_prefix = doctorInfoBasic.name_prefix
+    ? doctorInfoBasic.name_prefix
+    : "not found";
+  basic.name_suffix = doctorInfoBasic.name_suffix
+    ? doctorInfoBasic.name_suffix
+    : "not found";
+  basic.sole_proprietor = doctorInfoBasic.sole_proprietor
+    ? doctorInfoBasic.sole_proprietor
+    : "not found";
+  basic.gender = doctorInfoBasic.gender ? doctorInfoBasic.gender : "not found";
+  basic.name = doctorInfoBasic.name ? doctorInfoBasic.name : "not found";
+
+  setTimeout(function() {
+    let cipher = crypto.createCipheriv(algorithm, new Buffer.from(key), iv);
+    var encrypted =
+      cipher.update(req.body.password, "utf8", "hex") + cipher.final("hex");
+    let practise = new Practise({
+      enumerationType: req.body.enumeration_type,
+      npi: req.body.number,
+      last_updated_epoch: req.body.last_updated_epoch,
+      created_epoch: req.body.created_epoch,
+      basic,
+      other_names: req.body.other_names,
+      address: addressArray,
+      taxonomies: taxonomiesArray,
+      practiceLocation: practiceLocationsArray,
+      identifiers: req.body.identifiers,
+      email: req.body.email,
+      password: encrypted,
+      steps: [0, 0, 0, 0, 0]
+    });
+
+    //Saving the Doctor Info
+    practise.save(function(err, doc) {
+      if (err) {
+        console.log({ err });
+        if (err.name === "MongoError" && err.code === 11000) {
+          console.log("This Doctor already exists");
+        }
+      }
+
+      let mailOptions = {
+        from: '"DocMz"; <admin@docmz.com>',
+        to: email,
+        subject: "Successfully Registered - DocMz",
+        text: "You've been succesfully registered as a Doctor on DocMz. "
+      };
+
+      smtpTransport.sendMail(mailOptions, function(err) {
+        if (err) console.log(err);
+      });
+
+      res.json({ status: true, doc });
+    });
+  }, 3000);
+};
+
+// Function to authenticate an user
+let authenticateDoctor = (req, res) => {
+  if (req.body.email) {
+    // validate the input
+    req.checkBody("email", "Email is required").notEmpty();
+    req.checkBody("password", "Password is required").notEmpty();
+
+    // check the validation object for errors
+    let errors = req.validationErrors();
+
+    if (errors) {
+      res.json({ status: false, messages: errors });
+    } else {
+      let { email, password } = req.body;
+      let cipher = crypto.createCipheriv(algorithm, new Buffer.from(key), iv);
+      let encrypted =
+        cipher.update(password, "utf8", "hex") + cipher.final("hex");
+      Practise.findOne({ email }).then(doctor => {
+        app.get(sessionChecker, (req, res) => {
+          console.log({ status: "session stored" });
+        });
+
+        //Checking if User exits or not
+        if (doctor) {
+          console.log(doctor);
+          if (!doctor) {
+            res.status(404).json({ status: false, message: "User Not Found!" });
+          } else if (encrypted != doctor.password) {
+            res.json({ status: false, error: "Password Entered is Incorrect" });
+          } else {
+            if (doctor) {
+              req.session.user = doctor;
+              req.session.Auth = doctor;
+              res.status(200).json({
+                status: true,
+                user: req.session.Auth
+              });
+            }
+          }
+        }
+      });
+    }
+  }
 };
 
 //Exporting all the functions
@@ -248,5 +431,6 @@ module.exports = {
   getNpiInfo,
   addDoctors,
   getAllDoctors,
-  signUpDoc
+  signUpDoc,
+  authenticateDoctor
 };

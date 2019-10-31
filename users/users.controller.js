@@ -113,6 +113,67 @@ let register = async (req, res) => {
   }
 };
 
+let registerDoctor = async (req, res) => {
+  // validate the input
+  req.checkBody("email", "Email is required").notEmpty();
+  req.checkBody("role", "Role is required").notEmpty();
+  req.checkBody("name", "First Name is required").notEmpty();
+  req.checkBody("phonenumber", "Phone Number is required").notEmpty();
+  req.checkBody("password", "Password is required").notEmpty();
+
+  // check the validation object for errors
+  let errors = req.validationErrors();
+  let { name, email, role, phone, password } = req.body;
+  if (errors) {
+    res.json({ status: false, messages: errors });
+  } else {
+    // validate
+    if (await User.findOne({ email })) {
+      res.status(404).json({
+        status: false,
+        error: "Email " + email + " is already taken"
+      });
+    } else {
+      // hashing the password
+      let cipher = crypto.createCipheriv(algorithm, new Buffer.from(key), iv);
+      var encrypted =
+        cipher.update(password, "utf8", "hex") + cipher.final("hex");
+
+      //Creating the user model
+      const user = new User({
+        name,
+        email,
+        role,
+        phone,
+        password: encrypted
+      });
+
+      //Saving the user
+      await user
+        .save()
+        .then(data => {
+          //Sending Mail
+          let mailOptions = {
+            from: '"DocMz"; <admin@docmz.com>',
+            to: email,
+            subject: "Successfully Registered - DocMz",
+            text: "You've been succesfully registered on DocMz. "
+          };
+
+          smtpTransport.sendMail(mailOptions, function(err) {
+            if (err) console.log(err);
+          });
+
+          //Sending Success Response
+          res.status(200).json({ status: true, data });
+        })
+        .catch(error => {
+          res.status(404).json({ status: false, error });
+        });
+    }
+  }
+};
+
 // Function to authenticate an user
 let authenticate = (req, res) => {
   if (req.body.email) {
@@ -388,6 +449,187 @@ let logout = (req, res) => {
 // 		.then(User.findById(id).then((user) => res.json({ status: true, User: user })))
 // 		.catch((err) => res.json(err));
 // }
+
+//Forget password
+
+function tokenForgetPassword(email) {
+  console.log("Reset password token function executed");
+  async.waterfall(
+    [
+      function(done) {
+        crypto.randomBytes(20, function(err, buf) {
+          let token = buf.toString("hex");
+          done(err, token);
+        });
+      },
+      function(token, done) {
+        User.findOneAndUpdate(
+          { email },
+          {
+            $set: {
+              passwordToken: token,
+              passwordExpires: Date.now() + 3600000
+            }
+          }
+        ).exec(function(err, user) {
+          done(err, token, user);
+        });
+      },
+      function(token, user, done) {
+        let mailOptions = {
+          from: "anas3rde@gmail.com",
+          to: email,
+          subject: "Reset Password - DocMz",
+          text:
+            "Please click on the following link to reset your password:\n\n" +
+            process.enc.CLIENT_URL +
+            "/setpassword/" +
+            token +
+            "\n\n"
+        };
+
+        smtpTransport.sendMail(mailOptions, function(err) {
+          console.log("Reset Password email sent");
+          done(err, "done");
+        });
+      }
+    ],
+    function(err) {
+      if (err) console.log(err);
+    }
+  );
+}
+
+//Function to assign token
+async function assignToken(email) {
+  console.log("token function executed");
+  async.waterfall(
+    [
+      function(done) {
+        crypto.randomBytes(20, function(err, buf) {
+          var token = buf.toString("hex");
+          done(err, token);
+        });
+      },
+      function(token, done) {
+        User.findOneAndUpdate(
+          { email: email },
+          {
+            $set: {
+              passwordtoken: token,
+              passwordexpires: Date.now() + 3600000
+            }
+          },
+          { new: true }
+        ).exec(function(err, user) {
+          console.log("1");
+          done(err, token, user);
+          console.log("2");
+        });
+      },
+      function(token, user, done) {
+        // var smtpTransport = nodemailer.createTransport({
+        // 	host: 'smtp.gmail.com',
+        // 	port: 587,
+        // 	secure: false,
+        // 	// port: 465,
+        // 	// secure: true, // use SSL
+        // 	auth: {
+        // 		user: 'anas3rde@gmail.com',
+        // 		pass: '8123342590'
+        // 	}
+        // });
+
+        var mailOptions = {
+          from: "anas3rde@gmail.com",
+          to: email,
+          subject: "Test",
+          text:
+            "Please click on the following link, or paste this into your browser to complete the process:\n\n" +
+            process.env.CLIENT_URL +
+            "/users/setpassword/" +
+            token +
+            "\n\n"
+        };
+
+        smtpTransport.sendMail(mailOptions, function(err) {
+          console.log("Email sent");
+          done(err, "done");
+        });
+      }
+    ],
+    function(err) {
+      if (err) console.log(err);
+    }
+  );
+}
+
+//Function to set the password
+function setPassword(token, password, forget) {
+  let cipher = crypto.createCipheriv(algorithm, new Buffer.from(key), iv);
+  var encrypted = cipher.update(password, "utf8", "hex") + cipher.final("hex");
+  // var hashp = bcrypt.hashSync(password, 10);
+
+  User.findOneAndUpdate(
+    {
+      passwordtoken: token,
+      passwordexpires: { $gt: Date.now() }
+    },
+    {
+      $set: {
+        password: encrypted,
+        passwordToken: undefined,
+        passwordExpires: undefined
+      }
+    },
+    function(err, user) {
+      // var smtptransport2 = nodemailer.createTransport({
+      // 	host: 'smtp.gmail.com',
+      // 	port: 587,
+      // 	secure: false,
+      // 	// port: 465,
+      // 	// secure: true, // use SSL
+      // 	auth: {
+      // 		user: 'anas3rde@gmail.com',
+      // 		pass: '8123342590'
+      // 	}
+      // });
+
+      if (forget) {
+        var mailOptions = {
+          to: user.email,
+          from: "anas3rde@gmail.com",
+          subject: "Password Changed - USDE",
+          text:
+            "Your password has been successfully changed" +
+            "\n\n" +
+            "Feel free to log in with your newly set password. You can either use your username - " +
+            user.username +
+            " or your email - " +
+            user.email
+        };
+      } else {
+        var mailOptions = {
+          to: user.email,
+          from: "anas3rde@gmail.com",
+          subject: "Registration Successful",
+          text:
+            "You've been successfully registered on USDE." +
+            "\n\n" +
+            "Feel free to log in with your Credentials. Either use your username - " +
+            user.username +
+            " or your email - " +
+            user.email
+        };
+      }
+
+      smtpTransport.sendMail(mailOptions, function(err) {
+        done(err);
+        res.json({ status: "Registration complete" });
+      });
+    }
+  );
+}
 
 //Exporting all the functions
 module.exports = {
