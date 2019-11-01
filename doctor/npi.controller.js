@@ -353,7 +353,9 @@ signUpDoc = (req, res) => {
       identifiers: req.body.identifiers,
       email: req.body.email,
       password: encrypted,
-      steps: [0, 0, 0, 0, 0]
+      steps: [0, 0, 0, 0, 0],
+      specialty: req.body.specialty,
+      phone: req.body.phone
     });
 
     //Saving the Doctor Info

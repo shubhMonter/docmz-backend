@@ -38,6 +38,7 @@ const practise = new Schema({
   // addressLine2: {type: String},
   // city:{type: String},
   // state:{type: String},
+  //stet:tpe: test
   // zipCode:{type:String},
   // telephone:{type:String},
   // fax:{type:String},
@@ -67,7 +68,11 @@ const practise = new Schema({
   profile_url: { type: String },
   rating: { type: Object },
   isActive: { type: Boolean, default: true },
-  isApproved: { type: Boolean, default: true }
+  isApproved: { type: Boolean, default: false },
+  availability: { type: Array },
+  appointments: [{ type: Schema.Types.ObjectId, ref: "appointments" }],
+  specialty: { type: String },
+  phone: { type: String }
 });
 
 module.exports = mongoose.model("Practise", practise);

@@ -11,8 +11,9 @@ const schema = new Schema({
   passwordtoken: { type: String },
   verified: { type: Boolean },
   passwordexpires: { type: Date },
-  createdDate: { type: Date, default: Date.now }
+  createdDate: { type: Date, default: Date.now },
+  appointments: [{ type: Schema.Types.ObjectId, ref: "Appointments" }]
 });
 
 //Exporting the schema
-module.exports = mongoose.model("User", schema);
+module.exports = mongoose.model("Patient", schema);
