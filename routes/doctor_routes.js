@@ -1,4 +1,4 @@
-const npiController = require("../doctor/npi.controller");
+const npiController = require("../doctor/practise.controller");
 const doctorController = require("../doctor/doctor.controller");
 const express = require("express");
 const router = express.Router();

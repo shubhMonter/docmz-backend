@@ -75,7 +75,20 @@ const practise = new Schema({
   phone: { type: String },
   password: {
     type: String
-  }
+  },
+  experience: { type: String },
+  dob: { type: Date },
+  picture: { type: String },
+  establishmentName: { type: String },
+  city: { type: String },
+  country: { type: String },
+  identityProof: { type: String },
+  medicalProod: { type: String },
+  availability: [],
+  createdOn: { type: Date, default: Date.now },
+  availDate: { type: Date },
+  savedCards: { type: Object },
+  fee: { type: String }
 });
 
 module.exports = mongoose.model("Practise", practise);
