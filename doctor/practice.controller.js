@@ -467,7 +467,7 @@ let profileUpdate = (req, res) => {
 //Create and save time slots
 let saveSlots = (req, res) => {
   let test = Scheduler.getTimeSlots(req.body);
-  console.log(test);
+  res.json({ status: true, message: "Success", data: test });
 };
 
 //Exporting all the functions

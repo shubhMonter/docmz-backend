@@ -13,7 +13,7 @@ let getTimeSlots = body => {
     interval,
     schedule
   });
-  console.log(availability);
+  return availability;
 };
 
 module.exports = {
