@@ -29,7 +29,8 @@ function jwt() {
       "/doctors/get/procedures",
       "/doctors/upload/specialties",
       "/doctors/get/specialties",
-      "/doctors/register"
+      "/doctors/register",
+      "/doctors/authenticate"
     ]
   });
 }

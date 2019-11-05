@@ -72,7 +72,10 @@ const practise = new Schema({
   availability: { type: Array },
   appointments: [{ type: Schema.Types.ObjectId, ref: "appointments" }],
   specialty: { type: String },
-  phone: { type: String }
+  phone: { type: String },
+  password: {
+    type: String
+  }
 });
 
 module.exports = mongoose.model("Practise", practise);

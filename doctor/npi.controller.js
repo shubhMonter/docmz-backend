@@ -8,7 +8,8 @@ const db = require("_helpers/db"),
 let key = "abcdefghijklmnopqrstuvwxyztgbhgf";
 let iv = "1234567891234567";
 let filePathForDoctors = "./doctor/doctors.csv";
-
+let Jwt = require("../_helpers/jwt");
+var jwt = require("jsonwebtoken");
 //Function to upload the CPT codes from the CSV file to the MongoDb Database
 function addDoctors(req, res) {
   //Reading the File
@@ -340,6 +341,7 @@ signUpDoc = (req, res) => {
     let cipher = crypto.createCipheriv(algorithm, new Buffer.from(key), iv);
     var encrypted =
       cipher.update(req.body.password, "utf8", "hex") + cipher.final("hex");
+    console.log(encrypted);
     let practise = new Practise({
       enumerationType: req.body.enumeration_type,
       npi: req.body.number,
@@ -394,16 +396,7 @@ signUpDoc = (req, res) => {
 // Function to authenticate an user
 let authenticateDoctor = (req, res) => {
   if (req.body.email) {
-    // validate the input
-    req.checkBody("email", "Email is required").notEmpty();
-    req.checkBody("password", "Password is required").notEmpty();
-
-    // check the validation object for errors
-    let errors = req.validationErrors();
-
-    if (errors) {
-      res.json({ status: false, messages: errors });
-    } else {
+    {
       let { email, password } = req.body;
       let cipher = crypto.createCipheriv(algorithm, new Buffer.from(key), iv);
       let encrypted =
@@ -415,6 +408,7 @@ let authenticateDoctor = (req, res) => {
 
         //Checking if User exits or not
         if (doctor) {
+          console.log(encrypted);
           console.log(doctor);
           if (!doctor) {
             res.status(404).json({ status: false, message: "User Not Found!" });
@@ -422,17 +416,32 @@ let authenticateDoctor = (req, res) => {
             res.json({ status: false, error: "Password Entered is Incorrect" });
           } else {
             if (doctor) {
+              console.log(Jwt.secret);
+              let token = jwt.sign(doctor.toJSON(), "catchmeifyoucan", {
+                expiresIn: 604800
+              });
+
               req.session.user = doctor;
               req.session.Auth = doctor;
               res.status(200).json({
                 status: true,
-                user: req.session.Auth
+                user: req.session.Auth,
+                token: "JWT-" + token
               });
             }
           }
         }
       });
     }
+  }
+};
+
+// // middleware function to check for logged in users
+let sessionChecker = (req, res, next) => {
+  if (req.session.user && req.cookies.user_sid) {
+    res.redirect("/");
+  } else {
+    next();
   }
 };
 
