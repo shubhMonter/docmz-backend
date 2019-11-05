@@ -364,21 +364,29 @@ signUpDoc = (req, res) => {
         console.log({ err });
         if (err.name === "MongoError" && err.code === 11000) {
           console.log("This Doctor already exists");
+          res.json({
+            status: false,
+            message: "Doctor with this Npi number already exists"
+          });
         }
+      } else {
+        res.json({
+          status: true,
+          message: "Successfully Registered",
+          data: doc
+        });
       }
 
-      let mailOptions = {
-        from: '"DocMz"; <admin@docmz.com>',
-        to: email,
-        subject: "Successfully Registered - DocMz",
-        text: "You've been succesfully registered as a Doctor on DocMz. "
-      };
+      // let mailOptions = {
+      //   from: '"DocMz"; <admin@docmz.com>',
+      //   to: req.body.email,
+      //   subject: "Successfully Registered - DocMz",
+      //   text: "You've been succesfully registered as a Doctor on DocMz. "
+      // };
 
-      smtpTransport.sendMail(mailOptions, function(err) {
-        if (err) console.log(err);
-      });
-
-      res.json({ status: true, doc });
+      // smtpTransport.sendMail(mailOptions, function(err) {
+      //   if (err) console.log(err);
+      // });
     });
   }, 3000);
 };
