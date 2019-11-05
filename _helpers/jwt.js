@@ -31,7 +31,8 @@ function jwt() {
       "/doctors/get/specialties",
       "/doctors/register",
       "/doctors/authenticate",
-      "/doctors/profile/update"
+      "/doctors/profile/update",
+      "/doctors/saveslots"
     ]
   });
 }

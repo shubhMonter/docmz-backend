@@ -10,6 +10,7 @@ let iv = "1234567891234567";
 let filePathForDoctors = "./doctor/doctors.csv";
 let Jwt = require("../_helpers/jwt");
 var jwt = require("jsonwebtoken");
+let Scheduler = require("./availability.controller");
 //Function to upload the CPT codes from the CSV file to the MongoDb Database
 function addDoctors(req, res) {
   //Reading the File
@@ -463,6 +464,12 @@ let profileUpdate = (req, res) => {
   }
 };
 
+//Create and save time slots
+let saveSlots = (req, res) => {
+  let test = Scheduler.getTimeSlots(req.body);
+  console.log(test);
+};
+
 //Exporting all the functions
 module.exports = {
   getNpiInfo,
@@ -470,5 +477,6 @@ module.exports = {
   getAllDoctors,
   signUpDoc,
   authenticateDoctor,
-  profileUpdate
+  profileUpdate,
+  saveSlots
 };

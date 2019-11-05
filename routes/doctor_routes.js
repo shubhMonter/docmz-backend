@@ -1,4 +1,4 @@
-const npiController = require("../doctor/practise.controller");
+const npiController = require("../doctor/practice.controller");
 const doctorController = require("../doctor/doctor.controller");
 const express = require("express");
 const router = express.Router();
@@ -33,5 +33,7 @@ router.post("/authenticate", npiController.authenticateDoctor);
 //Update Doctors profile
 router.post("/profile/update", npiController.profileUpdate);
 
+//Create and save slots
+router.post("/saveslots", npiController.saveSlots);
 // exporting them
 module.exports = router;

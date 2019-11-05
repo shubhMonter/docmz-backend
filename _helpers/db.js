@@ -28,7 +28,7 @@ module.exports = {
   User: require("../users/user.model"),
   indexCpt: require("../codes/indexCpt.model"),
   Cpt: require("../codes/cpt.model"),
-  Practise: require("../doctor/practise.model"),
+  Practise: require("../doctor/practice.model"),
   Taxonomy: require("../doctor/taxonomies.model"),
   Address: require("../doctor/address.model"),
   ICD10Index: require("../codes/icd10Index.model.js"),
