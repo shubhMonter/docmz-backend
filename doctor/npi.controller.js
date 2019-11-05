@@ -445,11 +445,30 @@ let sessionChecker = (req, res, next) => {
   }
 };
 
+//Update profile details
+let profileUpdate = (req, res) => {
+  let { id } = req.body;
+  if (req.body.id) {
+    Practise.findByIdAndUpdate(id, req.body, { new: true })
+      .then(doctor => {
+        res.json({
+          status: true,
+          message: "Profile successfully updated",
+          data: doctor
+        });
+      })
+      .catch(error => {
+        res.json({ status: false, message: error });
+      });
+  }
+};
+
 //Exporting all the functions
 module.exports = {
   getNpiInfo,
   addDoctors,
   getAllDoctors,
   signUpDoc,
-  authenticateDoctor
+  authenticateDoctor,
+  profileUpdate
 };

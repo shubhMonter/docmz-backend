@@ -30,7 +30,8 @@ function jwt() {
       "/doctors/upload/specialties",
       "/doctors/get/specialties",
       "/doctors/register",
-      "/doctors/authenticate"
+      "/doctors/authenticate",
+      "/doctors/profile/update"
     ]
   });
 }
