@@ -83,7 +83,7 @@ const practise = new Schema({
   city: { type: String },
   country: { type: String },
   identityProof: { type: String },
-  medicalProod: { type: String },
+  medicalProof: { type: String },
   availability: [],
   createdOn: { type: Date, default: Date.now },
   availDate: { type: Date },
