@@ -43,13 +43,11 @@ let cancelAppointment = (req, res) => {
     { new: true }
   )
     .then(appointment => {
-      res
-        .status(200)
-        .json({
-          status: true,
-          message: "Appointment Cancelled",
-          data: appointment
-        });
+      res.status(200).json({
+        status: true,
+        message: "Appointment Cancelled",
+        data: appointment
+      });
     })
     .catch(error => {
       res.status(400).json({ status: false, message: error });
@@ -57,5 +55,6 @@ let cancelAppointment = (req, res) => {
 };
 
 module.exports = {
-  cancelAppointment
+  cancelAppointment,
+  bookAppointment
 };
