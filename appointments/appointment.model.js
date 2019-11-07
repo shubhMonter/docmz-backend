@@ -11,7 +11,7 @@ const appointment = new Schema({
   transactionId: { type: String },
   reasonForCancellation: { type: String },
   availabilitySelected: { type: String },
-  paid: { type: boolean, default: false },
+  paid: { type: Boolean, default: false },
   duration: { type: String }
 });
 
