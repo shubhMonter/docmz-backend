@@ -14,5 +14,8 @@ router.post("/create/profile", stripeController.createProfile);
 //List saved cards from stripe
 router.get("/list/:customer", stripeController.listCards);
 
+//Charge a card
+router.post("/charge/card", stripeController.chargeCard);
+
 // exporting them
 module.exports = router;

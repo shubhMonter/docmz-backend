@@ -6,6 +6,15 @@ const app = express();
 const router = express.Router();
 const stripe = require("stripe")(keySecret);
 
+let isCardError = response => {
+  console.log(response);
+  if (response.raw.type === "card_error") {
+    return true;
+  } else {
+    return false;
+  }
+};
+
 //Create a payment method
 router.post("/create/card", (req, res) => {
   let { number, exp_month, exp_year, cvc } = req.body;
@@ -90,7 +99,17 @@ let createCardProfile = (req, res) => {
     },
     function(err, token) {
       if (err) {
-        res.status(400).json({ status: false, message: err });
+        if (isCardError(err)) {
+          res
+            .status(406)
+            .json({
+              status: false,
+              message: "Card Error",
+              error: err.raw.message
+            });
+        } else {
+          res.status(400).json({ status: false, message: err });
+        }
       }
       console.log(token);
       if (token) {
@@ -187,41 +206,72 @@ router.post("/token/create", function(req, res) {
   );
 });
 
-router.post("/charge", function(req, res) {
-  let amount = req.body.amount;
+let chargeCard = (req, res) => {
+  let {
+    number,
+    exp_month,
+    exp_year,
+    cvc,
+    amount,
+    description,
+    email
+  } = req.body;
 
-  // create a customer
-  stripe.customers
-    .create({
-      email: req.body.stripeemail,
-      source: req.body.stripetoken
-    })
-    .then(customer => savedata(customer))
-    .catch(err => res.json({ status: false, error: err }));
-  // .then((charge) => res.json({ status: true, details: charge }));
-
-  async function savedata(customer) {
-    stripe.charges
-      .create({
-        amount,
-        description: req.body.description,
-        currency: "usd",
-        customer: customer.id
-      })
-      .then(data => saveData(data));
-
-    async function saveData(data) {
-      await Stripeuser.findOneAndUpdate(
-        { userid: req.body.userid },
-        { $set: { customerid: customer.id, stripedetails: data } }
-      ).then(() => res.json({ status: true, details: data }));
+  stripe.tokens.create(
+    {
+      card: {
+        number,
+        exp_month,
+        exp_year,
+        cvc
+      }
+    },
+    function(err, token) {
+      if (err) {
+        if (isCardError(err)) {
+          res
+            .status(406)
+            .json({
+              status: false,
+              message: "Card Error",
+              error: err.raw.message
+            });
+        } else {
+          res.status(400).json({ status: false, message: err });
+        }
+      } else if (token) {
+        console.log(token);
+        stripe.charges.create(
+          {
+            amount,
+            currency: "usd",
+            source: token.id,
+            description,
+            receipt_email: email
+          },
+          function(error, charge) {
+            if (error) {
+              res.status(400).json({ status: false, message: error });
+            } else if (charge) {
+              res
+                .status(200)
+                .json({
+                  status: true,
+                  message: "Transaction Successful",
+                  data: charge
+                });
+            }
+          }
+        );
+      }
     }
-  }
-});
+  );
+};
 
 module.exports = {
   createCardProfile,
   profileCharge,
   createProfile,
-  listCards
+  listCards,
+  chargeCard
 };
