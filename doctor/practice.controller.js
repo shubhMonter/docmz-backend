@@ -11,6 +11,8 @@ let filePathForDoctors = "./doctor/doctors.csv";
 let Jwt = require("../_helpers/jwt");
 var jwt = require("jsonwebtoken");
 let Scheduler = require("./availability.controller");
+const keySecret = "	sk_test_hoVy16mRDhxHCoNAOAEJYJ4N00pzRH8xK2";
+const stripe = require("stripe")(keySecret);
 
 //Email template for forgot your password
 
@@ -1557,13 +1559,11 @@ signUpDoc = (req, res) => {
         if (error) {
           res.status(400).json({ status: false, message: error });
         } else if (customer) {
-          res
-            .status(200)
-            .json({
-              status: true,
-              message: "Customer profile Created",
-              data: customer
-            });
+          res.status(200).json({
+            status: true,
+            message: "Customer profile Created",
+            data: customer
+          });
         }
 
         let cipher = crypto.createCipheriv(algorithm, new Buffer.from(key), iv);
