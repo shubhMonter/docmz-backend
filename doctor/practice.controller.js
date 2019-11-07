@@ -1553,69 +1553,68 @@ signUpDoc = (req, res) => {
   setTimeout(function() {
     stripe.customers.create(
       {
-        description: req.body.number + "|" + req.body.email
+        description: req.body.number + "|" + req.body.email,
+        email: req.body.email
       },
       function(error, customer) {
         if (error) {
           res.status(400).json({ status: false, message: error });
         } else if (customer) {
-          res.status(200).json({
-            status: true,
-            message: "Customer profile Created",
-            data: customer
+          let cipher = crypto.createCipheriv(
+            algorithm,
+            new Buffer.from(key),
+            iv
+          );
+          var encrypted =
+            cipher.update(req.body.password, "utf8", "hex") +
+            cipher.final("hex");
+          console.log(encrypted);
+          let practise = new Practise({
+            enumerationType: req.body.enumeration_type,
+            npi: req.body.number,
+            last_updated_epoch: req.body.last_updated_epoch,
+            created_epoch: req.body.created_epoch,
+            basic,
+            other_names: req.body.other_names,
+            address: addressArray,
+            taxonomies: taxonomiesArray,
+            practiceLocation: practiceLocationsArray,
+            identifiers: req.body.identifiers,
+            email: req.body.email,
+            password: encrypted,
+            steps: [0, 0, 0, 0],
+            specialty: req.body.specialty,
+            phone: req.body.phone,
+            customerProfile: customer
           });
-        }
 
-        let cipher = crypto.createCipheriv(algorithm, new Buffer.from(key), iv);
-        var encrypted =
-          cipher.update(req.body.password, "utf8", "hex") + cipher.final("hex");
-        console.log(encrypted);
-        let practise = new Practise({
-          enumerationType: req.body.enumeration_type,
-          npi: req.body.number,
-          last_updated_epoch: req.body.last_updated_epoch,
-          created_epoch: req.body.created_epoch,
-          basic,
-          other_names: req.body.other_names,
-          address: addressArray,
-          taxonomies: taxonomiesArray,
-          practiceLocation: practiceLocationsArray,
-          identifiers: req.body.identifiers,
-          email: req.body.email,
-          password: encrypted,
-          steps: [0, 0, 0, 0, 0],
-          specialty: req.body.specialty,
-          phone: req.body.phone,
-          customerProfile: customer
-        });
-
-        //Saving the Doctor Info
-        practise.save(function(err, doc) {
-          if (err) {
-            console.log({ err });
-            if (err.name === "MongoError" && err.code === 11000) {
-              console.log("This Doctor already exists");
+          //Saving the Doctor Info
+          practise.save(function(err, doc) {
+            if (err) {
+              console.log({ err });
+              if (err.name === "MongoError" && err.code === 11000) {
+                console.log("This Doctor already exists");
+                res.json({
+                  status: false,
+                  message: "Doctor with this Npi number already exists"
+                });
+              }
+            } else {
               res.json({
-                status: false,
-                message: "Doctor with this Npi number already exists"
+                status: true,
+                message: "Successfully Registered",
+                data: doc
               });
             }
-          } else {
-            res.json({
-              status: true,
-              message: "Successfully Registered",
-              data: doc
-            });
-          }
 
-          // let mailOptions = {
-          //   from: '"DocMz"; <admin@docmz.com>',
-          //   to: req.body.email,
-          //   subject: "Confirm your Email - DocMz",
-          //   text: "You've been succesfully registered as a Doctor on DocMz. "
-          // html="<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-          {
-            /* <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+            // let mailOptions = {
+            //   from: '"DocMz"; <admin@docmz.com>',
+            //   to: req.body.email,
+            //   subject: "Confirm your Email - DocMz",
+            //   text: "You've been succesfully registered as a Doctor on DocMz. "
+            // html="<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+            {
+              /* <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
   <head>
     <title></title>
     <!--[if !mso]><!-->
@@ -2214,9 +2213,10 @@ signUpDoc = (req, res) => {
   
   </body>
 </html>" */
-          }
-          // };
-        });
+            }
+            // };
+          });
+        }
         // smtpTransport.sendMail(mailOptions, function(err) {
         //   if (err) console.log(err);
         // });

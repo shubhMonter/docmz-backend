@@ -42,13 +42,11 @@ let createProfile = (req, res) => {
       if (error) {
         res.status(400).json({ status: false, message: error });
       } else if (customer) {
-        res
-          .status(200)
-          .json({
-            status: true,
-            message: "Customer profile Created",
-            data: customer
-          });
+        res.status(200).json({
+          status: true,
+          message: "Customer profile Created",
+          data: customer
+        });
       }
     }
   );
@@ -56,11 +54,12 @@ let createProfile = (req, res) => {
 
 //List all cards
 let listCards = (req, res) => {
-  let { customer } = req.param;
+  let { customer } = req.params;
+  console.log(customer);
   stripe.customers.listSources(
-    "cus_G7zcdqpwMHG9V3",
+    customer,
     {
-      limit: 3,
+      limit: 100,
       object: "card"
     },
     function(error, cards) {
@@ -104,13 +103,11 @@ let createCardProfile = (req, res) => {
             if (err) {
               res.status(400).json({ status: false, message: err });
             } else if (card) {
-              res
-                .status(200)
-                .json({
-                  status: true,
-                  message: "Card successfully added",
-                  data: card
-                });
+              res.status(200).json({
+                status: true,
+                message: "Card successfully added",
+                data: card
+              });
             }
           }
         );
@@ -121,27 +118,25 @@ let createCardProfile = (req, res) => {
 
 //charge a card from a payment profile
 let profileCharge = (req, res) => {
-  let { amount, source } = req.body;
-  stripe.paymentIntents.capture("pi_1FZCjJ2eZvKYlo2Cikbi4UdJ", function(
-    err,
-    paymentIntent
-  ) {
-    // asynchronously called
-  });
-  // stripe.charges.create(
-  //     {
-  //       amount,
-  //       currency: 'usd',
-  //       source
-  //     },
-  //     function(err, charge) {
-  //       if(err){
-  //         res.status(400).json({status: false, message:err})
-  //       } else if(charge) {
-  //         res.status(200).json({status: true, message:"Charge Object created", data: charge})
-  //       }
-  //     }
-  //   );
+  let { amount, source, customer, description } = req.body;
+  stripe.charges.create(
+    {
+      amount,
+      currency: "usd",
+      source,
+      customer,
+      description
+    },
+    function(err, charge) {
+      if (err) {
+        res.status(404).json({ status: false, error: err });
+      } else if (charge) {
+        res
+          .status(200)
+          .json({ status: true, message: "Charge Created", data: charge });
+      }
+    }
+  );
 };
 
 //
