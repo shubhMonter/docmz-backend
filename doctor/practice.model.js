@@ -88,7 +88,8 @@ const practise = new Schema({
   createdOn: { type: Date, default: Date.now },
   availDate: { type: Date },
   savedCards: { type: Object },
-  fee: { type: String }
+  fee: { type: String },
+  customerProfile: { type: String }
 });
 
 module.exports = mongoose.model("Practise", practise);

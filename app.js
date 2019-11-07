@@ -77,6 +77,9 @@ app.use("/insurance", require("./routes/insurance_routes"));
 //User Routes
 app.use("/user", require("./routes/user_routes"));
 
+//Stripe Routes
+app.use("/Stripe", require("./routes/stripe_routes"));
+
 app.use(errorHandler);
 
 module.exports = app;

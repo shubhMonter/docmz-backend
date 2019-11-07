@@ -32,7 +32,11 @@ function jwt() {
       "/doctors/register",
       "/doctors/authenticate",
       "/doctors/profile/update",
-      "/doctors/saveslots"
+      "/doctors/saveslots",
+      "/stripe/create/card/profile",
+      "/stripe/charge/profile",
+      "/stripe/create/profile",
+      { url: /\/stripe\/list\/([^\/]*)$/, methods: ["GET", "POST"] }
     ]
   });
 }
