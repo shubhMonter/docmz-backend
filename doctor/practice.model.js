@@ -62,6 +62,7 @@ const practise = new Schema({
   availability: { type: Array },
   appointments: [{ type: Schema.Types.ObjectId, ref: "Appointments" }],
   specialty: { type: String },
+  specialtyName: { type: String },
   phone: { type: String },
   password: {
     type: String

@@ -2304,8 +2304,8 @@ let saveSlots = (req, res) => {
 //Search doctors
 
 let searchDocs = (req, res) => {
-  let { speciality } = req.body;
-  Practise.find({ speciality })
+  let { specialty } = req.body;
+  Practise.find({ specialty })
     .then(data => {
       res
         .status(200)

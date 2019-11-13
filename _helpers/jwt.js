@@ -21,6 +21,7 @@ function jwt() {
       "/codes/upload/icd10",
       "/codes/upload/diseases",
       "/doctors/upload",
+      "/doctors/search",
       "/codes/get/diseases",
       "/doctors/get",
       "/insurance/addtodatabase/carriers",

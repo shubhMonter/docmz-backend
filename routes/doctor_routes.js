@@ -39,5 +39,8 @@ router.post("/saveslots", npiController.saveSlots);
 //Get a doctor through id
 router.get("/getdoc/:id", npiController.getDoc);
 
+//Search Doctors
+router.post("/search", npiController.searchDocs);
+
 // exporting them
 module.exports = router;
