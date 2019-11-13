@@ -39,24 +39,6 @@ let bookAppointment = (req, res) => {
         res.status(404).json({ status: false, message: err });
       });
   });
-  // let appointment = new Appointment(req.body);
-  // appointment
-  //   .save()
-  //   .then(data => {
-  //     res
-  //       .status(200)
-  //       .json({ status: true, message: "Appointment Booked", data });
-  //   let appointmentId = data._id;
-  //   Practise.findByIdAndUpdate(doctor, {
-  //     $push: { appointments: appointmentId }
-  //   }).catch(error => console.log(error));
-  //   Patient.findByIdAndUpdate(patient, {
-  //     $push: { appointments: appointmentId }
-  //   }).catch(error => console.log(error));
-  // })
-  // .catch(error => {
-  //   res.status(400).json({ status: false, message: error });
-  // });
 };
 
 //Cancel appointment by Doctor
@@ -66,8 +48,8 @@ let cancelAppointment = (req, res) => {
     id,
     {
       $set: {
-        cancelByPatient: byPatient,
-        cancelByDoctor: byDoctor,
+        cancelledByPatient: byPatient,
+        cancelledByDoctor: byDoctor,
         reasonForCancellation: reason
       }
     },
