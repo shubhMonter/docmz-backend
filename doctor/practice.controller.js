@@ -2297,8 +2297,8 @@ let profileUpdate = (req, res) => {
 
 //Create and save time slots
 let saveSlots = (req, res) => {
-  let test = Scheduler.getTimeSlots(req.body);
-  res.json({ status: true, message: "Success", data: test });
+  Scheduler.getTimeSlots(req, res);
+  // res.json({ status: true, message: "Success", data: test });
 };
 
 //Search doctors

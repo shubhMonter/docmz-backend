@@ -4,44 +4,50 @@ let Practise = require("./practice.model");
 
 let moment = require("moment");
 // Create time slots for doctor
-let getTimeSlots = body => {
-  let test = {
-    duration: "15",
-    customGap: "",
-    weekdaysArr: [
-      {
-        days: ["wednesday", "thursday", "friday"],
-        startTime: "2019-11-12T02:30:00.000Z",
-        endTime: "2019-11-12T11:30:00.000Z",
-        lunchStart: "2019-11-12T06:30:00.000Z",
-        lunchEnd: "2019-11-12T07:30:00.000Z"
-      },
-      {
-        days: ["monday", "tuesday"],
-        startTime: "2019-11-12T03:30:00.000Z",
-        endTime: "2019-11-12T12:30:00.000Z",
-        lunchStart: "2019-11-12T06:30:00.000Z",
-        lunchEnd: "2019-11-12T07:30:00.000Z"
-      }
-    ]
+let getTimeSlots = (req, res) => {
+  //USE THIS AS PAYLOAD
+  //  {
+  //     duration: "15",
+  //     id:""
+  //     weekdaysArr: [
+  //       {
+  //         days: ["wednesday", "thursday", "friday"],
+  //         startTime: "02:30",
+  //         endTime: "11:30",
+  //         lunchStart: "06:30",
+  //         lunchEnd: "07:30"
+  //       },
+  //       {
+  //         days: ["monday", "tuesday"],
+  //         startTime: "03:30",
+  //         endTime: "12:30",
+  //         lunchStart: "06:30",
+  //         lunchEnd: "07:30"
+  //       }
+  //     ]
+  //   };
+
+  let currentDate = moment().format("YYYY-MM-DD");
+
+  moment.addRealMonth = function addRealMonth(d) {
+    var fm = moment(d).add(1, "M");
+    var fmEnd = moment(fm).endOf("month");
+    return d.date() != fm.date() && fm.isSame(fmEnd.format("YYYY-MM-DD"))
+      ? fm.add(1, "d")
+      : fm;
   };
 
-  let currentDate = moment().format("MM/DD/YYYY");
-  let futureMonth = moment(currentDate).add(1, "M");
-  let futureMonthEnd = moment(futureMonth).endOf("month");
-
-  // if(currentDate.date() != futureMonth.date() && futureMonth.isSame(futureMonthEnd.format('YYYY-MM-DD'))) {
-  //     futureMonth = futureMonth.add(1, 'd');
-  // }
+  let futureMonth = moment.addRealMonth(moment()).format("YYYY-MM-DD");
 
   //Current Date
   console.log(currentDate);
+
   //Future Month
   console.log(futureMonth);
 
   //Construct Schedule
   let objArray = [];
-  test.weekdaysArr.map(el => {
+  req.body.weekdaysArr.map(el => {
     console.log({ el });
     let obj = {};
     el.days.map(day => {
@@ -51,116 +57,65 @@ let getTimeSlots = body => {
       obj.unavailability = [
         {
           from: el.lunchStart,
-          to: el.lunchStart
+          to: el.lunchEnd
         }
       ];
 
       objArray.push({ [day]: obj });
-      console.log({ day, obj });
     });
   });
 
   setTimeout(function() {
-    console.log({ objArray });
-    objArray.map(el => {
-      console.log({ el });
-    });
+    testArray = Object.assign({}, ...objArray);
 
-    let payload = {
-      from: currentDate,
-      to: futureMonth,
-      duration: test.duration,
-      // "interval": test.customGap,
-      id: "5dad6ba6f4ab551864e63f01",
-      schedule: objArray
-    };
+    let { id, duration, interval } = req.body;
     const scheduler = new Scheduler();
     const availability = scheduler.getAvailability({
       from: currentDate,
       to: futureMonth,
-      duration: 30,
-      interval: 15,
-      schedule: { objArray }
+      duration,
+      interval: duration,
+      schedule: testArray
     });
-    console.log({ availability });
-    return payload;
+    let timeSlotsArray = [];
+    let availabilityDates = Object.keys(availability).map((key, index) => {
+      let dash = availability[key];
+      dash.map(el => {
+        let timeString = key + " " + el.time + ":00";
+        console.log({ timeString });
+        const myDate = moment(timeString);
+        let timeModel = new AppointmentModel({
+          bookedFor: myDate,
+          available: el.available,
+          doctor: id
+        });
+
+        // timeModel.save()
+        console.log({ timeModel, myDate, el });
+        timeSlotsArray.push(timeModel._id);
+      });
+    });
+
+    let RenewDate = availabilityDates.pop();
+    console.log({ RenewDate });
+    setTimeout(function() {
+      Practise.findByIdAndUpdate(id, {
+        $set: { appointments: timeSlotsArray }
+      }).then(console.log("Successs"));
+
+      Practise.findById(id).then(data => {
+        test = data;
+      });
+
+      //This is how dates should be read from the server
+      // let date123 = new Date("2019-11-18T04:00:00.000Z")
+      // console.log({"read this":date123.toLocaleTimeString()})
+
+      console.log({ timeSlotsArray });
+    }, 3000);
+
+    res.json({ status: true, message: "Time Slots Saved", data: availability });
   }, 3000);
-
-  // {
-  //   monday: {
-  //     from: '09:00',
-  //     to: '17:00',
-  //     unavailability: [
-  //       { from: '12:00', to: '13:00' }
-  //     ]
-  //   },
-  //   custom_schedule: [
-  //     { "date": "2017-01-23", "from": "12:00", "to": "17:00" },
-  //   ]
-  // }
-
-  //   const availability = scheduler.getAvailability({
-  //     from,
-  //     to,
-  //     duration,
-  //     interval,
-  //     schedule
-  //   });
-  //   console.log({availability})
-
-  //   console.log(body);
-  //   const scheduler = new Scheduler();
-  //   let { from, to, duration, interval, schedule, id } = body;
-
-  //   const availability = scheduler.getAvailability({
-  //     from,
-  //     to,
-  //     duration,
-  //     interval,
-  //     schedule
-  //   });
-  //   console.log({availability})
-  //   let timeSlotsArray = [];
-  //   let availabilityDates = Object.keys(availability).map((key, index) => {
-  //     let dash = availability[key]
-  //     dash.map(el => {
-
-  //       let timeString = key + " " + el.time + ":00";
-  //       console.log({timeString})
-  //       const myDate = moment(timeString)
-  //     let timeModel = new AppointmentModel({
-  //       bookedFor: myDate,
-  //       available: el.available,
-  //       doctor:id
-  //     })
-
-  //     timeModel.save()
-  //     console.log({timeModel, myDate, el})
-  //     timeSlotsArray.push(timeModel._id);
-  //     })
-
-  //   });
-  //   let test;
-  //   setTimeout(function(){
-
-  //     Practise.findByIdAndUpdate(id, {$set:{appointments: timeSlotsArray }}).then(console.log("Successs"))
-
-  //     Practise.findById(id).then(data => {
-  //       test = data
-  //     })
-
-  //     console.log({timeSlotsArray})
-  //   }
-  //     , 3000);
-  // //   let RenewDate = availabilityDates.pop();
-  // //   console.log({RenewDate});
-
-  // //   var recToRemove={ id: 1, name: 'Siddhu' };
-
-  // // user.splice(user.indexOf(recToRemove),1)
-
-  //   // return availability;
-  // return test;
 };
 
 module.exports = {
