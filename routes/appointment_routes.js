@@ -8,5 +8,8 @@ router.post("/book", appointmentController.bookAppointment);
 //Cancel an appointment
 router.post("/cancel", appointmentController.cancelAppointment);
 
+//Get appointments
+router.post("/get", appointmentController.getAppointments);
+
 // exporting them
 module.exports = router;

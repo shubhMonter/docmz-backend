@@ -42,6 +42,7 @@ function jwt() {
       "/stripe/charge/card",
       "/appointment/book",
       "/appointment/cancel",
+      "/appointment/get",
       { url: /\/getdoc\/([^\/]*)$/, methods: ["GET", "POST"] }
     ]
   });
