@@ -3,6 +3,7 @@ let AppointmentModel = require("../appointments/appointment.model");
 let Practise = require("./practice.model");
 
 let moment = require("moment");
+
 // Create time slots for doctor
 let getTimeSlots = (req, res) => {
   //USE THIS AS PAYLOAD
@@ -90,7 +91,7 @@ let getTimeSlots = (req, res) => {
           doctor: id
         });
 
-        // timeModel.save()
+        timeModel.save();
         console.log({ timeModel, myDate, el });
         timeSlotsArray.push(timeModel._id);
       });
