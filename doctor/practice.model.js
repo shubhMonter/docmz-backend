@@ -34,18 +34,8 @@ const practise = new Schema({
   description: { type: String },
   identifiers: { type: Object },
   steps: { type: Array },
-  // addressLine1:{type: String},
-  // addressLine2: {type: String},
-  // city:{type: String},
-  // state:{type: String},
-  //stet:tpe: test
-  // zipCode:{type:String},
-  // telephone:{type:String},
-  // fax:{type:String},
   email: { type: String },
   website: { type: String },
-
-  // taxonomyCode:{type:String},
   taxId: { type: String },
   notes: { type: String },
   payToAddress: { type: String },
@@ -70,7 +60,7 @@ const practise = new Schema({
   isActive: { type: Boolean, default: true },
   isApproved: { type: Boolean, default: false },
   availability: { type: Array },
-  appointments: [{ type: Schema.Types.ObjectId, ref: "appointments" }],
+  appointments: [{ type: Schema.Types.ObjectId, ref: "Appointments" }],
   specialty: { type: String },
   phone: { type: String },
   password: {
@@ -89,7 +79,8 @@ const practise = new Schema({
   availDate: { type: Date },
   savedCards: { type: Object },
   fee: { type: String },
-  customerProfile: { type: String }
+  customerProfile: { type: String },
+  renewDate: { type: Date }
 });
 
 module.exports = mongoose.model("Practise", practise);

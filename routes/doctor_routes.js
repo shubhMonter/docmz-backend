@@ -35,5 +35,9 @@ router.post("/profile/update", npiController.profileUpdate);
 
 //Create and save slots
 router.post("/saveslots", npiController.saveSlots);
+
+//Get a doctor through id
+router.get("/getdoc/:id", npiController.getDoc);
+
 // exporting them
 module.exports = router;

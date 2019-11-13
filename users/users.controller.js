@@ -54,63 +54,63 @@ app.use((req, res, next) => {
 
 let register = async (req, res) => {
   // validate the input
-  req.checkBody("email", "Email is required").notEmpty();
-  req.checkBody("role", "Role is required").notEmpty();
-  req.checkBody("name", "First Name is required").notEmpty();
-  req.checkBody("phonenumber", "Phone Number is required").notEmpty();
-  req.checkBody("password", "Password is required").notEmpty();
+  // req.checkBody("email", "Email is required").notEmpty();
+  // req.checkBody("role", "Role is required").notEmpty();
+  // req.checkBody("name", "First Name is required").notEmpty();
+  // req.checkBody("phonenumber", "Phone Number is required").notEmpty();
+  // req.checkBody("password", "Password is required").notEmpty();
 
-  // check the validation object for errors
-  let errors = req.validationErrors();
-  let { name, email, role, phone, password } = req.body;
-  if (errors) {
-    res.json({ status: false, messages: errors });
+  // // check the validation object for errors
+  // let errors = req.validationErrors();
+  let { name, email, phone, password } = req.body;
+  // if (errors) {
+  //   res.json({ status: false, messages: errors });
+  // } else {
+  // validate
+  if (await User.findOne({ email })) {
+    res.status(404).json({
+      status: false,
+      error: "Email " + email + " is already taken"
+    });
   } else {
-    // validate
-    if (await User.findOne({ email })) {
-      res.status(404).json({
-        status: false,
-        error: "Email " + email + " is already taken"
+    // hashing the password
+    let cipher = crypto.createCipheriv(algorithm, new Buffer.from(key), iv);
+    var encrypted =
+      cipher.update(password, "utf8", "hex") + cipher.final("hex");
+
+    //Creating the user model
+    const user = new User({
+      name,
+      email,
+      // role,
+      phone,
+      password: encrypted
+    });
+
+    //Saving the user
+    await user
+      .save()
+      .then(data => {
+        //Sending Mail
+        let mailOptions = {
+          from: '"DocMz"; <admin@docmz.com>',
+          to: email,
+          subject: "Successfully Registered - DocMz",
+          text: "You've been succesfully registered on DocMz. "
+        };
+
+        // smtpTransport.sendMail(mailOptions, function(err) {
+        //   if (err) console.log(err);
+        // });
+
+        //Sending Success Response
+        res.status(200).json({ status: true, data });
+      })
+      .catch(error => {
+        res.status(404).json({ status: false, error });
       });
-    } else {
-      // hashing the password
-      let cipher = crypto.createCipheriv(algorithm, new Buffer.from(key), iv);
-      var encrypted =
-        cipher.update(password, "utf8", "hex") + cipher.final("hex");
-
-      //Creating the user model
-      const user = new User({
-        name,
-        email,
-        role,
-        phone,
-        password: encrypted
-      });
-
-      //Saving the user
-      await user
-        .save()
-        .then(data => {
-          //Sending Mail
-          let mailOptions = {
-            from: '"DocMz"; <admin@docmz.com>',
-            to: email,
-            subject: "Successfully Registered - DocMz",
-            text: "You've been succesfully registered on DocMz. "
-          };
-
-          smtpTransport.sendMail(mailOptions, function(err) {
-            if (err) console.log(err);
-          });
-
-          //Sending Success Response
-          res.status(200).json({ status: true, data });
-        })
-        .catch(error => {
-          res.status(404).json({ status: false, error });
-        });
-    }
   }
+  // }
 };
 
 let registerDoctor = async (req, res) => {
@@ -176,49 +176,46 @@ let registerDoctor = async (req, res) => {
 
 // Function to authenticate an user
 let authenticate = (req, res) => {
-  if (req.body.email) {
-    // validate the input
-    req.checkBody("email", "Email is required").notEmpty();
-    req.checkBody("password", "Password is required").notEmpty();
+  // if (req.body.email) {
+  //   // validate the input
+  //   req.checkBody("email", "Email is required").notEmpty();
+  //   req.checkBody("password", "Password is required").notEmpty();
 
-    // check the validation object for errors
-    let errors = req.validationErrors();
+  //   // check the validation object for errors
+  //   let errors = req.validationErrors();
 
-    if (errors) {
-      res.json({ status: false, messages: errors });
-    } else {
-      let { email, password } = req.body;
-      let cipher = crypto.createCipheriv(algorithm, new Buffer.from(key), iv);
-      let encrypted =
-        cipher.update(password, "utf8", "hex") + cipher.final("hex");
-      User.findOne({ email }).then(user => {
-        app.get(sessionChecker, (req, res) => {
-          console.log({ status: "session stored" });
-        });
+  //   if (errors) {
+  //     res.json({ status: false, messages: errors });
+  //   } else {
+  let { email, password } = req.body;
+  let cipher = crypto.createCipheriv(algorithm, new Buffer.from(key), iv);
+  let encrypted = cipher.update(password, "utf8", "hex") + cipher.final("hex");
+  User.findOne({ email }).then(user => {
+    app.get(sessionChecker, (req, res) => {
+      console.log({ status: "session stored" });
+    });
 
-        //Checking if User exits or not
+    //Checking if User exits or not
+    if (user) {
+      console.log(user);
+      if (!user) {
+        res.status(404).json({ status: false, message: "User Not Found!" });
+      } else if (encrypted != user.password) {
+        res.json({ status: false, error: "Password Entered is Incorrect" });
+      } else {
         if (user) {
-          console.log(user);
-          if (!user) {
-            res.status(404).json({ status: false, message: "User Not Found!" });
-          } else if (encrypted != user.password) {
-            res.json({ status: false, error: "Password Entered is Incorrect" });
-          } else {
-            if (user) {
-              req.session.user = user;
-              req.session.Auth = user;
-              res.status(200).json({
-                status: true,
-                user: req.session.Auth
-              });
-            }
-          }
+          req.session.user = user;
+          req.session.Auth = user;
+          res.status(200).json({
+            status: true,
+            user: req.session.Auth
+          });
         }
-      });
+      }
     }
-  }
+  });
+  // }
 };
-
 //Function for loggging out
 let logout = (req, res) => {
   res.clearCookie("user_sid");

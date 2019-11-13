@@ -10,7 +10,8 @@ function jwt() {
     path: [
       // public routes that don't require authentication
       "/doctors/getinfo",
-      "/users/register",
+      "/patient/register",
+      "/patient/authenticate",
       "/users/token",
       { url: /\/doctors\/getinfo\/([^\/]*)$/, methods: ["GET", "POST"] },
       "/users/login",
@@ -39,7 +40,8 @@ function jwt() {
       { url: /\/stripe\/list\/([^\/]*)$/, methods: ["GET", "POST"] },
       "/stripe/charge/card",
       "/appointment/book",
-      "/appointment/cancel"
+      "/appointment/cancel",
+      { url: /\/getdoc\/([^\/]*)$/, methods: ["GET", "POST"] }
     ]
   });
 }

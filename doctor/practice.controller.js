@@ -2301,6 +2301,36 @@ let saveSlots = (req, res) => {
   res.json({ status: true, message: "Success", data: test });
 };
 
+//Search doctors
+
+let searchDocs = (req, res) => {
+  let { speciality } = req.body;
+  Practise.find({ speciality })
+    .then(data => {
+      res
+        .status(200)
+        .json({ status: true, message: "Doctors Fetched successfully", data });
+    })
+    .catch(error => {
+      res.status(404).json({ status: false, message: error });
+    });
+};
+
+//Search doc by id
+
+let getDoc = (req, res) => {
+  let { id } = req.params;
+  console.log({ id });
+  Practise.findById(id)
+    .populate("appointments")
+    .then(data => {
+      res.status(200).json({ status: true, message: "Fetched", data });
+    })
+    .catch(error => {
+      res.status(404).json({ status: false, message: error });
+    });
+};
+
 //Exporting all the functions
 module.exports = {
   getNpiInfo,
@@ -2309,5 +2339,7 @@ module.exports = {
   signUpDoc,
   authenticateDoctor,
   profileUpdate,
-  saveSlots
+  saveSlots,
+  searchDocs,
+  getDoc
 };
