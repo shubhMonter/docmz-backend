@@ -80,6 +80,9 @@ app.use("/patient", require("./routes/user_routes"));
 //Stripe Routes
 app.use("/Stripe", require("./routes/stripe_routes"));
 
+//Appointment Routes
+app.use("/appointment", require("./routes/appointment_routes"));
+
 app.use(errorHandler);
 
 module.exports = app;
