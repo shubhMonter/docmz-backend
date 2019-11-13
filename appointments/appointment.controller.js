@@ -77,16 +77,15 @@ let getAppointments = (req, res) => {
   // let today = new Date()
   let newDate = new Date(date);
   let nextDate = addDays(newDate, limit);
-  console.log(nextDate);
+  console.log({ nextDate });
   Appointment.find({ doctor, bookedFor: { $gt: newDate, $lt: nextDate } })
+    .sort({ bookedFor: 1 })
     .then(appointments => {
-      res
-        .status(200)
-        .json({
-          status: true,
-          message: "Appointments Fetched",
-          data: appointments
-        });
+      res.status(200).json({
+        status: true,
+        message: "Appointments Fetched",
+        data: appointments
+      });
     })
     .catch(error => {
       res.status(404).json({ status: false, message: error });
