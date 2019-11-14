@@ -628,8 +628,21 @@ function setPassword(token, password, forget) {
   );
 }
 
+//Function to update profile
+let updateProfile = (req, res) => {
+  let { id } = req.body;
+  User.findByIdAndUpdate(id, req.body, { new: true })
+    .then(data => {
+      res.status(200).json({ status: true, message: "Profile Updated", data });
+    })
+    .catch(error => {
+      res.status(404).json({ status: false, message: error });
+    });
+};
+
 //Exporting all the functions
 module.exports = {
   authenticate,
-  register
+  register,
+  updateProfile
 };

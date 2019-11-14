@@ -8,5 +8,8 @@ router.post("/register", userController.register);
 //Authenticate an User
 router.post("/authenticate", userController.authenticate);
 
+//Update Profile
+router.post("/update", userController.updateProfile);
+
 // exporting them
 module.exports = router;
