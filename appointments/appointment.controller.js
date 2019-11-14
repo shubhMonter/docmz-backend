@@ -4,6 +4,7 @@ const db = require("_helpers/db"),
   Practise = db.Practise;
 Appointment = db.Appointment;
 Patient = db.User;
+let moment = require("moment");
 let nodemailer = require("nodemailer");
 let ejs = require("ejs");
 //SMTP Config
@@ -182,6 +183,46 @@ let getAppointments = (req, res) => {
     });
 };
 // find({ sale_date: { $gt: ISODate("2014-11-04"), $lt: new ISODate("2014-11-05") });
+
+//Delete appointments of past date
+let filterAppointments = (req, res) => {
+  let older_than = moment()
+    .subtract(2, "days")
+    .toDate();
+  Log.find({ Timestamp: { $lte: older_than } })
+    .remove()
+    .exec()
+    .then(RemoveStatus => {
+      console.log("Documents Removed Successfully");
+    })
+    .catch(err => {
+      console.error("something error");
+      console.error(err);
+    });
+};
+
+//Cron job to filter out appointments of past date
+let schedule = require("node-schedule");
+
+let filterOutAppointments = schedule.scheduleJob("0 0 */3 * * *", function() {
+  //Getting a date older than today
+  let older_than = moment()
+    .subtract(2, "days")
+    .toDate();
+
+  console.log({ older_than });
+
+  Appointment.find({ bookedFor: { $lte: older_than }, booked: false })
+    .deleteMany()
+    .exec()
+    .then(RemovedDocs => {
+      console.log({ RemovedDocs });
+      console.log("Appointments Removed Successfully");
+    })
+    .catch(err => {
+      console.error({ "Somethings Wrong - Check Cron Job": err });
+    });
+});
 
 module.exports = {
   cancelAppointment,
