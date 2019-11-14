@@ -184,23 +184,6 @@ let getAppointments = (req, res) => {
 };
 // find({ sale_date: { $gt: ISODate("2014-11-04"), $lt: new ISODate("2014-11-05") });
 
-//Delete appointments of past date
-let filterAppointments = (req, res) => {
-  let older_than = moment()
-    .subtract(2, "days")
-    .toDate();
-  Log.find({ Timestamp: { $lte: older_than } })
-    .remove()
-    .exec()
-    .then(RemoveStatus => {
-      console.log("Documents Removed Successfully");
-    })
-    .catch(err => {
-      console.error("something error");
-      console.error(err);
-    });
-};
-
 //Cron job to filter out appointments of past date
 let schedule = require("node-schedule");
 
