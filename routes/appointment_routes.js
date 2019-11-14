@@ -11,5 +11,8 @@ router.post("/cancel", appointmentController.cancelAppointment);
 //Get appointments
 router.post("/get", appointmentController.getAppointments);
 
+//Approve an appointment
+router.post("/approve", appointmentController.approveAppointment);
+
 // exporting them
 module.exports = router;

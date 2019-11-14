@@ -4,6 +4,30 @@ const db = require("_helpers/db"),
   Practise = db.Practise;
 Appointment = db.Appointment;
 Patient = db.User;
+let nodemailer = require("nodemailer");
+let ejs = require("ejs");
+//SMTP Config
+let smtpConfig = {
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true, // use SSL,
+  // you can try with TLS, but port is then 587
+  auth: {
+    user: "anas3rde@gmail.com", // Your email id
+    pass: "8123342590" // Your password
+  },
+  tls: {
+    rejectUnauthorized: false
+  }
+};
+
+//Read html file for - Appointment Approved
+
+let fs = require("fs"),
+  path = require("path"),
+  filePath = path.join(__dirname, "/appointmentConfirmed.html");
+console.log({ filePath });
+let template = fs.readFileSync(filePath, { encoding: "utf-8" });
 
 //Book an appointment
 let bookAppointment = (req, res) => {
@@ -39,6 +63,72 @@ let bookAppointment = (req, res) => {
         res.status(404).json({ status: false, message: err });
       });
   });
+};
+
+//Confirm appointment
+let approveAppointment = (req, res) => {
+  let { timeSlot, email, patient, time, date, address, doctor } = req.body;
+  let fields = {
+    patient,
+    time,
+    date,
+    address,
+    doctor
+  };
+
+  let html = ejs.render(template, fields);
+
+  // console.log({html})
+
+  //       let transporter = nodemailer.createTransport(smtpConfig);
+  // let mailOptions = {
+  //   from: 'anas3rde@gmail.com', // sender address
+  //   to: email, // list of receivers
+  //   subject: "Appointment Confirmed - DocMz", // Subject line
+  //   // text: 'this is some text', //, // plaintext body
+  //   html
+  // }
+  // console.log({mailOptions})
+  //   transporter.sendMail(mailOptions, function(error, info){
+  //     if(error){
+  //       // return false;
+  //       console.log({error})
+  //     }else{
+  //       console.log('Message sent: ' + info.response);
+  //       // return true;
+  //     };
+  //     console.log('Message sent');
+  //   });
+
+  Appointment.findByIdAndUpdate(timeSlot, {
+    $set: {
+      approved: true
+    }
+  })
+    .then(data => {
+      let transporter = nodemailer.createTransport(smtpConfig);
+      let mailOptions = {
+        from: "anas3rde@gmail.com", // sender address
+        to: email, // list of receivers
+        subject: "Appointment Confirmed - DocMz", // Subject line
+        // text: 'this is some text', //, // plaintext body
+        html
+      };
+
+      transporter.sendMail(mailOptions, function(error, info) {
+        if (error) {
+          // return false;
+          console.log({ error });
+        } else {
+          console.log("Message sent: " + info.response);
+        }
+      });
+
+      res.status(200).json({ status: true, message: "Appointment Approved" });
+    })
+    .catch(error => {
+      res.status(404).json({ status: false, message: error });
+    });
 };
 
 //Cancel appointment by Doctor
@@ -96,5 +186,6 @@ let getAppointments = (req, res) => {
 module.exports = {
   cancelAppointment,
   bookAppointment,
-  getAppointments
+  getAppointments,
+  approveAppointment
 };

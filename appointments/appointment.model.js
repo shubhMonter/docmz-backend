@@ -14,7 +14,8 @@ const appointment = new Schema({
   paid: { type: Boolean, default: false },
   duration: { type: String },
   available: { type: Boolean },
-  booked: { type: Boolean, default: false }
+  booked: { type: Boolean, default: false },
+  approved: { type: Boolean, default: false }
 });
 
 module.exports = mongoose.model("Appointments", appointment);
