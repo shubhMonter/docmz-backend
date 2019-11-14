@@ -7,12 +7,26 @@ const schema = new Schema({
   role: { type: String },
   name: { type: String },
   phone: { type: String },
+  home: { type: String },
+  work: { type: String },
+  preferredNumber: { type: String },
+  Address: { type: Object },
+  sex: { type: String },
+  dob: { type: String },
+  active: { type: Boolean },
+  wellnessReminder: { type: Boolean },
+  appointmentReminderText: { type: Boolean },
+  notify: { type: Boolean },
+  race: { type: String },
+  ethnicity: { type: String },
+  zip: { type: String },
   password: { type: String },
   passwordtoken: { type: String },
   verified: { type: Boolean },
   passwordexpires: { type: Date },
   createdDate: { type: Date, default: Date.now },
-  appointments: [{ type: Schema.Types.ObjectId, ref: "Appointments" }]
+  appointments: [{ type: Schema.Types.ObjectId, ref: "Appointments" }],
+  lastLogin: { type: Date, default: Date.now }
 });
 
 //Exporting the schema
