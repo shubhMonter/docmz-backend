@@ -632,6 +632,7 @@ function setPassword(token, password, forget) {
 let updateProfile = (req, res) => {
   let { id } = req.body;
   User.findByIdAndUpdate(id, req.body, { new: true })
+    .populate("appointments")
     .then(data => {
       res.status(200).json({ status: true, message: "Profile Updated", data });
     })
