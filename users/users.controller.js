@@ -7,6 +7,29 @@
   algorithm = "aes-256-cbc";
 let key = "abcdefghijklmnopqrstuvwxyztgbhgf";
 let iv = "1234567891234567";
+let async = require("async");
+let nodemailer = require("nodemailer");
+let ejs = require("ejs");
+//SMTP Config
+let smtpConfig = {
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true, // use SSL,
+  // you can try with TLS, but port is then 587
+  auth: {
+    user: "anas3rde@gmail.com", // Your email id
+    pass: "8123342590" // Your password
+  },
+  tls: {
+    rejectUnauthorized: false
+  }
+};
+
+let fs = require("fs"),
+  path = require("path"),
+  filePath = path.join(__dirname, "/forgotPassword.html");
+console.log({ filePath });
+let template = fs.readFileSync(filePath, { encoding: "utf-8" });
 
 app.use(cookieparser());
 
@@ -486,6 +509,16 @@ function tokenForgetPassword(email) {
         });
       },
       function(token, user, done) {
+        console.log({ user });
+
+        let url = "http://localhost:3000/forgetpassword/";
+
+        let fields = {
+          url
+        };
+
+        let html = ejs.render(template, fields);
+
         let mailOptions = {
           from: "anas3rde@gmail.com",
           to: email,
@@ -511,7 +544,8 @@ function tokenForgetPassword(email) {
 }
 
 //Function to assign token
-async function assignToken(email) {
+async function assignToken(req, res) {
+  let { email } = req.body;
   console.log("token function executed");
   async.waterfall(
     [
@@ -538,6 +572,16 @@ async function assignToken(email) {
         });
       },
       function(token, user, done) {
+        console.log({ user });
+
+        let url = "http://localhost:3000/forgetpassword/" + token;
+
+        let fields = {
+          url
+        };
+
+        let html = ejs.render(template, fields);
+
         // var smtpTransport = nodemailer.createTransport({
         // 	host: 'smtp.gmail.com',
         // 	port: 587,
@@ -554,15 +598,16 @@ async function assignToken(email) {
           from: "anas3rde@gmail.com",
           to: email,
           subject: "Test",
-          text:
-            "Please click on the following link, or paste this into your browser to complete the process:\n\n" +
-            process.env.CLIENT_URL +
-            "/users/setpassword/" +
-            token +
-            "\n\n"
+          html
+          // text:
+          //   "Please click on the following link, or paste this into your browser to complete the process:\n\n" +
+          //   process.env.CLIENT_URL +
+          //   "/users/setpassword/" +
+          //   token +
+          //   "\n\n"
         };
-
-        smtpTransport.sendMail(mailOptions, function(err) {
+        let transporter = nodemailer.createTransport(smtpConfig);
+        transporter.sendMail(mailOptions, function(err) {
           console.log("Email sent");
           done(err, "done");
         });
@@ -570,12 +615,16 @@ async function assignToken(email) {
     ],
     function(err) {
       if (err) console.log(err);
+      res.status(200).json({ status: true, message: "Email Sent" });
     }
   );
 }
 
 //Function to set the password
-function setPassword(token, password, forget) {
+function setPassword(req, res) {
+  console.log(req.body);
+  let { token, password } = req.body;
+
   let cipher = crypto.createCipheriv(algorithm, new Buffer.from(key), iv);
   var encrypted = cipher.update(password, "utf8", "hex") + cipher.final("hex");
   // var hashp = bcrypt.hashSync(password, 10);
@@ -604,39 +653,26 @@ function setPassword(token, password, forget) {
       // 		pass: '8123342590'
       // 	}
       // });
-
-      if (forget) {
-        var mailOptions = {
+      console.log({ user });
+      if (user) {
+        let mailOptions = {
           to: user.email,
           from: "anas3rde@gmail.com",
-          subject: "Password Changed - USDE",
+          subject: "Password Changed - DocMz",
           text:
             "Your password has been successfully changed" +
             "\n\n" +
-            "Feel free to log in with your newly set password. You can either use your username - " +
-            user.username +
-            " or your email - " +
-            user.email
+            "Feel free to log in with your newly set password."
         };
-      } else {
-        var mailOptions = {
-          to: user.email,
-          from: "anas3rde@gmail.com",
-          subject: "Registration Successful",
-          text:
-            "You've been successfully registered on USDE." +
-            "\n\n" +
-            "Feel free to log in with your Credentials. Either use your username - " +
-            user.username +
-            " or your email - " +
-            user.email
-        };
-      }
 
-      smtpTransport.sendMail(mailOptions, function(err) {
-        done(err);
-        res.json({ status: "Registration complete" });
-      });
+        let transporter = nodemailer.createTransport(smtpConfig);
+        transporter.sendMail(mailOptions, function(err) {
+          done(err);
+        });
+        res.status(200).json({ status: true, message: "Password Set" });
+      } else {
+        res.status(404).json({ status: false, message: "Token Expired" });
+      }
     }
   );
 }
@@ -658,5 +694,7 @@ let updateProfile = (req, res) => {
 module.exports = {
   authenticate,
   register,
-  updateProfile
+  updateProfile,
+  assignToken,
+  setPassword
 };
