@@ -78,37 +78,50 @@ let register = async (req, res) => {
     var encrypted =
       cipher.update(password, "utf8", "hex") + cipher.final("hex");
 
-    //Creating the user model
-    const user = new User({
-      name,
-      email,
-      // role,
-      phone,
-      password: encrypted
-    });
+    stripe.customers.create(
+      {
+        description: req.body.number + "|" + req.body.email,
+        email: req.body.email
+      },
+      function(error, customer) {
+        if (error) {
+          res.status(400).json({ status: false, message: error });
+        } else if (customer) {
+          //Creating the user model
+          const user = new User({
+            name,
+            email,
+            // role,
+            phone,
+            password: encrypted,
+            customerProfile: customer
+          });
 
-    //Saving the user
-    await user
-      .save()
-      .then(data => {
-        //Sending Mail
-        let mailOptions = {
-          from: '"DocMz"; <admin@docmz.com>',
-          to: email,
-          subject: "Successfully Registered - DocMz",
-          text: "You've been succesfully registered on DocMz. "
-        };
+          //Saving the user
+          user
+            .save()
+            .then(data => {
+              //Sending Mail
+              let mailOptions = {
+                from: '"DocMz"; <admin@docmz.com>',
+                to: email,
+                subject: "Successfully Registered - DocMz",
+                text: "You've been succesfully registered on DocMz. "
+              };
 
-        // smtpTransport.sendMail(mailOptions, function(err) {
-        //   if (err) console.log(err);
-        // });
+              // smtpTransport.sendMail(mailOptions, function(err) {
+              //   if (err) console.log(err);
+              // });
 
-        //Sending Success Response
-        res.status(200).json({ status: true, data });
-      })
-      .catch(error => {
-        res.status(404).json({ status: false, error });
-      });
+              //Sending Success Response
+              res.status(200).json({ status: true, data });
+            })
+            .catch(error => {
+              res.status(404).json({ status: false, error });
+            });
+        }
+      }
+    );
   }
   // }
 };
