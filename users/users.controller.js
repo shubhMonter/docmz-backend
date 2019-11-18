@@ -10,6 +10,8 @@ let iv = "1234567891234567";
 let async = require("async");
 let nodemailer = require("nodemailer");
 let ejs = require("ejs");
+const keySecret = "	sk_test_hoVy16mRDhxHCoNAOAEJYJ4N00pzRH8xK2";
+const stripe = require("stripe")(keySecret);
 //SMTP Config
 let smtpConfig = {
   host: "smtp.gmail.com",
@@ -103,8 +105,8 @@ let register = async (req, res) => {
 
     stripe.customers.create(
       {
-        description: req.body.number + "|" + req.body.email,
-        email: req.body.email
+        description: name + "|" + email,
+        email
       },
       function(error, customer) {
         if (error) {
@@ -117,7 +119,7 @@ let register = async (req, res) => {
             // role,
             phone,
             password: encrypted,
-            customerProfile: customer
+            customerProfile: customer.id
           });
 
           //Saving the user

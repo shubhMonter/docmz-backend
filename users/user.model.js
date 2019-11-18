@@ -27,7 +27,8 @@ const schema = new Schema({
   createdDate: { type: Date, default: Date.now },
   appointments: [{ type: Schema.Types.ObjectId, ref: "Appointments" }],
   lastLogin: { type: Date, default: Date.now },
-  bloodGroup: { type: String }
+  bloodGroup: { type: String },
+  customerProfile: { type: String }
 });
 
 //Exporting the schema
