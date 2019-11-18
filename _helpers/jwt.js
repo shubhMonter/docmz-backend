@@ -13,6 +13,8 @@ function jwt() {
       "/patient/register",
       "/patient/authenticate",
       "/patient/update",
+      "/patient/forgetpassword",
+      "/patient/setpassword",
       "/users/token",
       { url: /\/doctors\/getinfo\/([^\/]*)$/, methods: ["GET", "POST"] },
       "/users/login",

@@ -11,5 +11,11 @@ router.post("/authenticate", userController.authenticate);
 //Update Profile
 router.post("/update", userController.updateProfile);
 
+//Forget password route
+router.post("/forgetpassword", userController.assignToken);
+
+//Set password Route
+router.post("/setpassword", userController.setPassword);
+
 // exporting them
 module.exports = router;
