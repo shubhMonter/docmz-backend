@@ -69,7 +69,7 @@ const practise = new Schema({
   },
   experience: { type: String },
   dob: { type: Date },
-  picture: { type: String },
+  picture: { type: Array },
   establishmentName: { type: String },
   city: { type: String },
   country: { type: String },
