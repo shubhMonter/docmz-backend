@@ -38,6 +38,7 @@ function jwt() {
       "/doctors/authenticate",
       "/doctors/profile/update",
       "/doctors/saveslots",
+      "/doctors/picture/delete",
       "/stripe/create/card/profile",
       "/stripe/charge/profile",
       "/stripe/create/profile",
@@ -47,7 +48,8 @@ function jwt() {
       "/appointment/cancel",
       "/appointment/get",
       "/appointment/approve",
-      { url: /\/getdoc\/([^\/]*)$/, methods: ["GET", "POST"] }
+      { url: /\/getdoc\/([^\/]*)$/, methods: ["GET", "POST"] },
+      { url: /\/doctors\/upload\/([^\/]*)$/, methods: ["GET", "POST"] }
     ]
   });
 }
