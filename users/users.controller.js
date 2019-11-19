@@ -131,7 +131,7 @@ let register = async (req, res) => {
                 from: '"DocMz"; <admin@docmz.com>',
                 to: email,
                 subject: "Successfully Registered - DocMz",
-                text: "You've been succesfully registered on DocMz. "
+                text: "You've been successfully registered on DocMz. "
               };
 
               // smtpTransport.sendMail(mailOptions, function(err) {
