@@ -19,7 +19,9 @@ const appointment = new Schema({
   viewedByPatient: { type: Boolean },
   viewedByDoctor: { type: Boolean },
   amount: { type: String },
-  paidByAdmin: { type: Boolean }
+  paidByAdmin: { type: Boolean },
+  reasonForVisit: { type: String },
+  description: { type: String }
 });
 
 module.exports = mongoose.model("Appointments", appointment);
