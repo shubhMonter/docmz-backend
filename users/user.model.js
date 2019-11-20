@@ -18,7 +18,7 @@ const schema = new Schema({
   appointmentReminderText: { type: Boolean },
   notify: { type: Boolean },
   race: { type: String },
-  ethnicity: { type: String },
+  ethnicity: { type: Array },
   zip: { type: String },
   password: { type: String },
   passwordtoken: { type: String },
