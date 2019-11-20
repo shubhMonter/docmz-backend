@@ -599,7 +599,7 @@ async function assignToken(req, res) {
         var mailOptions = {
           from: "anas3rde@gmail.com",
           to: email,
-          subject: "Test",
+          subject: "Reset Your Password - DocMz",
           html
           // text:
           //   "Please click on the following link, or paste this into your browser to complete the process:\n\n" +

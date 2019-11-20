@@ -13,6 +13,31 @@ var jwt = require("jsonwebtoken");
 let Scheduler = require("./availability.controller");
 const keySecret = "	sk_test_hoVy16mRDhxHCoNAOAEJYJ4N00pzRH8xK2";
 const stripe = require("stripe")(keySecret);
+let nodemailer = require("nodemailer");
+let ejs = require("ejs");
+let async = require("async");
+let path = require("path");
+
+//Smptp Config
+let smtpConfig = {
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true, // use SSL,
+  // you can try with TLS, but port is then 587
+  auth: {
+    user: "anas3rde@gmail.com", // Your email id
+    pass: "8123342590" // Your password
+  },
+  tls: {
+    rejectUnauthorized: false
+  }
+};
+
+let fs = require("fs"),
+  path = require("path"),
+  filePath = path.join(__dirname, "/forgotPassword.html");
+console.log({ filePath });
+let template = fs.readFileSync(filePath, { encoding: "utf-8" });
 
 //Email template for forgot your password
 
@@ -1173,6 +1198,140 @@ let tokenForgetPassword = (req, res) => {
     }
   );
 };
+
+//Function to assign token to Doctor to reset the password
+async function assignToken(req, res) {
+  let { email } = req.body;
+  console.log("token function executed");
+  async.waterfall(
+    [
+      function(done) {
+        crypto.randomBytes(20, function(err, buf) {
+          var token = buf.toString("hex");
+          done(err, token);
+        });
+      },
+      function(token, done) {
+        Practise.findOneAndUpdate(
+          { email: email },
+          {
+            $set: {
+              passwordtoken: token,
+              passwordExpires: Date.now() + 3600000
+            }
+          },
+          { new: true }
+        ).exec(function(err, user) {
+          console.log("1");
+          done(err, token, user);
+          console.log("2");
+        });
+      },
+      function(token, user, done) {
+        console.log({ user });
+
+        let url = "http://localhost:3000/forgetpassword/" + token;
+
+        let fields = {
+          url
+        };
+
+        let html = ejs.render(template, fields);
+
+        // var smtpTransport = nodemailer.createTransport({
+        // 	host: 'smtp.gmail.com',
+        // 	port: 587,
+        // 	secure: false,
+        // 	// port: 465,
+        // 	// secure: true, // use SSL
+        // 	auth: {
+        // 		user: 'anas3rde@gmail.com',
+        // 		pass: '8123342590'
+        // 	}
+        // });
+
+        var mailOptions = {
+          from: "anas3rde@gmail.com",
+          to: email,
+          subject: "Reset Your Password - DocMz",
+          html
+          // text:
+          //   "Please click on the following link, or paste this into your browser to complete the process:\n\n" +
+          //   process.env.CLIENT_URL +
+          //   "/users/setpassword/" +
+          //   token +
+          //   "\n\n"
+        };
+        let transporter = nodemailer.createTransport(smtpConfig);
+        transporter.sendMail(mailOptions, function(err) {
+          console.log("Email sent");
+          done(err, "done");
+        });
+      }
+    ],
+    function(err) {
+      if (err) console.log(err);
+      res.status(200).json({ status: true, message: "Email Sent" });
+    }
+  );
+}
+
+//Function to set the password
+function setPassword(req, res) {
+  console.log(req.body);
+  let { token, password } = req.body;
+
+  let cipher = crypto.createCipheriv(algorithm, new Buffer.from(key), iv);
+  var encrypted = cipher.update(password, "utf8", "hex") + cipher.final("hex");
+  // var hashp = bcrypt.hashSync(password, 10);
+
+  Practise.findOneAndUpdate(
+    {
+      passwordtoken: token,
+      passwordExpires: { $gt: Date.now() }
+    },
+    {
+      $set: {
+        password: encrypted,
+        passwordToken: undefined,
+        passwordExpires: undefined
+      }
+    },
+    function(err, user) {
+      // var smtptransport2 = nodemailer.createTransport({
+      // 	host: 'smtp.gmail.com',
+      // 	port: 587,
+      // 	secure: false,
+      // 	// port: 465,
+      // 	// secure: true, // use SSL
+      // 	auth: {
+      // 		user: 'anas3rde@gmail.com',
+      // 		pass: '8123342590'
+      // 	}
+      // });
+      console.log({ user });
+      if (user) {
+        let mailOptions = {
+          to: user.email,
+          from: "anas3rde@gmail.com",
+          subject: "Password Changed - DocMz",
+          text:
+            "Your password has been successfully changed" +
+            "\n\n" +
+            "Feel free to log in with your newly set password."
+        };
+
+        let transporter = nodemailer.createTransport(smtpConfig);
+        transporter.sendMail(mailOptions, function(err) {
+          done(err);
+        });
+        res.status(200).json({ status: true, message: "Password Set" });
+      } else {
+        res.status(404).json({ status: false, message: "Token Expired" });
+      }
+    }
+  );
+}
 
 //Exporting all the functions
 module.exports = {

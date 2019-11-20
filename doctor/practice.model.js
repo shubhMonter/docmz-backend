@@ -81,7 +81,9 @@ const practise = new Schema({
   savedCards: { type: Object },
   fee: { type: String },
   customerProfile: { type: String },
-  renewDate: { type: Date }
+  renewDate: { type: Date },
+  passwordToken: { type: String },
+  passwordExpires: { type: Date }
 });
 
 module.exports = mongoose.model("Practise", practise);
