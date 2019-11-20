@@ -485,6 +485,20 @@ let logout = (req, res) => {
 // 		.catch((err) => res.json(err));
 // }
 
+//Get profile details
+function getProfileDetails(req, res) {
+  let { id } = req.params;
+  User.findById(id)
+    .then(data => {
+      res
+        .status(200)
+        .json({ status: true, message: "Profile Details fetched", data });
+    })
+    .catch(error => {
+      res.status(404).json({ status: false, message: error });
+    });
+}
+
 //Forget password
 
 function tokenForgetPassword(email) {
@@ -698,5 +712,6 @@ module.exports = {
   register,
   updateProfile,
   assignToken,
-  setPassword
+  setPassword,
+  getProfileDetails
 };

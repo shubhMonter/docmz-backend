@@ -2,8 +2,10 @@ const db = require("_helpers/db"),
   express = require("express"),
   app = express(),
   request = require("request");
-(csvParser = require("csv-parse")), (fs = require("fs"));
-(Practise = db.Practise), (Taxonomy = db.Taxonomy), (Address = db.Address);
+(csvParser = require("csv-parse")),
+  (Practise = db.Practise),
+  (Taxonomy = db.Taxonomy),
+  (Address = db.Address);
 (crypto = require("crypto")), (algorithm = "aes-256-cbc");
 let key = "abcdefghijklmnopqrstuvwxyztgbhgf";
 let iv = "1234567891234567";
@@ -16,8 +18,6 @@ const stripe = require("stripe")(keySecret);
 let nodemailer = require("nodemailer");
 let ejs = require("ejs");
 let async = require("async");
-let path = require("path");
-
 //Smptp Config
 let smtpConfig = {
   host: "smtp.gmail.com",

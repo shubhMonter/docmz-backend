@@ -17,5 +17,8 @@ router.post("/forgetpassword", userController.assignToken);
 //Set password Route
 router.post("/setpassword", userController.setPassword);
 
+//get patient details
+router.get("/getinfo/:id", userController.getProfileDetails);
+
 // exporting them
 module.exports = router;
