@@ -15,6 +15,39 @@ let isCardError = response => {
   }
 };
 
+//Test a card
+let testCard = (req, res) => {
+  let { number, exp_month, exp_year, cvc } = req.body;
+
+  stripe.tokens.create(
+    {
+      card: {
+        number,
+        exp_month,
+        exp_year,
+        cvc
+      }
+    },
+    function(err, token) {
+      if (err) {
+        if (isCardError(err)) {
+          res.status(406).json({
+            status: false,
+            message: "Card Error",
+            error: err.raw.message
+          });
+        } else {
+          res.status(400).json({ status: false, message: err });
+        }
+      } else if (token) {
+        res
+          .status(200)
+          .json({ status: true, message: "Card is valid", data: token });
+      }
+    }
+  );
+};
+
 //Create a payment method
 router.post("/create/card", (req, res) => {
   let { number, exp_month, exp_year, cvc } = req.body;
@@ -100,13 +133,11 @@ let createCardProfile = (req, res) => {
     function(err, token) {
       if (err) {
         if (isCardError(err)) {
-          res
-            .status(406)
-            .json({
-              status: false,
-              message: "Card Error",
-              error: err.raw.message
-            });
+          res.status(406).json({
+            status: false,
+            message: "Card Error",
+            error: err.raw.message
+          });
         } else {
           res.status(400).json({ status: false, message: err });
         }
@@ -229,13 +260,11 @@ let chargeCard = (req, res) => {
     function(err, token) {
       if (err) {
         if (isCardError(err)) {
-          res
-            .status(406)
-            .json({
-              status: false,
-              message: "Card Error",
-              error: err.raw.message
-            });
+          res.status(406).json({
+            status: false,
+            message: "Card Error",
+            error: err.raw.message
+          });
         } else {
           res.status(400).json({ status: false, message: err });
         }
@@ -253,13 +282,11 @@ let chargeCard = (req, res) => {
             if (error) {
               res.status(400).json({ status: false, message: error });
             } else if (charge) {
-              res
-                .status(200)
-                .json({
-                  status: true,
-                  message: "Transaction Successful",
-                  data: charge
-                });
+              res.status(200).json({
+                status: true,
+                message: "Transaction Successful",
+                data: charge
+              });
             }
           }
         );
@@ -273,5 +300,6 @@ module.exports = {
   profileCharge,
   createProfile,
   listCards,
-  chargeCard
+  chargeCard,
+  testCard
 };

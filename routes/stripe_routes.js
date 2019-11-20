@@ -17,5 +17,8 @@ router.get("/list/:customer", stripeController.listCards);
 //Charge a card
 router.post("/charge/card", stripeController.chargeCard);
 
+//Test a card
+router.post("/testcard", stripeController.testCard);
+
 // exporting them
 module.exports = router;

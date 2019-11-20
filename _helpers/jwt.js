@@ -45,6 +45,7 @@ function jwt() {
       "/stripe/create/profile",
       { url: /\/stripe\/list\/([^\/]*)$/, methods: ["GET", "POST"] },
       "/stripe/charge/card",
+      "/stripe/testcard",
       "/appointment/book",
       "/appointment/cancel",
       "/appointment/get",
