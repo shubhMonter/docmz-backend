@@ -21,7 +21,8 @@ const appointment = new Schema({
   amount: { type: String },
   paidByAdmin: { type: Boolean },
   reasonForVisit: { type: String },
-  description: { type: String }
+  description: { type: String },
+  type: { type: String }
 });
 
 module.exports = mongoose.model("Appointments", appointment);
