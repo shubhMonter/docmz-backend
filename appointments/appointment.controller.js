@@ -38,8 +38,7 @@ let bookAppointment = (req, res) => {
     timeSlot,
     {
       $set: {
-        patient,
-        transactionId,
+        ...req.body,
         booked: true,
         paid: true
       }
