@@ -1141,6 +1141,12 @@ let getDoc = (req, res) => {
   console.log({ id });
   Practise.findById(id)
     .populate("appointments")
+    .populate({
+      path: "appointments",
+      populate: {
+        path: "patient"
+      }
+    })
     .then(data => {
       res.status(200).json({ status: true, message: "Fetched", data });
     })
