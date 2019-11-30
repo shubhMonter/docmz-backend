@@ -489,6 +489,13 @@ let logout = (req, res) => {
 function getProfileDetails(req, res) {
   let { id } = req.params;
   User.findById(id)
+    .populate("appointments")
+    .populate({
+      path: "appointments",
+      populate: {
+        path: "doctor"
+      }
+    })
     .then(data => {
       res
         .status(200)
@@ -706,6 +713,19 @@ let updateProfile = (req, res) => {
     });
 };
 
+let getPatient = (req, res) => {
+  let { id } = req.body;
+  User.findById(id)
+    .then(data => {
+      res
+        .status(200)
+        .json({ status: true, message: "Patient details fetched", data });
+    })
+    .catch(error => {
+      res.status(403).json({ status: false, message: error });
+    });
+};
+
 //Exporting all the functions
 module.exports = {
   authenticate,
@@ -713,5 +733,6 @@ module.exports = {
   updateProfile,
   assignToken,
   setPassword,
-  getProfileDetails
+  getProfileDetails,
+  getPatient
 };

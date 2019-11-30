@@ -23,7 +23,8 @@ const appointment = new Schema({
   reasonForVisit: { type: String },
   description: { type: String },
   type: { type: String },
-  number: { type: String }
+  number: { type: String },
+  completed: { type: Boolean }
 });
 
 module.exports = mongoose.model("Appointments", appointment);
