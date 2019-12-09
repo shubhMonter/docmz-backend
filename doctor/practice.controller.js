@@ -378,6 +378,7 @@ signUpDoc = (req, res) => {
         if (error) {
           res.status(400).json({ status: false, message: error });
         } else if (customer) {
+          console.log({ customer });
           let cipher = crypto.createCipheriv(
             algorithm,
             new Buffer.from(key),
@@ -403,7 +404,7 @@ signUpDoc = (req, res) => {
             steps: [0, 0, 0, 0],
             specialty: req.body.specialty,
             phone: req.body.phone,
-            customerProfile: customer
+            customerProfile: customer.id
           });
 
           //Saving the Doctor Info
@@ -1141,6 +1142,8 @@ let getDoc = (req, res) => {
   console.log({ id });
   Practise.findById(id)
     .populate("appointments")
+    .populate("taxonomies")
+    .populate("address")
     .populate({
       path: "appointments",
       populate: {
@@ -1281,6 +1284,8 @@ async function assignToken(req, res) {
     }
   );
 }
+
+//
 
 //Function to set the password
 function setPassword(req, res) {
