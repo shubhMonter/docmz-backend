@@ -65,6 +65,8 @@ app.use(
 // use JWT auth to secure the api
 app.use(jwt());
 
+app.use("/questionnaire", require("./routes/questionnaire_route"));
+
 // NPI
 app.use("/doctors", require("./routes/doctor_routes.js"));
 
