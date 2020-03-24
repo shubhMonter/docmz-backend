@@ -9,8 +9,7 @@ const question = new Schema({
       text: { type: String },
       linkedQuestion: { type: Schema.Types.ObjectId, ref: "question" }
     }
-  ],
-  children: [{ type: Schema.Types.ObjectId, ref: "question" }]
+  ]
 });
 
 module.exports = mongoose.model("question", question);

@@ -1,7 +1,7 @@
 const question = require("./question.model");
 const questionnaire = require("./questionnaire.model");
 
-let addQuestion = async (req, res) => {
+const addQuestion = async (req, res) => {
   console.log("I came in here");
   let options = JSON.parse(req.body.option);
   console.log(req.body);
@@ -77,7 +77,27 @@ let addQuestion = async (req, res) => {
   // res.send("I am here in addQuestion");
 };
 
-let getQuestion = (req, res) => {
+const updateQuestion = (req, res) => {
+  question
+    .findOneAndUpdate(
+      { _id: req.body.id },
+      { $set: { title: req.body.title, option: req.body.option } }
+    )
+    .then(() => {
+      res.json({
+        message: "question updated successfully",
+        code: 0
+      });
+    })
+    .catch(err => {
+      res.json({
+        message: err,
+        code: 1
+      });
+    });
+};
+
+const getQuestion = (req, res) => {
   console.log("getQuestions");
   questionnaire
     .findOne({ author: "aman" })
@@ -115,5 +135,6 @@ let getQuestion = (req, res) => {
 
 module.exports = {
   addQuestion,
-  getQuestion
+  getQuestion,
+  updateQuestion
 };

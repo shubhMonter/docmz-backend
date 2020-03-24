@@ -7,6 +7,8 @@ const db = require("_helpers/db"),
   (Taxonomy = db.Taxonomy),
   (Address = db.Address);
 (crypto = require("crypto")), (algorithm = "aes-256-cbc");
+
+var geoip = require("geoip-lite");
 let key = "abcdefghijklmnopqrstuvwxyztgbhgf";
 let iv = "1234567891234567";
 let filePathForDoctors = "./doctor/doctors.csv";
@@ -18,6 +20,7 @@ const stripe = require("stripe")(keySecret);
 let nodemailer = require("nodemailer");
 let ejs = require("ejs");
 let async = require("async");
+let address = require("./address.model");
 //Smptp Config
 let smtpConfig = {
   host: "smtp.gmail.com",
@@ -1123,12 +1126,49 @@ let saveSlots = (req, res) => {
 //Search doctors
 
 let searchDocs = (req, res) => {
+  let geo = geoip.lookup(req.ip);
+
+  // console.log(req.ip, geo);
+  let city = req.body.city || geo.city;
   let { specialty } = req.body;
+
+  // Practise.aggregate([
+  // 	{ $match: { specialty: req.body.specialty } },
+  // 	{
+  // 		"$ lookup": {
+  // 			from: address.collection.name,
+  // 			localField: "_id",
+  // 			foreignField: "address",
+  // 			as: "result"
+  // 		}
+  // 	},
+  // 	{
+  // 		$unwind: "$result"
+  // 	},
+  // 	{
+  // 		$match: { "result.city": req.body.city }
+  // 	}
+  // ]).then(result => {
+  // 	res.send(result);
+  // });
   Practise.find({ specialty })
+    .populate({
+      path: "address",
+      match: { city: city }
+    })
+    .select("address")
     .then(data => {
-      res
-        .status(200)
-        .json({ status: true, message: "Doctors Fetched successfully", data });
+      let result = [];
+      data.forEach(elem => {
+        if (elem.address.length > 0) {
+          result.push(elem);
+        }
+      });
+      res.status(200).json({
+        status: true,
+        message: "Doctors Fetched successfully",
+        data: result
+      });
     })
     .catch(error => {
       res.status(404).json({ status: false, message: error });
