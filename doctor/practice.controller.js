@@ -262,6 +262,7 @@ function getNpiInfo(req, res) {
 //Functiont to list all the doctors
 function getAllDoctors(req, res) {
   Practise.find()
+    .select("appointments")
     .populate("taxonomies")
     .populate("address")
     .then(data => res.json({ status: true, data }))
@@ -270,6 +271,7 @@ function getAllDoctors(req, res) {
 
 //Sign up new doctor through API
 signUpDoc = (req, res) => {
+  console.log("i m here");
   let addressArray = [];
   if (req.body.addresses) {
     req.body.addresses.map(el => {
@@ -1126,10 +1128,23 @@ let saveSlots = (req, res) => {
 //Search doctors
 
 let searchDocs = (req, res) => {
+  var pageNo = parseInt(req.body.pageNo) || 1;
+  var size = parseInt(req.body.size) || 10;
+  // var query = {};
+  // if (pageNo < 0 || pageNo === 0) {
+  // 	response = {
+  // 		error: true,
+  // 		message: "invalid page number, should start with 1"
+  // 	};
+  // 	return res.json(response);
+  // }
+  skip = size * (pageNo - 1);
+  limit = size;
   let geo = geoip.lookup(req.ip);
 
   // console.log(req.ip, geo);
   let city = req.body.city || geo.city;
+  // let city = "";
   let { specialty } = req.body;
 
   // Practise.aggregate([
@@ -1151,22 +1166,25 @@ let searchDocs = (req, res) => {
   // ]).then(result => {
   // 	res.send(result);
   // });
-  Practise.find({ specialty })
+  Practise.find({ specialty, city })
+    // .skip(skip)
+    // .limit(limit)
     .populate({
-      path: "address",
-      match: { city: city }
+      path: "appointments",
+      match: { booked: "false" }
     })
-    .select("address")
     .then(data => {
       let result = [];
       data.forEach(elem => {
-        if (elem.address.length > 0) {
+        if (elem.appointments.length > 0) {
           result.push(elem);
         }
       });
       res.status(200).json({
+        length: data.length,
         status: true,
         message: "Doctors Fetched successfully",
+        city: city,
         data: result
       });
     })

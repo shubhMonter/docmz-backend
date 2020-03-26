@@ -29,6 +29,9 @@ const practise = new Schema({
   taxonomies: [{ type: Schema.Types.ObjectId, ref: "Taxonomies" }],
   practiceLocation: [{ type: Schema.Types.ObjectId, ref: "doctorAddress" }],
 
+  state: { type: String },
+  city: { type: String },
+
   practise: { type: String },
   organizationName: { type: String },
   description: { type: String },
