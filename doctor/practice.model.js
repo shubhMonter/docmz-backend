@@ -76,6 +76,7 @@ const practise = new Schema({
   establishmentName: { type: String },
   city: { type: String },
   country: { type: String },
+  state: { type: String },
   identityProof: { type: String },
   medicalProof: { type: String },
   availability: [],

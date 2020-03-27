@@ -31,7 +31,7 @@ app.use(
     }
   })
 );
-
+app.use(express.static("public"));
 // var socket = require('socket.io');
 
 // start server

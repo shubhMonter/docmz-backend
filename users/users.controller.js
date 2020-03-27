@@ -6,6 +6,7 @@
   crypto = require("crypto"),
   algorithm = "aes-256-cbc";
 let key = "abcdefghijklmnopqrstuvwxyztgbhgf";
+
 let iv = "1234567891234567";
 let async = require("async");
 let nodemailer = require("nodemailer");
@@ -26,7 +27,7 @@ let smtpConfig = {
     rejectUnauthorized: false
   }
 };
-
+const multer = require("multer");
 let fs = require("fs"),
   path = require("path"),
   filePath = path.join(__dirname, "/forgotPassword.html");
@@ -78,6 +79,7 @@ app.use((req, res, next) => {
 // }
 
 let register = async (req, res) => {
+  console.log("i am here in register");
   // validate the input
   // req.checkBody("email", "Email is required").notEmpty();
   // req.checkBody("role", "Role is required").notEmpty();
@@ -87,7 +89,7 @@ let register = async (req, res) => {
 
   // // check the validation object for errors
   // let errors = req.validationErrors();
-  let { name, email, phone, password } = req.body;
+  let { firstname, lastname, email, phone, password } = req.body;
   // if (errors) {
   //   res.json({ status: false, messages: errors });
   // } else {
@@ -105,7 +107,7 @@ let register = async (req, res) => {
 
     stripe.customers.create(
       {
-        description: name + "|" + email,
+        description: firstname + " " + lastname + "|" + email,
         email
       },
       function(error, customer) {
@@ -114,7 +116,8 @@ let register = async (req, res) => {
         } else if (customer) {
           //Creating the user model
           const user = new User({
-            name,
+            firstname,
+            lastname,
             email,
             // role,
             phone,
@@ -702,6 +705,8 @@ function setPassword(req, res) {
 
 //Function to update profile
 let updateProfile = (req, res) => {
+  delete req.body.email; //should not  be sent from frontend
+  delete req.body.password; //should not be sent from frontend
   let { id } = req.body;
   User.findByIdAndUpdate(id, req.body, { new: true })
     .populate("appointments")
@@ -726,6 +731,29 @@ let getPatient = (req, res) => {
     });
 };
 
+// SET STORAGE
+
+let uploadImage = async (req, res) => {
+  const file = req.file;
+  const id = req.body.id;
+  if (!file) {
+    const error = new Error("Please upload a file");
+    error.httpStatusCode = 400;
+    return next(error);
+  }
+  User.findByIdAndUpdate({ _id: id }, { imagePath: file.path }, { new: true })
+    .then(() => {
+      res.status(200).json({
+        message: "succesfully uploaded image"
+      });
+    })
+    .catch(err => {
+      res.status(501).json({
+        message: err
+      });
+    });
+  // res.send(file);
+};
 //Exporting all the functions
 module.exports = {
   authenticate,
@@ -734,5 +762,6 @@ module.exports = {
   assignToken,
   setPassword,
   getProfileDetails,
-  getPatient
+  getPatient,
+  uploadImage
 };
