@@ -4,7 +4,8 @@ mongoose.connect(
   "mongodb://dev:dev123@docmz-shard-00-00-fdoxl.mongodb.net:27017,docmz-shard-00-01-fdoxl.mongodb.net:27017,docmz-shard-00-02-fdoxl.mongodb.net:27017/docmz?ssl=true&replicaSet=DocMz-shard-0&authSource=admin&retryWrites=true&w=majority",
   {
     useNewUrlParser: true,
-    useFindAndModify: false
+    useFindAndModify: false,
+    useUnifiedTopology: true
   }
 );
 

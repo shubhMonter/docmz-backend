@@ -31,7 +31,7 @@ app.use(
     }
   })
 );
-
+app.use(express.static("public"));
 // var socket = require('socket.io');
 
 // start server
@@ -64,6 +64,8 @@ app.use(
 
 // use JWT auth to secure the api
 app.use(jwt());
+
+app.use("/questionnaire", require("./routes/questionnaire_route"));
 
 // NPI
 app.use("/doctors", require("./routes/doctor_routes.js"));

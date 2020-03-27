@@ -62,7 +62,7 @@ let upload = multer({
   storage: storage,
   fileFilter: function(req, file, callback) {
     var ext = path.extname(file.originalname);
-    if (ext !== ".png" && ext !== ".jpg" && ext !== ".jpeg" && ext !== ".pdf") {
+    if (ext !== ".png" && ext !== ".jpg" && ext !== ".jpeg") {
       req.fileValidationError = "Forbidden extension";
       return callback(null, false, req.fileValidationError);
     }

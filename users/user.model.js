@@ -5,12 +5,16 @@ const Schema = mongoose.Schema;
 const schema = new Schema({
   email: { type: String, unique: true },
   role: { type: String },
-  name: { type: String },
+  firstname: { type: String },
+  lastname: { type: String },
   phone: { type: String },
   home: { type: String },
   work: { type: String },
   preferredNumber: { type: String },
   Address: { type: Object },
+  city: { type: String },
+  country: { type: String },
+  state: { type: String },
   sex: { type: String },
   dob: { type: String },
   active: { type: Boolean },
@@ -28,7 +32,8 @@ const schema = new Schema({
   appointments: [{ type: Schema.Types.ObjectId, ref: "Appointments" }],
   lastLogin: { type: Date, default: Date.now },
   bloodGroup: { type: String },
-  customerProfile: { type: String }
+  customerProfile: { type: String },
+  imagePath: { type: String }
 });
 
 //Exporting the schema
