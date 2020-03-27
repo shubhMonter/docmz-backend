@@ -2,6 +2,7 @@ const userController = require("../users/users.controller");
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
+const path = require("path");
 var storage = multer.diskStorage({
   destination: function(req, file, cb) {
     cb(null, "public");
@@ -11,7 +12,21 @@ var storage = multer.diskStorage({
   }
 });
 
-var upload = multer({ storage: storage });
+let upload = multer({
+  storage: storage,
+  fileFilter: function(req, file, callback) {
+    var ext = path.extname(file.originalname);
+    console.log(ext);
+    if (ext !== ".png" && ext !== ".jpg" && ext !== ".jpeg") {
+      req.fileValidationError = "Forbidden extension";
+      return callback(null, false, req.fileValidationError);
+    }
+    callback(null, true);
+  },
+  limits: {
+    fileSize: 420 * 150 * 200
+  }
+});
 
 // Register an User
 router.post("/register", userController.register);

@@ -733,7 +733,7 @@ let getPatient = (req, res) => {
 
 // SET STORAGE
 
-let uploadImage = async (req, res) => {
+let uploadImage = (req, res, next) => {
   const file = req.file;
   const id = req.body.id;
   if (!file) {
