@@ -87,7 +87,9 @@ const practise = new Schema({
   customerProfile: { type: String },
   renewDate: { type: Date },
   passwordToken: { type: String },
-  passwordExpires: { type: Date }
+  passwordExpires: { type: Date },
+  killProfile: { type: Boolean }, //Deactivates profile
+  autoApprove: { type: Boolean }
 });
 
 module.exports = mongoose.model("Practise", practise);

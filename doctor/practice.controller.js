@@ -1103,6 +1103,8 @@ let sessionChecker = (req, res, next) => {
 
 //Update profile details
 let profileUpdate = (req, res) => {
+  delete req.body.email; // Shouldn't be sent from frontend. Handling michievious activities
+  delete req.body.password; //Shouldn't be sent from frontend
   let { id } = req.body;
   if (req.body.id) {
     Practise.findByIdAndUpdate(id, req.body, { new: true })

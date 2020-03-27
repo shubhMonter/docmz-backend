@@ -50,7 +50,7 @@ const path = require("path");
 //Multer storage route
 let storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "./public/images/uploads");
+    cb(null, "public");
   },
   filename: (req, file, cb) => {
     let filename = file.originalname.split(".")[0];
@@ -80,7 +80,7 @@ router.post("/upload/:id", upload.any(), (req, res) => {
   if (req.files) {
     let { id } = req.params;
     Practise.findOneAndUpdate(
-      id,
+      { _id: id },
       { $push: { picture: req.files[0].path } },
       { new: true }
     )
@@ -99,7 +99,11 @@ router.post("/upload/:id", upload.any(), (req, res) => {
 router.post("/picture/delete", (req, res) => {
   let { id, query } = req.body;
 
-  Practise.findOneAndUpdate(id, { $pull: { picture: query } }, { new: true })
+  Practise.findOneAndUpdate(
+    { _id: id },
+    { $pull: { picture: query } },
+    { new: true }
+  )
     .then(data => {
       res
         .status(200)
