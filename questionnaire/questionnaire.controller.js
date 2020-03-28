@@ -1,5 +1,5 @@
 const question = require("./question.model");
-const questionnaire = require("./questionnaire.model");
+const practice = require("../doctor/practice.model");
 
 const addQuestion = async (req, res) => {
   console.log("I came in here");
@@ -7,37 +7,56 @@ const addQuestion = async (req, res) => {
   console.log(req.body);
   // let children = JSON.parse(req.body.children);
   let qus = new question({
-    title: req.body.title,
+    ...req.body,
     option: options,
-    children: []
+    superQuestion: req.body.superQuestion || false,
+    speciality: req.body.speciality || "NA"
+    // title: req.body.title,
+    // option: options,
+    // speciality: req.body.speciality || "NA",
+    // superQuestion: req.body.superQuestion || false,
+    // parent: req.body.parent || "",
+    // optionText: req.body.optionText || ""
   });
   console.log(options);
-  if (req.body.parentId === undefined) {
+  if (req.body.parent === undefined) {
     qus
       .save()
       .then(() => {
-        let data = new questionnaire({
-          author: "aman",
-          title: "something",
-          question: qus._id
-        });
-        data
-          .save()
+        practice
+          .findByIdAndUpdate(req.body.id, { $set: { question: qus._id } })
           .then(() => {
-            res.json({
-              message: "question saved successfully",
-              code: 0
+            res.status(200).json({
+              message: "successfully added question"
             });
           })
           .catch(err => {
-            res.json({
-              message: err,
-              code: 1
+            res.status(500).json({
+              message: err
             });
           });
+        // let data = new questionnaire({
+        // 	author: "aman",
+        // 	title: "something",
+        // 	question: qus._id
+        // });
+        // data
+        // 	.save()
+        // 	.then(() => {
+        // 		res.json({
+        // 			message: "question saved successfully",
+        // 			code: 0
+        // 		});
+        // 	})
+        // 	.catch(err => {
+        // 		res.json({
+        // 			message: err,
+        // 			code: 1
+        // 		});
+        // 	});
       })
       .catch(err => {
-        res.json({
+        res.status(500).json({
           message: err,
           code: 1
         });
@@ -48,10 +67,9 @@ const addQuestion = async (req, res) => {
       .then(() => {
         question
           .findOneAndUpdate(
-            { _id: req.body.parentId, "option.text": req.body.optionText },
+            { _id: req.body.parent, "option.text": req.body.optionText },
             {
-              $set: { "option.$.linkedQuestion": qus._id },
-              $push: { children: qus._id }
+              $set: { "option.$.linkedQuestion": qus._id }
             }
           )
           .then(() => {
@@ -77,12 +95,13 @@ const addQuestion = async (req, res) => {
   // res.send("I am here in addQuestion");
 };
 
-const updateQuestion = (req, res) => {
+const updateQuestion = async (req, res) => {
+  // let d = await question.findOne({ _id: req.body.id });
+  // console.log(d);
+  // res.send(d);
+
   question
-    .findOneAndUpdate(
-      { _id: req.body.id },
-      { $set: { title: req.body.title, option: req.body.option } }
-    )
+    .findOneAndUpdate({ _id: req.body.id }, req.body)
     .then(() => {
       res.json({
         message: "question updated successfully",
@@ -99,8 +118,8 @@ const updateQuestion = (req, res) => {
 
 const getQuestion = (req, res) => {
   console.log("getQuestions");
-  questionnaire
-    .findOne({ author: "aman" })
+  practice
+    .findOne({ _id: req.body.id })
     .select("question")
     .then(result => {
       console.log(result);
@@ -133,8 +152,46 @@ const getQuestion = (req, res) => {
     });
 };
 
+const deleteQuestion = async (req, res) => {
+  let d1 = await question.deleteOne({ _id: req.body.id });
+
+  let d2 = await question.findOneAndUpdate(
+    { _id: req.body.parent, "option.text": req.body.optionText },
+    {
+      $unset: { "option.$.linkedQuestion": 1 }
+    }
+  );
+
+  Promise.all([d1, d2])
+    .then(result => {
+      console.log(result);
+      res.status(200).json({
+        message: "successfully deleted question"
+      });
+    })
+    .catch(err => {
+      res.status(500).json({
+        message: err
+      });
+    });
+
+  // question
+  // 	.deleteOne({ _id: req.body.id })
+  // 	.then(() => {
+  // 		res.status(200).json({
+  // 			message: "successfully deleted question"
+  // 		});
+  // 	})
+  // 	.catch(err => {
+  // 		res.status(500).json({
+  // 			message: err
+  // 		});
+  // 	});
+};
+
 module.exports = {
   addQuestion,
   getQuestion,
-  updateQuestion
+  updateQuestion,
+  deleteQuestion
 };

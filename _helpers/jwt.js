@@ -11,8 +11,10 @@ function jwt() {
       // public routes that don't require authentication
       "/patient/picture/delete",
       "/patient/uploadImage",
-      "/questionnaire/addQuestion",
-      "/questionnaire/getQuestion",
+      "/questionnaire/delete",
+      "/questionnaire/update",
+      "/questionnaire/add",
+      "/questionnaire/get",
       "/doctors/getinfo",
       "/patient/register",
       "/patient/authenticate",

@@ -89,7 +89,8 @@ const practise = new Schema({
   passwordToken: { type: String },
   passwordExpires: { type: Date },
   killProfile: { type: Boolean }, //Deactivates profile
-  autoApprove: { type: Boolean }
+  autoApprove: { type: Boolean },
+  question: { type: Schema.Types.ObjectId, ref: "question" }
 });
 
 module.exports = mongoose.model("Practise", practise);
