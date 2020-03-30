@@ -29,9 +29,6 @@ const practise = new Schema({
   taxonomies: [{ type: Schema.Types.ObjectId, ref: "Taxonomies" }],
   practiceLocation: [{ type: Schema.Types.ObjectId, ref: "doctorAddress" }],
 
-  state: { type: String },
-  city: { type: String },
-
   practise: { type: String },
   organizationName: { type: String },
   description: { type: String },
@@ -88,9 +85,10 @@ const practise = new Schema({
   renewDate: { type: Date },
   passwordToken: { type: String },
   passwordExpires: { type: Date },
-  killProfile: { type: Boolean }, //Deactivates profile
+  profileStatus: { type: Boolean }, //shows whether doctor is active or not
   autoApprove: { type: Boolean },
-  question: { type: Schema.Types.ObjectId, ref: "question" }
+  question: { type: Schema.Types.ObjectId, ref: "question" },
+  appointmentsString: { type: String }
 });
 
 module.exports = mongoose.model("Practise", practise);

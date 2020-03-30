@@ -43,6 +43,8 @@ router.get("/getdoc/:id", npiController.getDoc);
 //Search Doctors
 router.post("/search", npiController.searchDocs);
 
+router.post("/searchlite", npiController.searchDocsLite);
+
 //Upload picture
 
 const multer = require("multer");

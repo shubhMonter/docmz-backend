@@ -9,7 +9,7 @@ const question = new Schema(
       {
         optionType: { type: String },
         text: { type: String },
-        linkedQuestion: { type: Schema.Types.ObjectId, ref: "question" }
+        linkedQuestion: [{ type: Schema.Types.ObjectId, ref: "question" }]
       }
     ],
     speciality: { type: String },

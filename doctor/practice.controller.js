@@ -5,7 +5,8 @@ const db = require("_helpers/db"),
 (csvParser = require("csv-parse")),
   (Practise = db.Practise),
   (Taxonomy = db.Taxonomy),
-  (Address = db.Address);
+  (Address = db.Address),
+  (Appointment = db.Appointment);
 (crypto = require("crypto")), (algorithm = "aes-256-cbc");
 
 var geoip = require("geoip-lite");
@@ -409,7 +410,10 @@ signUpDoc = (req, res) => {
             steps: [0, 0, 0, 0],
             specialty: req.body.specialty,
             phone: req.body.phone,
-            customerProfile: customer.id
+            customerProfile: customer.id,
+            city: req.body.city || "NA",
+            state: req.body.state || "NA",
+            country: req.body.country || "NA"
           });
 
           //Saving the Doctor Info
@@ -1130,69 +1134,143 @@ let saveSlots = (req, res) => {
 //Search doctors
 
 let searchDocs = (req, res) => {
+  console.log("came here");
   var pageNo = parseInt(req.body.pageNo) || 1;
   var size = parseInt(req.body.size) || 10;
-  // var query = {};
-  // if (pageNo < 0 || pageNo === 0) {
-  // 	response = {
-  // 		error: true,
-  // 		message: "invalid page number, should start with 1"
-  // 	};
-  // 	return res.json(response);
-  // }
-  skip = size * (pageNo - 1);
-  limit = size;
+
+  if (pageNo < 0 || pageNo === 0) {
+    response = {
+      error: true,
+      message: "invalid page number, should start with 1"
+    };
+    return res.json(response);
+  }
+  let skip = size * (pageNo - 1);
+  let limit = size;
   let geo = geoip.lookup(req.ip);
 
-  // console.log(req.ip, geo);
+  console.log(req.ip, geo);
   let city = req.body.city || geo.city;
-  // let city = "";
-  let { specialty } = req.body;
+  let specialty = req.body.specialty;
+  console.log(req.body, city, specialty, skip, limit);
 
-  // Practise.aggregate([
-  // 	{ $match: { specialty: req.body.specialty } },
-  // 	{
-  // 		"$ lookup": {
-  // 			from: address.collection.name,
-  // 			localField: "_id",
-  // 			foreignField: "address",
-  // 			as: "result"
+  Practise.aggregate([
+    { $match: { city: city, specialty: specialty } },
+    {
+      $lookup: {
+        from: Appointment.collection.name,
+        localField: "appointments",
+        foreignField: "_id",
+        as: "result"
+      }
+    },
+    { $match: { "result.booked": false } },
+    { $project: { appointments: 0 } }
+  ])
+    .skip(skip)
+    .limit(limit)
+    .then(result => {
+      res.send(result);
+    })
+    .catch(err => res.send(err));
+  // Practise.find({ ...req.body })
+  // .skip(skip)
+  // .limit(limit)
+  // .populate({
+  // 	path: "appointments",
+  // 	match: { booked: "false" }
+  // })
+  // .then(data => {
+  // 	console.log(data);
+  // 	let result = [];
+  // 	data.forEach(elem => {
+  // 		if (elem.appointments.length > 0) {
+  // 			result.push(elem);
   // 		}
-  // 	},
-  // 	{
-  // 		$unwind: "$result"
-  // 	},
-  // 	{
-  // 		$match: { "result.city": req.body.city }
-  // 	}
-  // ]).then(result => {
-  // 	res.send(result);
+  // 	});
+  // 	res.status(200).json({
+  // 		length: data.length,
+  // 		status: true,
+  // 		message: "Doctors Fetched successfully",
+  // 		city: city,
+  // 		data: data
+  // 	});
+  // })
+  // .catch(error => {
+  // 	console.log(error);
+  // 	res.status(404).json({ status: false, message: error });
   // });
-  Practise.find({ specialty, city })
-    // .skip(skip)
-    // .limit(limit)
-    .populate({
-      path: "appointments",
-      match: { booked: "false" }
-    })
+};
+
+let searchDocsLite = (req, res) => {
+  console.log(address.collection.name);
+  let page = req.body.page || 0;
+  let size = req.body.size || 3;
+  Practise.aggregate([
+    {
+      $project: {
+        picture: 1,
+        profileStatus: 1,
+        "basic.first_name": 1,
+        "basic.middle_name": 1,
+        "basic.last_name": 1,
+        npi: 1,
+        appointments: 1
+      }
+    },
+    {
+      $lookup: {
+        from: Appointment.collection.name,
+        localField: "appointments",
+        foreignField: "_id",
+        as: "output"
+      }
+    },
+    { $match: { "output.booked": false } },
+    // { $slice: ["$output", 3] },
+    // { $match: { output: { $exists: true, $not: { $size: 0 } } } },
+    {
+      $project: {
+        appointments: 0
+        // next: { $slice: ["$output", 3] }
+        // output: 0
+      }
+    }
+  ])
+    .skip(size * page)
+    .limit(size)
     .then(data => {
-      let result = [];
-      data.forEach(elem => {
-        if (elem.appointments.length > 0) {
-          result.push(elem);
-        }
-      });
       res.status(200).json({
-        length: data.length,
         status: true,
-        message: "Doctors Fetched successfully",
-        city: city,
-        data: result
+        message: "successfully fetched data",
+        data: data
       });
     })
-    .catch(error => {
-      res.status(404).json({ status: false, message: error });
-    });
+    .catch(err =>
+      res.status(500).json({
+        status: false,
+        message: err
+      })
+    );
+  // Practise.find({ ...req.body })
+  // 	// .select([...req.body.select, "appointments"])
+  // 	.select("appointments")
+  // 	.populate({
+  // 		path: "appointments",
+  // 		match: { booked: false }
+  // 	})
+  // 	.then(result => {
+  // 		let arr = result;
+  // 		var l = 0;
+  // 		for (var i = 0; i < result.length; i++) {
+  // 			if (result[i].appointments.length > 0) l++;
+  // 		}
+
+  // 		res.send({
+  // 			length: l,
+  // 			result
+  // 		});
+  // 	});
 };
 
 //Search doc by id
@@ -1414,6 +1492,7 @@ module.exports = {
   profileUpdate,
   saveSlots,
   searchDocs,
+  searchDocsLite,
   getDoc,
   tokenForgetPassword
 };
