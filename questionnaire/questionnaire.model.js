@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const questionnaire = new Schema(
   {
     title: { type: String },
-    question: { type: Schema.Types.ObjectId, ref: "question" },
+    question: [{ type: Schema.Types.ObjectId, ref: "question" }],
     author: { type: String }
   },
   { timestamps: true }

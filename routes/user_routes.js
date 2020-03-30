@@ -3,12 +3,16 @@ const express = require("express");
 const router = express.Router();
 const multer = require("multer");
 const path = require("path");
-var storage = multer.diskStorage({
-  destination: function(req, file, cb) {
+const db = require("_helpers/db");
+const User = db.User;
+
+let storage = multer.diskStorage({
+  destination: (req, file, cb) => {
     cb(null, "public");
   },
-  filename: function(req, file, cb) {
-    cb(null, file.fieldname + "-" + Date.now());
+  filename: (req, file, cb) => {
+    let filename = file.originalname.split(".")[0];
+    cb(null, filename + "-" + Date.now() + path.extname(file.originalname));
   }
 });
 
@@ -16,7 +20,6 @@ let upload = multer({
   storage: storage,
   fileFilter: function(req, file, callback) {
     var ext = path.extname(file.originalname);
-    console.log(ext);
     if (ext !== ".png" && ext !== ".jpg" && ext !== ".jpeg") {
       req.fileValidationError = "Forbidden extension";
       return callback(null, false, req.fileValidationError);
@@ -46,11 +49,50 @@ router.post("/setpassword", userController.setPassword);
 //get patient details
 router.get("/getinfo/:id", userController.getProfileDetails);
 
-router.post(
-  "/uploadImage",
-  upload.single("myFile"),
-  userController.uploadImage
-);
+router.post("/uploadImage", upload.any(), (req, res, next) => {
+  console.log("it came here");
+  const file = req.files;
+  console.log(file);
+  const id = req.body.id;
+  if (!file) {
+    const error = new Error("Please upload a file");
+    error.httpStatusCode = 400;
+    return next(error);
+  }
+  User.findOneAndUpdate(
+    { _id: id },
+    { $push: { picture: req.files[0].path } },
+    { new: true }
+  )
+    .then(data => {
+      res
+        .status(200)
+        .json({ status: true, message: "Image uploaded successfully", data });
+    })
+    .catch(error => {
+      res.status(200).json({ status: false, message: error });
+    });
+  // res.send(file);
+});
+
+//Delete a Picture
+router.post("/picture/delete", (req, res) => {
+  let { id, query } = req.body;
+
+  User.findOneAndUpdate(
+    { _id: id },
+    { $pull: { picture: query } },
+    { new: true }
+  )
+    .then(data => {
+      res
+        .status(200)
+        .json({ status: true, message: "Image deleted successfully", data });
+    })
+    .catch(error => {
+      res.status(200).json({ status: false, message: error });
+    });
+});
 
 // exporting them
 module.exports = router;

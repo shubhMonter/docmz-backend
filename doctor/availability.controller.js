@@ -101,7 +101,10 @@ let getTimeSlots = (req, res) => {
     console.log({ RenewDate });
     setTimeout(function() {
       Practise.findByIdAndUpdate(id, {
-        $set: { appointments: timeSlotsArray }
+        $set: {
+          appointments: timeSlotsArray,
+          appointmentsString: JSON.stringify(req.body)
+        }
       }).then(console.log("Successs"));
 
       Practise.findById(id).then(data => {

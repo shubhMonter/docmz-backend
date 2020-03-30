@@ -3,10 +3,14 @@ const express = require("express");
 const router = express.Router();
 
 // Add a question
-router.post("/addQuestion", questionnaireController.addQuestion);
+router.post("/add", questionnaireController.addQuestion);
 
 //Get all question
-router.post("/getQuestion", questionnaireController.getQuestion);
+router.post("/get", questionnaireController.getQuestion);
+
+router.post("/update", questionnaireController.updateQuestion);
+
+router.post("/delete", questionnaireController.deleteQuestion);
 
 // exporting them
 module.exports = router;

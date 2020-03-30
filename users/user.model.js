@@ -33,7 +33,7 @@ const schema = new Schema({
   lastLogin: { type: Date, default: Date.now },
   bloodGroup: { type: String },
   customerProfile: { type: String },
-  imagePath: { type: String }
+  picture: { type: Array }
 });
 
 //Exporting the schema
