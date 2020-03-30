@@ -24,7 +24,7 @@ const addQuestion = async (req, res) => {
       .save()
       .then(() => {
         practice
-          .findByIdAndUpdate(req.body.id, { $set: { question: qus._id } })
+          .findByIdAndUpdate(req.body.id, { $push: { question: qus._id } })
           .then(() => {
             res.status(200).json({
               message: "successfully added question"
@@ -69,7 +69,7 @@ const addQuestion = async (req, res) => {
           .findOneAndUpdate(
             { _id: req.body.parent, "option.text": req.body.optionText },
             {
-              $set: { "option.$.linkedQuestion": qus._id }
+              $push: { "option.$.linkedQuestion": qus._id }
             }
           )
           .then(() => {
@@ -119,37 +119,57 @@ const updateQuestion = async (req, res) => {
 const getQuestion = (req, res) => {
   console.log("getQuestions");
   practice
-    .findOne({ _id: req.body.id })
+    .findById(req.body.id)
     .select("question")
+    .populate({
+      path: "question",
+      populate: "option.linkedQuestion"
+    })
     .then(result => {
-      console.log(result);
-      question
-        .findOne({ _id: result.question })
-        .populate({
-          path: "option.linkedQuestion",
-          populate: "option.linkedQuestion"
-        })
-        .populate({ path: "children", populate: "children" })
-        .then(result => {
-          res.json({
-            message: "Success",
-            code: 0,
-            data: result
-          });
-        })
-        .catch(err => {
-          res.json({
-            message: err,
-            code: 1
-          });
-        });
+      res.status(200).json({
+        status: true,
+        message: "successfully",
+        question: result
+      });
     })
     .catch(err => {
-      res.json({
-        message: err,
-        code: 1
+      res.status(500).json({
+        status: false,
+        message: err
       });
     });
+  // practice
+  // 	.findOne({ _id: req.body.id })
+  // 	.select("question")
+  // 	.then(result => {
+  // 		console.log(result);
+  // 		question
+  // 			.findOne({ _id: result.question })
+  // 			.populate({
+  // 				path: "option.linkedQuestion",
+  // 				populate: "option.linkedQuestion"
+  // 			})
+  // 			.populate({ path: "children", populate: "children" })
+  // 			.then(result => {
+  // 				res.json({
+  // 					message: "Success",
+  // 					code: 0,
+  // 					data: result
+  // 				});
+  // 			})
+  // 			.catch(err => {
+  // 				res.json({
+  // 					message: err,
+  // 					code: 1
+  // 				});
+  // 			});
+  // 	})
+  // 	.catch(err => {
+  // 		res.json({
+  // 			message: err,
+  // 			code: 1
+  // 		});
+  // 	});
 };
 
 const deleteQuestion = async (req, res) => {
@@ -158,13 +178,13 @@ const deleteQuestion = async (req, res) => {
   let d2 = await question.findOneAndUpdate(
     { _id: req.body.parent, "option.text": req.body.optionText },
     {
-      $unset: { "option.$.linkedQuestion": 1 }
+      $pull: { "option.$.linkedQuestion": req.body.id }
     }
   );
 
   Promise.all([d1, d2])
     .then(result => {
-      console.log(result);
+      // console.log(result);
       res.status(200).json({
         message: "successfully deleted question"
       });

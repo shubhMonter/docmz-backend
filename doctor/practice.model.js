@@ -87,7 +87,7 @@ const practise = new Schema({
   passwordExpires: { type: Date },
   profileStatus: { type: Boolean }, //shows whether doctor is active or not
   autoApprove: { type: Boolean },
-  question: { type: Schema.Types.ObjectId, ref: "question" },
+  question: [{ type: Schema.Types.ObjectId, ref: "question" }],
   appointmentsString: { type: String }
 });
 
