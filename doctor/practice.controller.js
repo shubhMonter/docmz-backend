@@ -413,7 +413,8 @@ signUpDoc = (req, res) => {
             customerProfile: customer.id,
             city: req.body.city || "NA",
             state: req.body.state || "NA",
-            country: req.body.country || "NA"
+            country: req.body.country || "NA",
+            appointmentsString: req.body.appointmentsString
           });
 
           //Saving the Doctor Info

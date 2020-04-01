@@ -88,7 +88,7 @@ const practise = new Schema({
   profileStatus: { type: Boolean }, //shows whether doctor is active or not
   autoApprove: { type: Boolean },
   question: [{ type: Schema.Types.ObjectId, ref: "question" }],
-  appointmentsString: { type: String }
+  appointmentsString: { type: String } //holds the payload by the doctor for the appointment in string format
 });
 
 module.exports = mongoose.model("Practise", practise);
