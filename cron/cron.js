@@ -102,11 +102,14 @@ const removeSlots = async (yesterday, today) => {
       { upsert: true }
     );
     console.log(d);
+
+    let d2 = await AppointmentModel.remove({ _id: { $in: resultId } });
+    console.log(d2);
   }
+
   console.log("over");
 };
 const main = async () => {
-  console.log("running every minute 1, 2, 4 and 5");
   // Practise.update(
   // 	{},
   // 	{
@@ -127,14 +130,14 @@ const main = async () => {
     .subtract(1, "days")
     .toDate();
   const today = moment().toDate;
-  console.log(yesterday);
+  // console.log(yesterday);
   // console.log(today);
 
   let doctorsData = await Practise.find({}).select("appointmentsString");
   console.log(doctorsData);
   for (let i = 0; i < doctorsData.length; i++) {
-    console.log(i);
-    console.log("i got this", JSON.parse(doctorsData[i].appointmentsString));
+    // console.log(i);
+    // console.log("i got this", JSON.parse(doctorsData[i].appointmentsString));
     let appointmentString = JSON.parse(doctorsData[i].appointmentsString);
     let weekdays = {};
     let index = -1;
@@ -152,7 +155,7 @@ const main = async () => {
       }
     ];
     weekdays.unavailability = unavailability;
-    console.log("Weekdays", weekdays);
+    // console.log("Weekdays", weekdays);
 
     let data = {
       from: from,
