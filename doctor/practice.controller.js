@@ -1205,18 +1205,25 @@ let searchDocs = (req, res) => {
 
 let searchDocsLite = (req, res) => {
   console.log(address.collection.name);
+  let options = { ...JSON.parse(req.body.match) };
+  console.log("options;", { ...options });
   let page = req.body.page || 0;
-  let size = req.body.size || 3;
+  let size = req.body.size || 10;
   Practise.aggregate([
+    { $match: { ...options } },
     {
       $project: {
         picture: 1,
         profileStatus: 1,
-        "basic.first_name": 1,
-        "basic.middle_name": 1,
-        "basic.last_name": 1,
+        basic: 1,
         npi: 1,
-        appointments: 1
+        appointments: 1,
+        experience: 1,
+        specialtyName: 1,
+        rating: 1,
+        fee: 1,
+        description: 1,
+        phone: 1
       }
     },
     {

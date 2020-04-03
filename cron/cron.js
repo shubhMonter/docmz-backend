@@ -178,11 +178,11 @@ const main = async () => {
     console.log(appointmentsArray);
     //update doctor appointments array.
     let Doc = await updateDoctor(appointmentsArray, doctorsData[i]._id);
-    console.log("Doc", Doc);
+    // console.log("Doc", Doc);
     console.log(i);
   }
   //Removes slots which are not booked. It removes all unbooked appointment of yesterday. Should run
 
-  let removePreviosSlots = await removeSlots(yesterday, today);
+  // let removePreviosSlots = await removeSlots(yesterday, today);
   console.log("done");
 };
