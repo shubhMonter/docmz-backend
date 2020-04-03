@@ -1204,10 +1204,11 @@ let searchDocs = (req, res) => {
 };
 
 let searchDocsLite = (req, res) => {
-  console.log(address.collection.name);
+  // console.log(address.collection.name);
+  console.log(req.body);
   let options = { ...JSON.parse(req.body.match) };
   console.log("options;", { ...options });
-  let page = req.body.page || 0;
+  let page = req.body.pageNo || 0;
   let size = req.body.size || 10;
   console.log(req.body.name);
   let name = "";
