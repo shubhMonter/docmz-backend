@@ -1209,21 +1209,40 @@ let searchDocsLite = (req, res) => {
   console.log("options;", { ...options });
   let page = req.body.page || 0;
   let size = req.body.size || 10;
+  console.log(req.body.name);
+  let name = "";
+  if (req.body.name) {
+    let exp = req.body.name;
+    name = new RegExp(exp);
+    console.log("here name", name);
+  }
+  let h = "abc";
+  console.log(new RegExp(h));
+  // console.log("name", name, options);
+  // console.log("name", name);
+  // let name = 7;
   Practise.aggregate([
-    { $match: { ...options } },
+    {
+      $match: {
+        ...options,
+        "basic.name": { $regex: new RegExp(req.body.name), $options: "i" }
+      }
+    },
     {
       $project: {
         picture: 1,
         profileStatus: 1,
         basic: 1,
         npi: 1,
-        appointments: 1,
+        specialty: 1,
         experience: 1,
         specialtyName: 1,
         rating: 1,
         fee: 1,
         description: 1,
-        phone: 1
+        phone: 1,
+        is_superDoc: 1,
+        appointments: 1
       }
     },
     {
@@ -1239,9 +1258,9 @@ let searchDocsLite = (req, res) => {
     // { $match: { output: { $exists: true, $not: { $size: 0 } } } },
     {
       $project: {
-        appointments: 0
-        // next: { $slice: ["$output", 3] }
-        // output: 0
+        appointments: 0,
+        // next: { $slice: ["$output", 3] },
+        output: 0
       }
     }
   ])
