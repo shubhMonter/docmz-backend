@@ -6,6 +6,47 @@ const connectToDatabase = require('../database/config/connection.js')
 const User = require('../database/models/User.js')
 
 module.exports = {
+
+async getUserById(req,res){
+  try {
+    const id = req.params.id
+    const db = await connectToDatabase()
+    return User.findById(id).exec().then((user)=>{
+      if(!user) return res.status(401).send({success:false,message:'No user found'})
+      else return res.status(201).send({success:true,user})
+    })
+  } catch (err) {
+    return res.status(400).send(err)
+  }
+},
+async updateUserById(req,res){
+  try {
+    const id = req.body.id
+    const db = await connectToDatabase()
+    return User
+          .findById(id).exec()
+          .then(user => {
+            if (!user) {
+              return res.status(404).send({
+                message: 'User not found',
+              });
+            }
+            return user
+              .updateOne({
+                name: req.body.name || user.name,
+                email:req.body.email || user.email,
+                number: req.body.number || user.number,
+                password:req.body.password || user.password,
+                meta:req.body.meta || user.meta
+              })
+              .then(() => res.status(200).send(user))
+              .catch((error) => res.status(400).send(error));
+          })
+          .catch((error) => res.status(400).send(error));
+      } catch (e) {
+          return res.status(400).send(e)
+      }
+},
 async signin(req,res){
   try {
     const email = req.body.email

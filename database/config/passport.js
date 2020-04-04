@@ -15,10 +15,10 @@ const db =  connectToDatabase()
 passport.use('jwt-private', new JwtStrategy(private, (jwt_payload, done) => {
   User
   .findOne({
-    id: jwt_payload.id,
+    _id: jwt_payload._id,
     role: 'admin',
   }).exec()
-    .then((user) => { return done(null, user); })
+    .then((user) => {  return done(null, user) })
     .catch((error) => { return done(error, false); });
 }))
 
