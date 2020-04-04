@@ -32,7 +32,13 @@ module.exports = {
         playstore_logo:req.body.playstore_logo,
         company_emergency_call:req.body.company_emergency_call,
         company_emergency_email:req.body.company_emergency_email,
-        site_links:req.body.site_links
+        site_links:req.body.site_links,
+        city_text:req.body.city_text,
+        specility_text:req.body.specility_text,
+        insurance_text:req.body.insurance_text,
+        city_list:req.body.city_list,
+        insurance_list:req.body.insurance_text,
+        specility_list:req.body.specility_text
       }).then((footer) => {
         res.status(201).send(footer)
       }).catch((error) => res.status(400).send(error));
@@ -65,7 +71,13 @@ module.exports = {
                 playstore_logo:req.body.playstore_logo || footer.playstore_logo,
                 company_emergency_call:req.body.company_emergency_call || footer.company_emergency_call,
                 company_emergency_email:req.body.company_emergency_email || footer.company_emergency_email,
-                site_links:req.body.site_links || footer.site_links
+                site_links:req.body.site_links || footer.site_links,
+                city_text:req.body.city_text || footer.city_text,
+                specility_text:req.body.specility_text || footer.specility_text,
+                insurance_text:req.body.insurance_text || footer.insurance_text,
+                city_list:req.body.city_list || footer.city_list,
+                insurance_list:req.body.insurance_text || footer.insurance_list,
+                specility_list:req.body.specility_text || footer.specility_list
               })
                  .then((footer) =>  res.status(201).send(footer))
                  .catch((error) => res.status(400).send(error))

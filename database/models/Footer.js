@@ -16,6 +16,22 @@ var FooterSchema = new Schema({
   site_links:[{
     name:String,
     link:String,
+    index: Number
+  }],
+  city_text:String,
+  specility_text:String,
+  insurance_text:String,
+  city_list:[{
+    name_text:String,
+    index:Number
+  }],
+  insurance_list:[{
+    insurance_text:String,
+    index: Number
+  }],
+  specility_list:[{
+      specility_text:String,
+      index: Number
   }],
   created_at: Date,
   updated_at: Date

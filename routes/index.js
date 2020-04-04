@@ -3,6 +3,13 @@ var router = express.Router();
 const passport = require('passport')
 const userController = require('../controller').user;
 const footerController = require('../controller').footer
+const homeController = require('../controller').home
+const headerController = require('../controller').header
+const contactController = require('../controller').contact
+const joinController = require('../controller').join
+const howitworksController = require('../controller').howitworks
+const loginController = require('../controller').login
+
 require('../database/config/passport')(passport);
 
 const getToken =  ((headers) => {
@@ -29,6 +36,36 @@ router.put('/api/user',private,userController.updateUserById)
 // Footer Controller
 router.post('/api/footer',private,footerController.add)
 router.put('/api/footer',private,footerController.update)
-router.get('/api/footer/:id',private,footerController.getFooterById)
+router.get('/api/footer/:id',footerController.getFooterById)
+
+// Header Controller
+router.post('/api/header',private,headerController.add)
+router.put('/api/header',private,headerController.update)
+router.get('/api/header/:id',headerController.getHeaderById)
+
+// Home controller
+router.post('/api/home',private,homeController.add)
+router.put('/api/home',private,homeController.update)
+router.get('/api/home/:id',homeController.getHomeById)
+
+// Contact Controller
+router.post('/api/contact',private,contactController.add)
+router.put('/api/contact',private,contactController.update)
+router.get('/api/contact/:id',contactController.getContactById)
+
+// Login controller
+router.post('/api/login',private,loginController.add)
+router.put('/api/login',private,loginController.update)
+router.get('/api/login/:id',loginController.getLoginById)
+
+// Join controller
+router.post('/api/join',private,joinController.add)
+router.put('/api/join',private,joinController.update)
+router.get('/api/join/:id',joinController.getJoinById)
+
+// Howitworks controller
+router.post('/api/howitworks',private,howitworksController.add)
+router.put('/api/howitworks',private,howitworksController.update)
+router.get('/api/howitworks/:id',howitworksController.getHowitworksById)
 
 module.exports = router;
