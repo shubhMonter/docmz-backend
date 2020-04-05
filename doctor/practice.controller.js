@@ -396,7 +396,7 @@ signUpDoc = (req, res) => {
           console.log(encrypted);
           let practise = new Practise({
             enumerationType: req.body.enumeration_type,
-            npi: req.body.number,
+            npi: req.body.registration_number,
             last_updated_epoch: req.body.last_updated_epoch,
             created_epoch: req.body.created_epoch,
             basic,
@@ -414,13 +414,13 @@ signUpDoc = (req, res) => {
             city: req.body.city || "NA",
             state: req.body.state || "NA",
             country: req.body.country || "NA",
-            appointmentsString: req.body.appointmentsString
+            appointmentsString: req.body.appointmentsString || "NA"
           });
 
           //Saving the Doctor Info
           practise.save(function(err, doc) {
             if (err) {
-              console.log({ err });
+              console.log("error is", { err });
               if (err.name === "MongoError" && err.code === 11000) {
                 console.log("This Doctor already exists");
                 res.json({
@@ -1509,13 +1509,114 @@ function setPassword(req, res) {
     }
   );
 }
+registerByAdmin = async (req, res) => {
+  console.log(req.body);
+  let addressArray = [];
 
+  let address = new Address({
+    country_name: req.body.country,
+    address_1: req.body.address,
+    city: req.body.city,
+    state: req.body.state,
+    postal_code: req.body.zip,
+    telephone_number: req.body.phone
+  });
+  address
+    .save()
+    .then(() => {
+      addressArray.push(address._id);
+      let doctor = new Practise({
+        ...req.body,
+        address: addressArray,
+        npi: req.body.registration_number
+      });
+      doctor
+        .save()
+        .then(() =>
+          res
+            .status(200)
+            .json({ status: true, message: "Succesfuuly registered doctor" })
+        )
+        .catch(err =>
+          res.status(500).json({
+            status: false,
+            message: err
+          })
+        );
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({
+        message: err,
+        status: false
+      });
+    });
+};
+
+addDoctorsByAdmin = async file => {
+  let fileReceived = await fs.readFileSync(file, {
+    encoding: "utf-8"
+  });
+  console.log("file", fileReceived);
+  let data = await csvParser(fileReceived, {
+    delimiter: ","
+  });
+  console.log("data", data);
+  let i = 0;
+  let errorLogs = [];
+  for await (const elem of data) {
+    // console.log(elem, i++);
+    let addressArray = [];
+
+    let address = new Address({
+      address_1: elem[6],
+      city: elem[7],
+      state: elem[8],
+      country_name: elem[9],
+      postal_code: elem[10],
+      telephone_number: elem[4]
+    });
+    let d = await address
+      .save()
+      .then(() => {
+        addressArray.push(address._id);
+        let doctor = new Practise({
+          first_name: elem[0],
+          last_name: elem[1],
+          npi: elem[2],
+          specialty: elem[3],
+          telephone_number: elem[4],
+          city: elem[7],
+          state: elem[8],
+          country_name: elem[9],
+          address: addressArray
+        });
+        doctor
+          .save()
+          .then(doc => {
+            // console.log(doc);
+          })
+          .catch(err => {
+            // console.log(err);
+            errorLogs.push({ err, index: i });
+          });
+      })
+      .catch(err => {
+        // console.log("address didnot save", err);
+        errorLogs.push({ err, index: i });
+      });
+    console.log(i++);
+  }
+  return Promise.resolve(errorLogs);
+};
 //Exporting all the functions
 module.exports = {
   getNpiInfo,
   addDoctors,
   getAllDoctors,
   signUpDoc,
+  registerByAdmin,
+  addDoctorsByAdmin,
   authenticateDoctor,
   profileUpdate,
   saveSlots,
