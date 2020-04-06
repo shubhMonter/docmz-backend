@@ -51,7 +51,7 @@ const practise = new Schema({
     insurancePlan: { type: Number }
   },
   is_in_network: { type: Boolean, default: true },
-  is_superDoc: { type: Boolean, default: false },
+  is_superDoc: { type: Boolean, default: false }, //Shows whether doctor is currently open for taking patients
   next_timeslot: { type: Object },
   location_ids: { type: Array },
   main_specialty_id: { type: Number },
@@ -86,9 +86,12 @@ const practise = new Schema({
   passwordToken: { type: String },
   passwordExpires: { type: Date },
   profileStatus: { type: Boolean }, //shows whether doctor is active or not
-  autoApprove: { type: Boolean },
+  autoApprove: { type: Boolean }, //Auto approve appointments
   question: [{ type: Schema.Types.ObjectId, ref: "question" }],
-  appointmentsString: { type: String } //holds the payload by the doctor for the appointment in string format
+  appointmentsString: { type: String }, //holds the payload by the doctor for the appointment in string format
+  totalPatient: { type: String }, //Shows total number of patient viewed
+  first_name: { type: String },
+  last_name: { type: String }
 });
 
 module.exports = mongoose.model("Practise", practise);
