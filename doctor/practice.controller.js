@@ -1259,9 +1259,8 @@ let searchDocsLite = (req, res) => {
     // { $match: { output: { $exists: true, $not: { $size: 0 } } } },
     {
       $project: {
-        appointments: 0,
+        appointments: 0
         // next: { $slice: ["$output", 3] },
-        output: 0
       }
     }
   ])
