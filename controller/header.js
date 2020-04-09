@@ -16,15 +16,33 @@ module.exports = {
       return res.status(400).send(e)
     }
   },
+
+  async getAll(req,res){
+    try {
+
+      const db = await connectToDatabase()
+      return Header.find().exec().then((header)=>{
+        if(!header) return res.status(401).send({success:false,message:'No header found'})
+        else return res.status(201).send({success:true,header})
+      })
+    } catch (e) {
+      return res.status(400).send(e)
+    }
+  },
+
   async add(req,res){
     try {
       const db = await connectToDatabase()
-      return Header.create({
-        logo_img: req.body.logo_img,
-        item_list: req.body.item_list
-      }).then((header) => {
-        res.status(201).send(header)
-      }).catch((error) => res.status(400).send(error));
+      return Header.deleteMany({}).exec()
+              .then(header =>{
+                return Header.create({
+                  logo_img: req.body.logo_img,
+                  item_list: req.body.item_list
+                }).then((header) => {
+                  res.status(201).send(header)
+                }).catch((error) => res.status(400).send(error))
+              })
+
     } catch (e) {
       return res.status(400).send(e)
     }

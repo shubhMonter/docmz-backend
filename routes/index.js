@@ -37,16 +37,17 @@ router.put('/api/user',private,userController.updateUserById)
 router.post('/api/footer',private,footerController.add)
 router.put('/api/footer',private,footerController.update)
 router.get('/api/footer/:id',footerController.getFooterById)
-
+router.get('/api/footer',footerController.getAll)
 // Header Controller
 router.post('/api/header',private,headerController.add)
 router.put('/api/header',private,headerController.update)
 router.get('/api/header/:id',headerController.getHeaderById)
-
+router.get('/api/header',headerController.getAll)
 // Home controller
 router.post('/api/home',private,homeController.add)
 router.put('/api/home',private,homeController.update)
 router.get('/api/home/:id',homeController.getHomeById)
+
 
 // Contact Controller
 router.post('/api/contact',private,contactController.add)

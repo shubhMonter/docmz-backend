@@ -20,7 +20,6 @@ var HeaderSchema = new Schema({
       index:Number
     }
   },
-
   created_at: Date,
   updated_at: Date
 })

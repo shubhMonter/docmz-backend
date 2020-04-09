@@ -22,6 +22,7 @@ async getUserById(req,res){
 async updateUserById(req,res){
   try {
     const id = req.body.id
+
     const db = await connectToDatabase()
     return User
           .findById(id).exec()
