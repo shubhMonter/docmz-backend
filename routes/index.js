@@ -1,16 +1,16 @@
 var express = require("express");
 var router = express.Router();
 const passport = require("passport");
-const userController = require("../controller").user;
-const footerController = require("../controller").footer;
-const homeController = require("../controller").home;
-const headerController = require("../controller").header;
-const contactController = require("../controller").contact;
-const joinController = require("../controller").join;
-const howitworksController = require("../controller").howitworks;
-const loginController = require("../controller").login;
+const userController = require("../admin/controller").user;
+const footerController = require("../admin/controller").footer;
+const homeController = require("../admin/controller").home;
+const headerController = require("../admin/controller").header;
+const contactController = require("../admin/controller").contact;
+const joinController = require("../admin/controller").join;
+const howitworksController = require("../admin/controller").howitworks;
+const loginController = require("../admin/controller").login;
 
-require("../database/config/passport")(passport);
+require("../admin/database/config/passport")(passport);
 
 const getToken = headers => {
   if (headers && headers.authorization) {

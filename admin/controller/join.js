@@ -1,7 +1,7 @@
 var express = require("express");
 var router = express.Router();
-const connectToDatabase = require("../database/config/connection.js");
-const Join = require("../database/models/Join.js");
+
+const Join = require("../database/models/Join");
 
 module.exports = {
   async getJoinById(req, res) {

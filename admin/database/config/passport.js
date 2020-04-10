@@ -3,14 +3,12 @@ const JwtStrategy = require("passport-jwt").Strategy,
 
 // load up the user model
 const User = require("../models/User.js");
-const connectToDatabase = require("./connection.js");
-require("dotenv").config();
+
 module.exports = passport => {
   const private = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme("JWT"),
     secretOrKey: process.env.SECRETKEY
   };
-  const db = connectToDatabase();
   passport.use(
     "jwt-private",
     new JwtStrategy(private, (jwt_payload, done) => {

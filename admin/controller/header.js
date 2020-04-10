@@ -1,7 +1,6 @@
 var express = require("express");
 var router = express.Router();
-const connectToDatabase = require("../database/config/connection.js");
-const Header = require("../database/models/Header.js");
+const Header = require("../database/models/Header");
 
 module.exports = {
   async getHeaderById(req, res) {

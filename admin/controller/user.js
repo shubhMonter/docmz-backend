@@ -2,14 +2,13 @@ var express = require("express");
 var router = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const connectToDatabase = require("../database/config/connection.js");
-const User = require("../database/models/User.js");
+
+const User = require("../database/models/User");
 
 module.exports = {
   async getUserById(req, res) {
     try {
       const id = req.params.id;
-      const db = await connectToDatabase();
       return User.findById(id)
         .exec()
         .then(user => {
@@ -27,7 +26,6 @@ module.exports = {
     try {
       const id = req.body.id;
 
-      const db = await connectToDatabase();
       return User.findById(id)
         .exec()
         .then(user => {
@@ -57,7 +55,6 @@ module.exports = {
       const email = req.body.email;
       const password = req.body.password;
 
-      const db = await connectToDatabase();
       return User.findOne({ email: email })
         .exec()
         .then(user => {
@@ -78,12 +75,10 @@ module.exports = {
               token: "JWT " + token
             });
           } else {
-            return res
-              .status(401)
-              .send({
-                success: false,
-                message: "Authentication failed. Wrong password."
-              });
+            return res.status(401).send({
+              success: false,
+              message: "Authentication failed. Wrong password."
+            });
           }
         });
     } catch (err) {
@@ -96,8 +91,6 @@ module.exports = {
       const email = req.body.email;
       const password = req.body.password;
       const username = email.split("@")[0];
-
-      const db = await connectToDatabase();
 
       const user = new User({
         username: username,

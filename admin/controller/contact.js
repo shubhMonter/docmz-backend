@@ -1,7 +1,7 @@
 var express = require("express");
 var router = express.Router();
-const connectToDatabase = require("../database/config/connection.js");
-const Contact = require("../database/models/Contact.js");
+
+const Contact = require("../database/models/Contact");
 
 module.exports = {
   async getContactById(req, res) {

@@ -1,6 +1,6 @@
 var express = require("express");
 var router = express.Router();
-const connectToDatabase = require("../database/config/connection.js");
+
 const Howitworks = require("../database/models/Howitworks.js");
 
 module.exports = {

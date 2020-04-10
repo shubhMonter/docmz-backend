@@ -1,7 +1,7 @@
 var express = require("express");
 var router = express.Router();
-const connectToDatabase = require("../database/config/connection.js");
-const Home = require("../database/models/Home.js");
+
+const Home = require("../database/models/Home");
 
 module.exports = {
   async getHomeById(req, res) {

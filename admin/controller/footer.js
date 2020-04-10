@@ -1,7 +1,7 @@
 var express = require("express");
 var router = express.Router();
-const connectToDatabase = require("../database/config/connection.js");
-const Footer = require("../database/models/Footer.js");
+
+const Footer = require("../database/models/Footer");
 
 module.exports = {
   async getAll(req, res) {

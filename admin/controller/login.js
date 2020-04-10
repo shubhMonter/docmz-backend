@@ -1,13 +1,12 @@
 var express = require("express");
 var router = express.Router();
-const connectToDatabase = require("../database/config/connection.js");
-const Login = require("../database/models/Login.js");
+
+const Login = require("../database/models/Login");
 
 module.exports = {
   async getLoginById(req, res) {
     try {
       const id = req.params.id;
-      const db = await connectToDatabase();
       return Login.findById(id)
         .exec()
         .then(login => {
@@ -23,7 +22,6 @@ module.exports = {
   },
   async add(req, res) {
     try {
-      const db = await connectToDatabase();
       return Login.create({
         login_banner_img: req.body.login_banner_img,
         login_form_title: req.body.login_form_title,
@@ -42,7 +40,6 @@ module.exports = {
 
   async update(req, res) {
     try {
-      const db = await connectToDatabase();
       return Login.findById(id)
         .exec()
         .then(login => {
