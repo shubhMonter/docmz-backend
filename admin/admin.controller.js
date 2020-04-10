@@ -8,6 +8,7 @@ const db = require("_helpers/db"),
   (Appointment = db.Appointment),
   (Specialty = db.Specialty),
   (Patient = db.User),
+  (Payment = db.Payment),
   (crypto = require("crypto")),
   (algorithm = "aes-256-cbc");
 
@@ -286,6 +287,44 @@ updatePatient = (req, res) => {
     })
     .catch(err => res.status(500).json({ status: false, message: err }));
 };
+
+getPayment = (req, res) => {
+  Payment.find({})
+    .populate("patient")
+    .populate("doctor")
+    .then(result => {
+      res.status(200).json({
+        status: true,
+        message: "Successfully fetched  payments",
+        data: result
+      });
+    })
+    .catch(err => {
+      res.status(500).json({
+        status: false,
+        message: err
+      });
+    });
+};
+
+addPayment = (req, res) => {
+  let data = new Payment(req.body);
+  data
+    .save()
+    .then(result => {
+      res.status(200).json({
+        status: true,
+        message: "Successfully added payment",
+        data: result
+      });
+    })
+    .catch(err => {
+      res.status(500).json({
+        status: false,
+        message: err
+      });
+    });
+};
 module.exports = {
   addPatient,
   updatePatient,
@@ -295,5 +334,7 @@ module.exports = {
   addDoctorsByAdmin,
   addSpecialty,
   getSpecialty,
-  searchDocsLite
+  searchDocsLite,
+  getPayment,
+  addPayment
 };

@@ -5,8 +5,8 @@ const Schema = mongoose.Schema;
 const schema = new Schema({
   email: { type: String, unique: true },
   role: { type: String },
-  firstname: { type: String },
-  lastname: { type: String },
+  first_name: { type: String },
+  last_name: { type: String },
   phone: { type: String },
   home: { type: String },
   work: { type: String },

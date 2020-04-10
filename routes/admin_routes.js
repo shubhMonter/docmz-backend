@@ -8,7 +8,16 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
-//Patient routes
+//-------------------Payment routes-----------------------------
+
+//Get all payments
+router.get("/payment/get", adminController.getPayment);
+
+//Add payment
+
+router.post("/payment/add", adminController.addPayment);
+
+//-------------------Patient routes-----------------------------
 
 //Add Patient
 router.post("/patient/add", adminController.addPatient);
@@ -19,7 +28,7 @@ router.get("/patient/get", adminController.getPatient);
 //Update Patient
 router.post("/patient/update", adminController.updatePatient);
 
-//Specialty routes
+//------------------Specialty routes-----------------------------
 
 //Get specialities
 
@@ -28,10 +37,10 @@ router.get("/specialty/get", adminController.getSpecialty);
 //add Specialty
 router.post("/specialty/add", adminController.addSpecialty);
 
-//Doctor Routes
-
 //Update Specialty
 router.post("/specialty/update", adminController.updateSpecialty);
+
+//-------------------------Doctor Routes-----------------------------
 
 //Search doctors
 router.post("/doctors/searchlite", adminController.searchDocsLite);
