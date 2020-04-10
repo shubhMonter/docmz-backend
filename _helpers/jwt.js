@@ -9,8 +9,15 @@ function jwt() {
   return expressJwt({ secret, isRevoked }).unless({
     path: [
       // public routes that don't require authentication
-      "/doctors/addDoctorsByAdmin",
-      "/doctors/registerByAdmin",
+      "/admin/patient/update",
+      "/admin/patient/add",
+      "/admin/patient/get",
+      "/admin/specialty/update",
+      "/admin/specialty/add",
+      "/admin/specialty/get",
+      "/admin/doctors/searchlite",
+      "/admin/doctors/addCSV",
+      "/admin/doctors/register",
       "/doctors/searchlite",
       "/patient/picture/delete",
       "/patient/uploadImage",
