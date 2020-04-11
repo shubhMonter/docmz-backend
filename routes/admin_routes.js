@@ -11,7 +11,7 @@ const fs = require("fs");
 //-------------------Payment routes-----------------------------
 
 //Get all payments
-router.get("/payment/get", adminController.getPayment);
+router.post("/payment/get", adminController.getPayment);
 
 //Add payment
 
@@ -23,7 +23,7 @@ router.post("/payment/add", adminController.addPayment);
 router.post("/patient/add", adminController.addPatient);
 
 //Get Patient
-router.get("/patient/get", adminController.getPatient);
+router.post("/patient/get", adminController.getPatient);
 
 //Update Patient
 router.post("/patient/update", adminController.updatePatient);
@@ -32,7 +32,7 @@ router.post("/patient/update", adminController.updatePatient);
 
 //Get specialities
 
-router.get("/specialty/get", adminController.getSpecialty);
+router.post("/specialty/get", adminController.getSpecialty);
 
 //add Specialty
 router.post("/specialty/add", adminController.addSpecialty);

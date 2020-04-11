@@ -122,8 +122,29 @@ addDoctorsByAdmin = async file => {
   return Promise.resolve(errorLogs);
 };
 
+updateDoctor = (req, res) => {
+  Practise.update({ _id: req._id }, req.body)
+    .then(result => {
+      res.status(200).json({
+        message: "Update doctor successfully",
+        status: true,
+        data: result
+      });
+    })
+    .catch(err =>
+      res.status(500).json({
+        message: err,
+        status: false
+      })
+    );
+};
 getSpecialty = (req, res) => {
+  console.log(req.body);
+  let pageNo = Number(req.body.pageNo) || 0;
+  let size = Number(req.body.size) || 10;
   Specialty.find({})
+    .skip(pageNo * size)
+    .limit(size)
     .then(result => {
       res.status(200).json({
         status: true,
@@ -252,7 +273,11 @@ updateSpecialty = (req, res) => {
 };
 
 getPatient = (req, res) => {
+  let pageNo = Number(req.body.pageNo) || 0;
+  let size = Number(req.body.size) || 10;
   Patient.find({})
+    .skip(pageNo * size)
+    .limit(size)
     .then(result => {
       res.status(200).json({
         status: true,
@@ -262,6 +287,7 @@ getPatient = (req, res) => {
     })
     .catch(err => res.status(500).json({ status: false, message: err }));
 };
+
 addPatient = (req, res) => {
   console.log(req.body);
   let data = new Patient(req.body);
@@ -274,6 +300,7 @@ addPatient = (req, res) => {
     })
     .catch(err => res.status(500).json({ status: false, message: err }));
 };
+
 updatePatient = (req, res) => {
   Patient.findOneAndUpdate({ _id: req.body._id }, req.body, {
     new: true
@@ -289,9 +316,13 @@ updatePatient = (req, res) => {
 };
 
 getPayment = (req, res) => {
+  let pageNo = Number(req.body.pageNo) || 0;
+  let size = Number(req.body.size) || 10;
   Payment.find({})
     .populate("patient")
     .populate("doctor")
+    .skip(pageNo * size)
+    .limit(size)
     .then(result => {
       res.status(200).json({
         status: true,
@@ -332,6 +363,7 @@ module.exports = {
   updateSpecialty,
   registerByAdmin,
   addDoctorsByAdmin,
+  updateDoctor,
   addSpecialty,
   getSpecialty,
   searchDocsLite,
