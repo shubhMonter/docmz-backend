@@ -24,7 +24,8 @@ const appointment = new Schema({
   description: { type: String },
   type: { type: String },
   number: { type: String },
-  completed: { type: Boolean }
+  completed: { type: Boolean },
+  quiz: { type: Object } //Stores question answer of patient on doctor quiz
 });
 
 module.exports = mongoose.model("Appointments", appointment);

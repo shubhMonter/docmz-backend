@@ -1,6 +1,7 @@
 ﻿const cookieparser = require("cookie-parser"),
   db = require("_helpers/db"),
   User = db.User,
+  Appointment = db.Appointment,
   express = require("express"),
   app = express(),
   crypto = require("crypto"),
@@ -744,16 +745,36 @@ let uploadImage = (req, res, next) => {
   User.findByIdAndUpdate({ _id: id }, { imagePath: file.path }, { new: true })
     .then(() => {
       res.status(200).json({
+        status: true,
         message: "succesfully uploaded image"
       });
     })
     .catch(err => {
       res.status(501).json({
+        status: false,
         message: err
       });
     });
   // res.send(file);
 };
+
+let attemptQuiz = (req, res) => {
+  Appointment.findOneAndUpdate({ _id: req.body.id }, { quiz: req.body.quiz })
+    .then(result => {
+      console.log(result);
+      res.status(200).json({
+        status: true,
+        message: "Successfully added Quiz"
+      });
+    })
+    .catch(err =>
+      res.status(500).json({
+        status: false,
+        message: err
+      })
+    );
+};
+
 //Exporting all the functions
 module.exports = {
   authenticate,
@@ -763,5 +784,6 @@ module.exports = {
   setPassword,
   getProfileDetails,
   getPatient,
-  uploadImage
+  uploadImage,
+  attemptQuiz
 };
