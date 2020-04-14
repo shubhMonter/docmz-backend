@@ -287,7 +287,6 @@ getPatient = (req, res) => {
     })
     .catch(err => res.status(500).json({ status: false, message: err }));
 };
-
 addPatient = (req, res) => {
   console.log(req.body);
   let data = new Patient(req.body);
@@ -300,7 +299,6 @@ addPatient = (req, res) => {
     })
     .catch(err => res.status(500).json({ status: false, message: err }));
 };
-
 updatePatient = (req, res) => {
   Patient.findOneAndUpdate({ _id: req.body._id }, req.body, {
     new: true
@@ -440,6 +438,8 @@ module.exports = {
   updateSpecialty,
   registerByAdmin,
   addDoctorsByAdmin,
+  addSpecialty,
+  getSpecialty,
   updateDoctor,
   addSpecialty,
   getSpecialty,
