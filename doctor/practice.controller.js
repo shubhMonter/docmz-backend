@@ -6,8 +6,10 @@ const db = require("_helpers/db"),
   (Practise = db.Practise),
   (Taxonomy = db.Taxonomy),
   (Address = db.Address),
-  (Appointment = db.Appointment);
-(crypto = require("crypto")), (algorithm = "aes-256-cbc");
+  (Appointment = db.Appointment),
+  (Specialty = db.Specialty),
+  (crypto = require("crypto")),
+  (algorithm = "aes-256-cbc");
 
 var geoip = require("geoip-lite");
 let key = "abcdefghijklmnopqrstuvwxyztgbhgf";
@@ -1071,26 +1073,24 @@ let authenticateDoctor = (req, res) => {
         if (doctor) {
           console.log(encrypted);
           console.log(doctor);
-          if (!doctor) {
-            res.status(404).json({ status: false, message: "User Not Found!" });
-          } else if (encrypted != doctor.password) {
+          if (encrypted != doctor.password) {
             res.json({ status: false, error: "Password Entered is Incorrect" });
           } else {
-            if (doctor) {
-              console.log(Jwt.secret);
-              let token = jwt.sign(doctor.toJSON(), "catchmeifyoucan", {
-                expiresIn: 604800
-              });
+            console.log(Jwt.secret);
+            let token = jwt.sign(doctor.toJSON(), "catchmeifyoucan", {
+              expiresIn: 604800
+            });
 
-              req.session.user = doctor;
-              req.session.Auth = doctor;
-              res.status(200).json({
-                status: true,
-                user: req.session.Auth,
-                token: "JWT-" + token
-              });
-            }
+            req.session.user = doctor;
+            req.session.Auth = doctor;
+            res.status(200).json({
+              status: true,
+              user: req.session.Auth,
+              token: "JWT-" + token
+            });
           }
+        } else {
+          res.status(404).json({ status: false, message: "User Not Found!" });
         }
       });
     }
@@ -1508,7 +1508,6 @@ function setPassword(req, res) {
     }
   );
 }
-
 //Exporting all the functions
 module.exports = {
   getNpiInfo,
