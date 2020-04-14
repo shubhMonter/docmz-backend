@@ -8,6 +8,11 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
+//-------------------Authentication-----------------------------
+
+router.post("/auth/signIn", adminController.signIn);
+router.post("/auth/signUp", adminController.signUp);
+
 //-------------------Payment routes-----------------------------
 
 //Get all payments

@@ -1208,8 +1208,8 @@ let searchDocsLite = (req, res) => {
   console.log(req.body);
   let options = { ...JSON.parse(req.body.match) };
   console.log("options;", { ...options });
-  let page = req.body.pageNo || 0;
-  let size = req.body.size || 10;
+  let page = Number(req.body.pageNo) || 0;
+  let size = Number(req.body.size) || 10;
   console.log(req.body.name);
   let name = "";
   if (req.body.name) {

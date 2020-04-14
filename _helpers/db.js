@@ -41,5 +41,6 @@ module.exports = {
   Plans: require("../insurance/plan.model"),
   Procedure: require("../doctor/procedure.model"),
   Specialty: require("../doctor/specialty.model"),
-  Payment: require("../payment/model/payment.model")
+  Payment: require("../payment/model/payment.model"),
+  Admin: require("../admin/admin.model")
 };
