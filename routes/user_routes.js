@@ -94,5 +94,6 @@ router.post("/picture/delete", (req, res) => {
     });
 });
 
+router.post("/attempt", userController.attemptQuiz);
 // exporting them
 module.exports = router;

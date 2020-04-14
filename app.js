@@ -87,10 +87,7 @@ app.use("/Stripe", require("./routes/stripe_routes"));
 //Appointment Routes
 app.use("/appointment", require("./routes/appointment_routes"));
 
-//Admin route
 app.use("/admin", require("./routes/admin_routes"));
-
-app.use(require("./routes"));
 
 app.use(errorHandler);
 

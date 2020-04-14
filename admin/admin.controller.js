@@ -8,6 +8,7 @@ const db = require("_helpers/db"),
   (Appointment = db.Appointment),
   (Specialty = db.Specialty),
   (Patient = db.User),
+  (Payment = db.Payment),
   (crypto = require("crypto")),
   (algorithm = "aes-256-cbc");
 
@@ -121,8 +122,29 @@ addDoctorsByAdmin = async file => {
   return Promise.resolve(errorLogs);
 };
 
+updateDoctor = (req, res) => {
+  Practise.update({ _id: req._id }, req.body)
+    .then(result => {
+      res.status(200).json({
+        message: "Update doctor successfully",
+        status: true,
+        data: result
+      });
+    })
+    .catch(err =>
+      res.status(500).json({
+        message: err,
+        status: false
+      })
+    );
+};
 getSpecialty = (req, res) => {
+  console.log(req.body);
+  let pageNo = Number(req.body.pageNo) || 0;
+  let size = Number(req.body.size) || 10;
   Specialty.find({})
+    .skip(pageNo * size)
+    .limit(size)
     .then(result => {
       res.status(200).json({
         status: true,
@@ -251,7 +273,11 @@ updateSpecialty = (req, res) => {
 };
 
 getPatient = (req, res) => {
+  let pageNo = Number(req.body.pageNo) || 0;
+  let size = Number(req.body.size) || 10;
   Patient.find({})
+    .skip(pageNo * size)
+    .limit(size)
     .then(result => {
       res.status(200).json({
         status: true,
@@ -286,6 +312,48 @@ updatePatient = (req, res) => {
     })
     .catch(err => res.status(500).json({ status: false, message: err }));
 };
+
+getPayment = (req, res) => {
+  let pageNo = Number(req.body.pageNo) || 0;
+  let size = Number(req.body.size) || 10;
+  Payment.find({})
+    .populate("patient")
+    .populate("doctor")
+    .skip(pageNo * size)
+    .limit(size)
+    .then(result => {
+      res.status(200).json({
+        status: true,
+        message: "Successfully fetched  payments",
+        data: result
+      });
+    })
+    .catch(err => {
+      res.status(500).json({
+        status: false,
+        message: err
+      });
+    });
+};
+
+addPayment = (req, res) => {
+  let data = new Payment(req.body);
+  data
+    .save()
+    .then(result => {
+      res.status(200).json({
+        status: true,
+        message: "Successfully added payment",
+        data: result
+      });
+    })
+    .catch(err => {
+      res.status(500).json({
+        status: false,
+        message: err
+      });
+    });
+};
 module.exports = {
   addPatient,
   updatePatient,
@@ -295,5 +363,10 @@ module.exports = {
   addDoctorsByAdmin,
   addSpecialty,
   getSpecialty,
-  searchDocsLite
+  updateDoctor,
+  addSpecialty,
+  getSpecialty,
+  searchDocsLite,
+  getPayment,
+  addPayment
 };

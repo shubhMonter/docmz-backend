@@ -26,6 +26,7 @@ function jwt() {
       "/questionnaire/add",
       "/questionnaire/get",
       "/doctors/getinfo",
+      "/patient/attempt",
       "/patient/register",
       "/patient/authenticate",
       "/patient/update",
