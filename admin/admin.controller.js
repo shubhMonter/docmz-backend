@@ -9,7 +9,7 @@ const db = require("_helpers/db"),
   (Specialty = db.Specialty),
   (Patient = db.User),
   (Payment = db.Payment),
-  (crypto = require("crypto")),
+  (Admin = db.Admin)((crypto = require("crypto"))),
   (algorithm = "aes-256-cbc");
 
 let key = "abcdefghijklmnopqrstuvwxyztgbhgf";
@@ -354,6 +354,83 @@ addPayment = (req, res) => {
       });
     });
 };
+
+//Authentication
+signUp = (req, res) => {
+  let cipher = crypto.createCipheriv(algorithm, new Buffer.from(key), iv);
+  var encrypted =
+    cipher.update(req.body.password, "utf8", "hex") + cipher.final("hex");
+  let data = { ...req.body, password: encrypted };
+  let User = new Admin(data);
+  User.save()
+    .then(result => {
+      console.log(result);
+      res.status(200).json({
+        message: "Successfully added admin",
+        status: true
+      });
+    })
+    .catch(err => {
+      res.status(500).json({
+        message: err,
+        status: false
+      });
+    });
+};
+
+signIn = (req, res) => {
+  if (req.body.email) {
+    {
+      let { email, password } = req.body;
+      let cipher = crypto.createCipheriv(algorithm, new Buffer.from(key), iv);
+      let encrypted =
+        cipher.update(password, "utf8", "hex") + cipher.final("hex");
+      Admin.findOne({ email }).then(result => {
+        app.get(sessionChecker, (req, res) => {
+          console.log({ status: "session stored" });
+        });
+
+        //Checking if User exits or not
+        if (result) {
+          console.log(encrypted);
+          console.log(result);
+          if (!result) {
+            res.status(404).json({ status: false, message: "User Not Found!" });
+          } else if (encrypted != result.password) {
+            res.json({ status: false, error: "Password Entered is Incorrect" });
+          } else {
+            if (result) {
+              console.log(Jwt.secret);
+              let token = jwt.sign(result.toJSON(), "catchmeifyoucan", {
+                expiresIn: 604800
+              });
+
+              req.session.user = result;
+              req.session.Auth = result;
+              res.status(200).json({
+                status: true,
+                user: req.session.Auth,
+                token: "JWT-" + token
+              });
+            }
+          }
+        }
+      });
+    }
+  } else {
+    res.status(500).json({
+      message: "please enter email",
+      status: false
+    });
+  }
+};
+let sessionChecker = (req, res, next) => {
+  if (req.session.user && req.cookies.user_sid) {
+    res.redirect("/");
+  } else {
+    next();
+  }
+};
 module.exports = {
   addPatient,
   updatePatient,
@@ -368,5 +445,7 @@ module.exports = {
   getSpecialty,
   searchDocsLite,
   getPayment,
-  addPayment
+  addPayment,
+  signIn,
+  signUp
 };
