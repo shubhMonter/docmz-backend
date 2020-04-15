@@ -16,7 +16,7 @@ const question = new Schema(
     category: { type: String },
     parent: { type: Schema.Types.ObjectId },
     optionText: { type: String },
-    rootQuestion: { type: Boolean, default: false }
+    root: { type: Boolean, default: false } //Set true is its a root question
   },
   { timestamps: true }
 );
