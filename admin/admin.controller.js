@@ -9,6 +9,7 @@ const db = require("_helpers/db"),
   (Specialty = db.Specialty),
   (Patient = db.User),
   (Payment = db.Payment),
+  (Question = db.Question),
   (Admin = db.Admin)((crypto = require("crypto"))),
   (algorithm = "aes-256-cbc");
 
@@ -431,6 +432,28 @@ let sessionChecker = (req, res, next) => {
     next();
   }
 };
+
+getQuestionnaire = (req, res) => {
+  let pageNo = Number(req.body.pageNo) || 0;
+  let size = Number(req.body.size) || 10;
+  Question.find({ root: true })
+    .skip(pageNo * size)
+    .limit(size)
+    .then(result => {
+      res.status(200).json({
+        status: true,
+        message: "Successfully fetched Questionnaire",
+        data: result
+      });
+    })
+    .catch(err =>
+      res.status(500).json({
+        status: false,
+        message: err
+      })
+    );
+};
+
 module.exports = {
   addPatient,
   updatePatient,
@@ -447,5 +470,6 @@ module.exports = {
   getPayment,
   addPayment,
   signIn,
-  signUp
+  signUp,
+  getQuestionnaire
 };

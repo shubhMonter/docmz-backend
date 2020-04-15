@@ -118,18 +118,48 @@ const updateQuestion = async (req, res) => {
 
 const getQuestion = (req, res) => {
   console.log("getQuestions");
+  // question
+  // 	.findById("5e96f129e06d8c066f009951")
+  // 	.populate({
+  // 		path: "option.linkedQuestion",
+  // 		populate: {
+  // 			path: "option.linkedQuestion",
+  // 			populate: "option.linkedQuestion",
+  // 		},
+  // 	})
+  // 	.then((result) => {
+  // 		res.json({
+  // 			message: "Success message",
+  // 			code: 0,
+  // 			data: result,
+  // 		});
+  // 	})
+  // 	.catch((err) => {
+  // 		res.json({
+  // 			message: err,
+  // 			code: 1,
+  // 		});
+  // 	});
+
   practice
     .findById(req.body.id)
     .select("question")
-    .populate({
-      path: "question",
-      populate: "option.linkedQuestion"
-    })
-    .then(result => {
+    .then(async result => {
+      let data = [];
+      for await (const doc of result.question) {
+        let d = await question.findById(doc).populate({
+          path: "option.linkedQuestion",
+          populate: {
+            path: "option.linkedQuestion",
+            populate: "option.linkedQuestion"
+          }
+        });
+        data.push(d);
+      }
       res.status(200).json({
         status: true,
         message: "successfully",
-        question: result
+        question: data
       });
     })
     .catch(err => {

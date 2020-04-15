@@ -13,8 +13,10 @@ const question = new Schema(
       }
     ],
     speciality: { type: String },
+    category: { type: String },
     parent: { type: Schema.Types.ObjectId },
-    optionText: { type: String }
+    optionText: { type: String },
+    root: { type: Boolean, default: false } //Set true is its a root question
   },
   { timestamps: true }
 );
