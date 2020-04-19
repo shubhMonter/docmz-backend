@@ -11,6 +11,8 @@ const fs = require("fs");
 //-------------------Questionnaire----------------------------
 
 router.post("/questionnaire/get", adminController.getQuestionnaire);
+router.post("/questionnaire/question/get", adminController.getQuestion);
+router.post("/questionnaire/question/update", adminController.updateQuestion);
 
 //-------------------Authentication-----------------------------
 

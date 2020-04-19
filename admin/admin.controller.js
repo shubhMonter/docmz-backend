@@ -434,6 +434,7 @@ let sessionChecker = (req, res, next) => {
 };
 
 getQuestionnaire = (req, res) => {
+  console.log("I came in here");
   let pageNo = Number(req.body.pageNo) || 0;
   let size = Number(req.body.size) || 10;
   Question.find({ root: true })
@@ -454,6 +455,47 @@ getQuestionnaire = (req, res) => {
     );
 };
 
+getQuestion = (req, res) => {
+  Question.findById(req.body.id)
+    .populate({
+      path: "option.linkedQuestion",
+      populate: {
+        path: "option.linkedQuestion",
+        populate: "option.linkedQuestion"
+      }
+    })
+    .then(result => {
+      res.status(200).json({
+        message: "Successfully fetched Question",
+        status: true,
+        data: result
+      });
+    })
+    .catch(err => {
+      res.status(500).json({
+        status: false,
+        message: err
+      });
+    });
+};
+
+updateQuestion = (req, res) => {
+  Question.findOneAndUpdate({ _id: req.body._id }, req.body, { new: true })
+    .then(result => {
+      res.status(200).json({
+        message: "Successfully updated Question",
+        status: true,
+        data: result
+      });
+    })
+    .catch(err => {
+      res.status(500).json({
+        message: err,
+        status: false
+      });
+    });
+};
+
 module.exports = {
   addPatient,
   updatePatient,
@@ -471,5 +513,7 @@ module.exports = {
   addPayment,
   signIn,
   signUp,
-  getQuestionnaire
+  getQuestionnaire,
+  getQuestion,
+  updateQuestion
 };
