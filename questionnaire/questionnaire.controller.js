@@ -10,7 +10,7 @@ const addQuestion = async (req, res) => {
     ...req.body,
     option: options,
     superQuestion: req.body.superQuestion || false,
-    speciality: req.body.speciality || "NA"
+    speciality: req.body.specialty || "NA"
     // title: req.body.title,
     // option: options,
     // speciality: req.body.speciality || "NA",
@@ -27,11 +27,13 @@ const addQuestion = async (req, res) => {
           .findByIdAndUpdate(req.body.id, { $push: { question: qus._id } })
           .then(() => {
             res.status(200).json({
+              status: true,
               message: "successfully added question"
             });
           })
           .catch(err => {
             res.status(500).json({
+              status: false,
               message: err
             });
           });
@@ -57,8 +59,8 @@ const addQuestion = async (req, res) => {
       })
       .catch(err => {
         res.status(500).json({
-          message: err,
-          code: 1
+          status: false,
+          message: err
         });
       });
   } else {
@@ -74,21 +76,21 @@ const addQuestion = async (req, res) => {
           )
           .then(() => {
             res.json({
-              message: "all done succesfully added with link",
-              code: 0
+              status: false,
+              message: "all done succesfully added with link"
             });
           })
           .catch(err => {
             res.json({
-              message: err,
-              code: 0
+              status: false,
+              message: err
             });
           });
       })
       .catch(err => {
         res.json({
-          message: err,
-          code: 0
+          status: false,
+          message: err
         });
       });
   }

@@ -434,6 +434,7 @@ let sessionChecker = (req, res, next) => {
 };
 
 getQuestionnaire = (req, res) => {
+  console.log("I came in here");
   let pageNo = Number(req.body.pageNo) || 0;
   let size = Number(req.body.size) || 10;
   Question.find({ root: true })
@@ -454,6 +455,114 @@ getQuestionnaire = (req, res) => {
     );
 };
 
+getQuestion = (req, res) => {
+  Question.findById(req.body.id)
+    .populate({
+      path: "option.linkedQuestion",
+      populate: {
+        path: "option.linkedQuestion",
+        populate: "option.linkedQuestion"
+      }
+    })
+    .then(result => {
+      res.status(200).json({
+        message: "Successfully fetched Question",
+        status: true,
+        data: result
+      });
+    })
+    .catch(err => {
+      res.status(500).json({
+        status: false,
+        message: err
+      });
+    });
+};
+
+updateQuestion = (req, res) => {
+  Question.findOneAndUpdate({ _id: req.body._id }, req.body, { new: true })
+    .then(result => {
+      res.status(200).json({
+        message: "Successfully updated Question",
+        status: true,
+        data: result
+      });
+    })
+    .catch(err => {
+      res.status(500).json({
+        message: err,
+        status: false
+      });
+    });
+};
+
+const addQuestion = async (req, res) => {
+  console.log("I came in addQuestion admin");
+  let options = {};
+  if (typeof req.body.option === "string") {
+    options = JSON.parse(req.body.option);
+  } else {
+    options = req.body.option;
+  }
+  console.log(req.body);
+  // let children = JSON.parse(req.body.children);
+  let qus = new Question({
+    ...req.body,
+    option: options, //Handling if not received an stringifiend option array
+    superQuestion: req.body.superQuestion || false,
+    specialty: req.body.specialty || "NA"
+  });
+  console.log(options);
+  if (req.body.parent === undefined) {
+    console.log("No parent");
+    qus
+      .save()
+      .then(data => {
+        res.status(200).json({
+          status: true,
+          message: "successfully added question",
+          data: data
+        });
+      })
+      .catch(err => {
+        res.status(500).json({
+          message: err,
+          status: false
+        });
+      });
+  } else {
+    qus
+      .save()
+      .then(() => {
+        Question.findOneAndUpdate(
+          { _id: req.body.parent, "option.text": req.body.optionText },
+          {
+            $push: { "option.$.linkedQuestion": qus._id }
+          },
+          { new: true }
+        )
+          .then(data => {
+            res.status(200).json({
+              message: "all done succesfully added with link",
+              status: true,
+              data: data
+            });
+          })
+          .catch(err => {
+            res.status(500).json({
+              message: err,
+              status: false
+            });
+          });
+      })
+      .catch(err => {
+        res.json({
+          message: err,
+          status: false
+        });
+      });
+  }
+};
 module.exports = {
   addPatient,
   updatePatient,
@@ -471,5 +580,8 @@ module.exports = {
   addPayment,
   signIn,
   signUp,
-  getQuestionnaire
+  getQuestionnaire,
+  getQuestion,
+  updateQuestion,
+  addQuestion
 };
