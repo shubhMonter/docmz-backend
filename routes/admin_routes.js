@@ -13,6 +13,7 @@ const fs = require("fs");
 router.post("/questionnaire/get", adminController.getQuestionnaire);
 router.post("/questionnaire/question/get", adminController.getQuestion);
 router.post("/questionnaire/question/update", adminController.updateQuestion);
+router.post("/questionnaire/question/add", adminController.addQuestion);
 
 //-------------------Authentication-----------------------------
 
