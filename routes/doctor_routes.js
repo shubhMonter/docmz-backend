@@ -98,6 +98,48 @@ router.post("/upload/:id", upload.any(), (req, res) => {
   }
 });
 
+let vupload = multer({
+  storage: storage,
+  fileFilter: function(req, file, callback) {
+    var ext = path.extname(file.originalname);
+    if (ext !== ".mp4") {
+      req.fileValidationError = "Forbidden extension";
+      return callback(null, false, req.fileValidationError);
+    }
+    callback(null, true);
+  },
+  limits: {
+    fileSize: 420 * 150 * 200
+  }
+});
+
+router.post("/video", vupload.any(), (req, res) => {
+  if (req.fileValidationError) {
+    res.status(500).json({ status: false, message: req.fileValidationError });
+  }
+  if (req.files.length > 0) {
+    let { id } = req.body;
+    console.log(req.body);
+    Practise.findOneAndUpdate(
+      { _id: id },
+      { video: req.files[0].path },
+      { new: true }
+    )
+      .then(data => {
+        res
+          .status(200)
+          .json({ status: true, message: "video uploaded successfully", data });
+      })
+      .catch(error => {
+        res
+          .status(500)
+          .json({ status: false, message: "something went wrong" });
+      });
+  } else {
+    res.status(500).json({ status: false, message: "Please select a file" });
+  }
+});
+
 //Delete a Picture
 router.post("/picture/delete", (req, res) => {
   let { id, query } = req.body;

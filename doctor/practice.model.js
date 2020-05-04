@@ -91,7 +91,8 @@ const practise = new Schema({
   appointmentsString: { type: String }, //holds the payload by the doctor for the appointment in string format
   totalPatient: { type: String }, //Shows total number of patient viewed
   first_name: { type: String },
-  last_name: { type: String }
+  last_name: { type: String },
+  video: { type: String }
 });
 
 module.exports = mongoose.model("Practise", practise);

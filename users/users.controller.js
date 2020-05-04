@@ -14,6 +14,7 @@ let nodemailer = require("nodemailer");
 let ejs = require("ejs");
 const keySecret = "	sk_test_hoVy16mRDhxHCoNAOAEJYJ4N00pzRH8xK2";
 const stripe = require("stripe")(keySecret);
+
 //SMTP Config
 let smtpConfig = {
   host: "smtp.gmail.com",
