@@ -53,7 +53,7 @@ router.post("/searchlite", npiController.searchDocsLite);
 //Multer storage route
 let storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "public");
+    cb(null, "public/doctors/image");
   },
   filename: (req, file, cb) => {
     let filename = file.originalname.split(".")[0];
@@ -77,11 +77,11 @@ let upload = multer({
 });
 
 //Uplaod a picture to doctors profile
-router.post("/upload/:id", upload.any(), (req, res) => {
+router.post("/upload/image", upload.any(), (req, res) => {
   console.log(req.files);
 
   if (req.files) {
-    let { id } = req.params;
+    let { id } = req.body;
     Practise.findOneAndUpdate(
       { _id: id },
       { $push: { picture: req.files[0].path } },
@@ -159,5 +159,59 @@ router.post("/picture/delete", (req, res) => {
     });
 });
 
+//Upload document
+let dstorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "public/doctors/document");
+  },
+  filename: (req, file, cb) => {
+    let filename = file.originalname.split(".")[0];
+    cb(null, filename + "-" + Date.now() + path.extname(file.originalname));
+  }
+});
+
+let dupload = multer({
+  storage: dstorage
+  // fileFilter: function(req, file, callback) {
+  // 	var ext = path.extname(file.originalname);
+  // 	if (ext !== ".png" && ext !== ".jpg" && ext !== ".jpeg") {
+  // 		req.fileValidationError = "Forbidden extension";
+  // 		return callback(null, false, req.fileValidationError);
+  // 	},	callback(null, true);
+  // },
+  // limits: {
+  // 	fileSize: 420 * 150 * 200,
+  // },
+});
+
+router.post("/upload/document", dupload.any(), (req, res) => {
+  console.log("upload document", req.body);
+  if (req.fileValidationError) {
+    res.status(500).json({ status: false, message: req.fileValidationError });
+  }
+  if (req.files.length > 0) {
+    let { id, docName } = req.body;
+    console.log(req.body);
+    Practise.findOneAndUpdate(
+      { _id: id },
+      { [docName]: req.files[0].path, [`document.${docName}`]: true },
+      { new: true }
+    )
+      .then(data => {
+        res.status(200).json({
+          status: true,
+          message: "document uploaded successfully",
+          data
+        });
+      })
+      .catch(error => {
+        res
+          .status(500)
+          .json({ status: false, message: "something went wrong" });
+      });
+  } else {
+    res.status(500).json({ status: false, message: "Please select a file" });
+  }
+});
 // exporting them
 module.exports = router;

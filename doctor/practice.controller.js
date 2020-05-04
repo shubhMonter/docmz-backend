@@ -274,7 +274,7 @@ function getAllDoctors(req, res) {
 
 //Sign up new doctor through API
 signUpDoc = (req, res) => {
-  console.log("i m here");
+  // console.log("i m here");
   let addressArray = [];
   if (req.body.addresses) {
     req.body.addresses.map(el => {
@@ -416,7 +416,9 @@ signUpDoc = (req, res) => {
             city: req.body.city || "NA",
             state: req.body.state || "NA",
             country: req.body.country || "NA",
-            appointmentsString: req.body.appointmentsString || "NA"
+            appointmentsString: req.body.appointmentsString || "NA",
+            first_name: req.body.first_name,
+            last_name: req.body.last_name
           });
 
           //Saving the Doctor Info

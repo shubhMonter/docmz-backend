@@ -92,6 +92,15 @@ const practise = new Schema({
   totalPatient: { type: String }, //Shows total number of patient viewed
   first_name: { type: String },
   last_name: { type: String },
+  //Document of doctors
+  document: {
+    idProof: { type: Boolean, default: false },
+    registrationProof: { type: Boolean, default: false },
+    establishment: { type: Boolean, default: false }
+  },
+  idProof: { type: String },
+  registrationProof: { type: String },
+  establishment: { type: String },
   video: { type: String }
 });
 
