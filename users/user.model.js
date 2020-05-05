@@ -5,8 +5,8 @@ const Schema = mongoose.Schema;
 const schema = new Schema({
   email: { type: String, unique: true },
   role: { type: String },
-  first_name: { type: String },
-  last_name: { type: String },
+  firstname: { type: String },
+  lastname: { type: String },
   phone: { type: String },
   home: { type: String },
   work: { type: String },
@@ -33,7 +33,8 @@ const schema = new Schema({
   lastLogin: { type: Date, default: Date.now },
   bloodGroup: { type: String },
   customerProfile: { type: String },
-  picture: { type: Array }
+  picture: { type: Array },
+  records: [{ type: Object }]
 });
 
 //Exporting the schema

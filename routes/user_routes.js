@@ -8,7 +8,7 @@ const User = db.User;
 
 let storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "public");
+    cb(null, "public/patient/image");
   },
   filename: (req, file, cb) => {
     let filename = file.originalname.split(".")[0];
@@ -49,7 +49,7 @@ router.post("/setpassword", userController.setPassword);
 //get patient details
 router.get("/getinfo/:id", userController.getProfileDetails);
 
-router.post("/uploadImage", upload.any(), (req, res, next) => {
+router.post("/upload/image", upload.any(), (req, res, next) => {
   console.log("it came here");
   const file = req.files;
   console.log(file);
@@ -95,5 +95,60 @@ router.post("/picture/delete", (req, res) => {
 });
 
 router.post("/attempt", userController.attemptQuiz);
+
+//Upload records
+
+let recordsStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "public/patient/records");
+  },
+  filename: (req, file, cb) => {
+    let filename = file.originalname.split(".")[0];
+    cb(null, filename + "-" + Date.now() + path.extname(file.originalname));
+  }
+});
+
+let recordsUpload = multer({
+  storage: recordsStorage,
+  fileFilter: function(req, file, callback) {
+    var ext = path.extname(file.originalname);
+    if (ext !== ".pdf") {
+      req.fileValidationError = "Please upload file in PDF format";
+      return callback(null, false, req.fileValidationError);
+    }
+    callback(null, true);
+  }
+  // limits: {
+  // 	fileSize: 420 * 150 * 200,
+  // },
+});
+
+router.post("/upload/records", recordsUpload.any(), (req, res) => {
+  if (req.files.length > 0) {
+    let { id } = req.body;
+    let data = {
+      document: req.body.document,
+      path: req.files[0].path,
+      Date: Date.now(),
+      description: req.body.description || "NA"
+    };
+
+    User.findOneAndUpdate(
+      { _id: id },
+      { $push: { records: data } },
+      { new: true }
+    )
+      .then(data => {
+        res
+          .status(200)
+          .json({ status: true, message: "Successfully added record", data });
+      })
+      .catch(error => {
+        res.status(500).json({ status: false, message: error });
+      });
+  } else {
+    res.status(500).json({ status: false, message: "Please select a file" });
+  }
+});
 // exporting them
 module.exports = router;
