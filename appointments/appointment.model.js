@@ -25,7 +25,8 @@ const appointment = new Schema({
   type: { type: String },
   number: { type: String },
   completed: { type: Boolean },
-  quiz: { type: Object } //Stores question answer of patient on doctor quiz
+  quiz: { type: Object }, //Stores question answer of patient on doctor quiz
+  medicines: { type: Schema.Types.ObjectId, ref: "Medicine" }
 });
 
 module.exports = mongoose.model("Appointments", appointment);

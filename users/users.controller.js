@@ -1,6 +1,7 @@
 ﻿const cookieparser = require("cookie-parser"),
   db = require("_helpers/db"),
   User = db.User,
+  Usermeta = db.Usermeta,
   Appointment = db.Appointment,
   express = require("express"),
   app = express(),
@@ -117,38 +118,58 @@ let register = async (req, res) => {
           res.status(400).json({ status: false, message: error });
         } else if (customer) {
           //Creating the user model
-          const user = new User({
-            firstname,
-            lastname,
-            email,
-            // role,
-            phone,
-            password: encrypted,
-            customerProfile: customer.id
-          });
 
-          //Saving the user
-          user
-            .save()
-            .then(data => {
-              //Sending Mail
-              let mailOptions = {
-                from: '"DocMz"; <admin@docmz.com>',
-                to: email,
-                subject: "Successfully Registered - DocMz",
-                text: "You've been successfully registered on DocMz. "
-              };
-
-              // smtpTransport.sendMail(mailOptions, function(err) {
-              //   if (err) console.log(err);
-              // });
-
-              //Sending Success Response
-              res.status(200).json({ status: true, data });
-            })
-            .catch(error => {
-              res.status(404).json({ status: false, error });
+          let meta = new Usermeta({});
+          meta.save().then(() => {
+            const user = new User({
+              firstname,
+              lastname,
+              email,
+              // role,
+              phone,
+              password: encrypted,
+              customerProfile: customer.id,
+              meta: meta._id
             });
+
+            //Saving the user
+            user
+              .save()
+              .then(data => {
+                //Sending Mail
+                Usermeta.findOneAndUpdate(
+                  { _id: data.meta },
+                  { userId: data._id },
+                  { new: true }
+                )
+                  .then(result => {
+                    // console.log(result);
+                    res.status(200).json({ status: true, data });
+                  })
+                  .catch(err => {
+                    res.status(500).json({
+                      status: false,
+                      message: "Something went wrong",
+                      err: err
+                    });
+                  });
+                // let mailOptions = {
+                // 	from: '"DocMz"; <admin@docmz.com>',
+                // 	to: email,
+                // 	subject: "Successfully Registered - DocMz",
+                // 	text: "You've been successfully registered on DocMz. ",
+                // };
+
+                // smtpTransport.sendMail(mailOptions, function(err) {
+                //   if (err) console.log(err);
+                // });
+
+                //Sending Success Response
+              })
+              .catch(error => {
+                res.status(404).json({ status: false, error });
+              });
+          });
         }
       }
     );
@@ -763,6 +784,7 @@ let attemptQuiz = (req, res) => {
   Appointment.findOneAndUpdate({ _id: req.body.id }, { quiz: req.body.quiz })
     .then(result => {
       console.log(result);
+
       res.status(200).json({
         status: true,
         message: "Successfully added Quiz"
@@ -776,6 +798,91 @@ let attemptQuiz = (req, res) => {
     );
 };
 
+addFavourite = (req, res) => {
+  const { id, docId } = req.body;
+  User.findOneAndUpdate(
+    { _id: id, favourites: { $ne: docId } },
+    { $push: { favourites: docId } },
+    { new: true }
+  )
+    .then(result => {
+      // console.log(result);
+      if (result !== null) {
+        res.status(200).json({
+          message: "Successfully added to favourites",
+          status: true
+        });
+      } else {
+        res.status(201).json({
+          status: false,
+          message: "Already in favourites"
+        });
+      }
+    })
+    .catch(err => {
+      res.status(500).json({
+        status: false,
+        err: err,
+        message: "Something went wrong"
+      });
+    });
+};
+
+removeFavourite = (req, res) => {
+  const { id, docId } = req.body;
+  User.findOneAndUpdate(
+    { _id: id },
+    { $pull: { favourites: docId } },
+    { new: true }
+  )
+    .then(result => {
+      // console.log(result);
+
+      res.status(200).json({
+        message: "Successfully removed from favourites",
+        status: true
+      });
+    })
+    .catch(err => {
+      res.status(500).json({
+        status: false,
+        err: err,
+        message: "Something went wrong"
+      });
+    });
+};
+
+addMedicalInfo = async (req, res) => {
+  let { id, meta, field, data } = req.body;
+  if (typeof data === "string") {
+    data = JSON.parse(data);
+  }
+
+  let d1 = await User.findOneAndUpdate(
+    { _id: id },
+    { [field]: data },
+    { new: true }
+  );
+  let d2 = await Usermeta.findOneAndUpdate(
+    { _id: meta },
+    { $push: { [field]: data } },
+    { new: true }
+  );
+  Promise.all([d1, d2])
+    .then(result => {
+      console.log(result);
+      res
+        .status(200)
+        .json({ status: true, message: "Successfully updated data" });
+    })
+    .catch(err => {
+      res.status(500).json({
+        status: false,
+        err: err,
+        message: "Something went wrong"
+      });
+    });
+};
 //Exporting all the functions
 module.exports = {
   authenticate,
@@ -786,5 +893,8 @@ module.exports = {
   getProfileDetails,
   getPatient,
   uploadImage,
-  attemptQuiz
+  attemptQuiz,
+  addFavourite,
+  removeFavourite,
+  addMedicalInfo
 };

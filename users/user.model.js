@@ -34,7 +34,60 @@ const schema = new Schema({
   bloodGroup: { type: String },
   customerProfile: { type: String },
   picture: { type: Array },
-  records: [{ type: Object }]
+  records: [{ type: Object }],
+  weight: {
+    value: { type: String },
+    practiseName: { type: String },
+    practise: { type: Schema.Types.ObjectId, ref: "Practise" },
+    modifiedBy: { type: String },
+    date: { type: Date, default: Date.now() }
+  },
+  height: {
+    value: { type: String },
+    practise: { type: Schema.Types.ObjectId, ref: "Practise" },
+    practiseName: { type: String },
+    modifiedBy: { type: String },
+    date: { type: Date, default: Date.now() }
+  },
+  heartRate: {
+    value: { type: String },
+    practise: { type: Schema.Types.ObjectId, ref: "Practise" },
+    practiseName: { type: String },
+    modifiedBy: { type: String },
+    date: { type: Date, default: Date.now() }
+  },
+  bloodPressure: {
+    value: { type: String },
+    practise: { type: Schema.Types.ObjectId, ref: "Practise" },
+    practiseName: { type: String },
+    modifiedBy: { type: String },
+    date: { type: Date, default: Date.now() }
+  },
+
+  temperature: {
+    value: { type: String },
+    practise: { type: Schema.Types.ObjectId, ref: "Practise" },
+    practiseName: { type: String },
+    modifiedBy: { type: String },
+    date: { type: Date, default: Date.now() }
+  },
+
+  respiration: {
+    value: { type: String },
+    practise: { type: Schema.Types.ObjectId, ref: "Practise" },
+    practiseName: { type: String },
+    modifiedBy: { type: String },
+    date: { type: Date, default: Date.now() }
+  },
+  oxygen: {
+    value: { type: String },
+    practise: { type: Schema.Types.ObjectId, ref: "Practise" },
+    practiseName: { type: String },
+    modifiedBy: { type: String },
+    date: { type: Date, default: Date.now() }
+  },
+  meta: { type: Schema.Types.ObjectId, ref: "Usermeta" },
+  favourites: [{ type: Schema.Types.ObjectId, ref: "Practise" }]
 });
 
 //Exporting the schema

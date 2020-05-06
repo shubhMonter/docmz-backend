@@ -43,5 +43,7 @@ module.exports = {
   Specialty: require("../doctor/specialty.model"),
   Payment: require("../payment/model/payment.model"),
   Admin: require("../admin/admin.model"),
-  Question: require("../questionnaire/question.model")
+  Question: require("../questionnaire/question.model"),
+  Usermeta: require("../users/usermeta.model"),
+  Medicine: require("../medicine/medicine.model")
 };
