@@ -514,12 +514,13 @@ let logout = (req, res) => {
 //Get profile details
 function getProfileDetails(req, res) {
   let { id } = req.params;
-  User.findById(id)
+  User.findOne({ _id: id })
     .populate("appointments")
     .populate({
       path: "appointments",
       populate: {
-        path: "doctor"
+        path: "doctor",
+        select: "-appointments"
       }
     })
     .then(data => {
@@ -744,6 +745,7 @@ let updateProfile = (req, res) => {
 let getPatient = (req, res) => {
   let { id } = req.body;
   User.findById(id)
+    .populate("appointments")
     .then(data => {
       res
         .status(200)
