@@ -151,4 +151,10 @@ router.post("/upload/records", recordsUpload.any(), (req, res) => {
   }
 });
 // exporting them
+
+router.post("/favourite/add", userController.addFavourite);
+router.post("/favourite/remove", userController.removeFavourite);
+
+router.post("/medicalInfo/add", userController.addMedicalInfo);
+
 module.exports = router;
