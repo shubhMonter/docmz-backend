@@ -3,6 +3,7 @@
   User = db.User,
   Usermeta = db.Usermeta,
   Appointment = db.Appointment,
+  Referral = db.Referral,
   express = require("express"),
   app = express(),
   crypto = require("crypto"),
@@ -15,7 +16,8 @@ let nodemailer = require("nodemailer");
 let ejs = require("ejs");
 const keySecret = "	sk_test_hoVy16mRDhxHCoNAOAEJYJ4N00pzRH8xK2";
 const stripe = require("stripe")(keySecret);
-
+const randomstring = require("randomstring");
+const _ = require("underscore");
 //SMTP Config
 let smtpConfig = {
   host: "smtp.gmail.com",
@@ -92,7 +94,7 @@ let register = async (req, res) => {
 
   // // check the validation object for errors
   // let errors = req.validationErrors();
-  let { firstname, lastname, email, phone, password } = req.body;
+  let { firstName, lastName, email, phone, password } = req.body;
   // if (errors) {
   //   res.json({ status: false, messages: errors });
   // } else {
@@ -110,53 +112,218 @@ let register = async (req, res) => {
 
     stripe.customers.create(
       {
-        description: firstname + " " + lastname + "|" + email,
+        description: firstName + " " + lastName + "|" + email,
         email
       },
-      function(error, customer) {
+      async function(error, customer) {
         if (error) {
           res.status(400).json({ status: false, message: error });
         } else if (customer) {
           //Creating the user model
+          let referralId = req.body.firstName + randomstring.generate(5);
+          let meta = new Usermeta({ referralId });
 
-          let meta = new Usermeta({});
-          meta.save().then(() => {
+          meta.save().then(metadata => {
+            console.log("meta", metadata);
             const user = new User({
-              firstname,
-              lastname,
+              firstName,
+              lastName,
               email,
               // role,
               phone,
               password: encrypted,
               customerProfile: customer.id,
-              meta: meta._id
+              meta: metadata._id
             });
 
             //Saving the user
             user
               .save()
-              .then(data => {
-                //Sending Mail
+              .then(async data => {
+                // console.log("User", data);
                 Usermeta.findOneAndUpdate(
                   { _id: data.meta },
                   { userId: data._id },
                   { new: true }
                 )
                   .then(result => {
-                    // console.log(result);
-                    res.status(200).json({ status: true, data });
+                    // console.log("updated meta", result);
+                    Referral.findOne({ email: req.body.email }).then(result => {
+                      if (!_.isEmpty(result)) {
+                        result.referredTo = "Patient";
+                        result.registered = true;
+                        result.registeredId = data._id;
+                        result.save().then(final => {
+                          // console.log("final", final);
+                          res.json({
+                            status: true,
+                            message: "Successfully Registered",
+                            data: result
+                          });
+                        });
+                      } else if (req.body.referralId) {
+                        // console.log("in referral");
+                        let refData = new Referral({
+                          firstName: req.body.firstName,
+                          lastName: req.body.lastName,
+                          referredTo: "Patient",
+                          registered: true,
+                          registeredId: data._id,
+                          referralId: req.body.referralId
+                        });
+                        refData
+                          .save()
+                          .then(ref => {
+                            // console.log("ref created", data._id, ref);
+                            if (req.body.referralId.split("_") === "d") {
+                              Practise.findOneAndUpdate(
+                                { referralId: req.body.referralId },
+                                { $push: { referrals: ref._id } },
+                                { new: true }
+                              )
+                                .then(final => {
+                                  console.log("by link", final);
+                                  res.status(200).json({
+                                    status: true,
+                                    message: "Successfully Registered"
+                                  });
+                                })
+                                .catch(err => {
+                                  // console.log("with referralId", err);
+                                  res.status(500).json({
+                                    status: false,
+                                    message: "Something went wrong",
+                                    err: err
+                                  });
+                                });
+                            } else {
+                              Usermeta.findOneAndUpdate(
+                                { referralId: req.body.referralId },
+                                { $push: { referrals: ref._id } },
+                                { new: true }
+                              )
+                                .then(final => {
+                                  // console.log("by link", final);
+                                  res.status(200).json({
+                                    status: true,
+                                    message: "Successfully Registered"
+                                  });
+                                })
+                                .catch(err => {
+                                  // console.log("with referralId", err);
+                                  res.status(500).json({
+                                    status: false,
+                                    message: "Something went wrong",
+                                    err: err
+                                  });
+                                });
+                            }
+                          })
+                          .catch(err => {
+                            // console.log(err);
+                            res.status(500).json({
+                              status: false,
+                              message: "Something went wrong",
+                              err: err
+                            });
+                          });
+                      } else {
+                        // console.log("no referral");
+                        res.status(200).json({
+                          status: true,
+                          message: "Successfully Registered",
+                          data: doc
+                        });
+                      }
+                    });
                   })
                   .catch(err => {
                     res.status(500).json({
                       status: false,
-                      message: "Something went wrong",
-                      err: err
+                      err: err,
+                      message: "err while find"
                     });
                   });
+
+                // if (req.b\\ ody.referralId) {
+                // 	let refData = new Referral({
+
+                // 		firstName: req.body.firstName,
+                // 		lastName: req.body.lastName,
+                // 		referredBy: req.body.referralId,
+                // 		registered: true,
+                // 		registeredId: data._id,
+                // 	});
+                // 	refData.save().then((ref) => {
+                // 		console.log("ref created", req.body.referralId, ref);
+                // 		Usermeta.findOneAndUpdate(
+                // 			{ referralId: req.body.referralId },
+                // 			{ $push: { referrals: ref._id } },
+                // 			{ new: true }
+                // 		)
+                // 			.then((metares) => {
+                // 				console.log("final meta update", metares);
+                // 				res.status(200).json({
+                // 					status: true,
+                // 					message: "Successfully registered",
+                // 				});
+                // 			})
+                // 			.catch((err) => {
+                // 				res.status(500).json({
+                // 					status: false,
+                // 					err: err,
+                // 					message: "err by refdata",
+                // 				});
+                // 			});
+                // 	});
+                // } else {
+                // 	Referral.findOne({ email: req.body.email }).then(
+                // 		(refres) => {
+                // 			console.log("check by mail", refres);
+                // 			if (_.isEmpty(refres)) {
+                // 				res.status(200).json({
+                // 					status: true,
+                // 					message: "Successfully registered",
+                // 				});
+                // 			} else {
+                // 				refres.registered = true;
+                // 				refres.registeredId = result._id;
+                // 				refres.save().then((output) => {
+                // 					console.log("final refres update", output);
+                // 					res
+                // 						.status(200)
+                // 						.json({
+                // 							status: true,
+                // 							message: "Successfully registered",
+                // 						})
+                // 						.catch((err) => {
+                // 							res.status(500).json({
+                // 								status: false,
+                // 								err: err,
+                // 								message: "err by form",
+                // 							});
+                // 						});
+                // 				});
+                // 			}
+                // 		}
+                // 	);
+                // }
+
+                // .then((result) => {
+                // 	// console.log(result);
+                // 	res.status(200).json({ status: true, data });
+                // })
+                // .catch((err) => {
+                // 	res.status(500).json({
+                // 		status: false,
+                // 		message: "Something went wrong",
+                // 		err: err,
+                // 	});
+                // });
                 // let mailOptions = {
                 // 	from: '"DocMz"; <admin@docmz.com>',
                 // 	to: email,
-                // 	subject: "Successfully Registered - DocMz",
+                // 	subject: "Su`ccessfully Registered - DocMz",
                 // 	text: "You've been successfully registered on DocMz. ",
                 // };
 
@@ -520,7 +687,7 @@ function getProfileDetails(req, res) {
       path: "appointments",
       populate: {
         path: "doctor",
-        select: "-appointments"
+        select: "-appointments -password"
       }
     })
     .then(data => {
