@@ -133,7 +133,8 @@ let register = async (req, res) => {
               phone,
               password: encrypted,
               customerProfile: customer.id,
-              meta: metadata._id
+              meta: metadata._id,
+              referralId
             });
 
             //Saving the user

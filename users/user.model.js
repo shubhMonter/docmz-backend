@@ -87,6 +87,7 @@ const schema = new Schema({
     date: { type: Date, default: Date.now() }
   },
   meta: { type: Schema.Types.ObjectId, ref: "Usermeta" },
+  referralId: { type: String, required: true },
   favourites: [{ type: Schema.Types.ObjectId, ref: "Practise" }]
 });
 

@@ -5,6 +5,7 @@ const multer = require("multer");
 const path = require("path");
 const db = require("_helpers/db");
 const User = db.User;
+const Usermeta = db.Usermeta;
 
 let storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -156,5 +157,54 @@ router.post("/favourite/add", userController.addFavourite);
 router.post("/favourite/remove", userController.removeFavourite);
 
 router.post("/medicalInfo/add", userController.addMedicalInfo);
+
+let idstorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "public/patient/document");
+  },
+  filename: (req, file, cb) => {
+    let filename = file.originalname.split(".")[0];
+    cb(null, filename + "-" + Date.now() + path.extname(file.originalname));
+  }
+});
+
+let idupload = multer({
+  storage: idstorage,
+  fileFilter: function(req, file, callback) {
+    var ext = path.extname(file.originalname);
+    if (ext !== ".png" && ext !== ".jpg" && ext !== ".jpeg") {
+      req.fileValidationError = "Forbidden extension";
+      return callback(null, false, req.fileValidationError);
+    }
+    callback(null, true);
+  },
+  limits: {
+    fileSize: 420 * 150 * 200
+  }
+});
+
+router.post("/add/identity", idupload.any(), (req, res) => {
+  if (req.files.length > 0) {
+    let { id } = req.body;
+
+    const path = req.files[0].path;
+
+    Usermeta.findOneAndUpdate(
+      { _id: id },
+      { $push: { idProof: path } },
+      { new: true }
+    )
+      .then(data => {
+        res
+          .status(200)
+          .json({ status: true, message: "Successfully added record" });
+      })
+      .catch(error => {
+        res.status(500).json({ status: false, message: error });
+      });
+  } else {
+    res.status(500).json({ status: false, message: "Please select a file" });
+  }
+});
 
 module.exports = router;

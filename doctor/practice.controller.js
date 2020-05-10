@@ -1302,20 +1302,20 @@ let searchDocs = (req, res) => {
 
 let searchDocsLite = (req, res) => {
   // console.log(address.collection.name);
-  console.log(req.body);
+  //   console.log(req.body);
   let options = { ...JSON.parse(req.body.match) };
   console.log("options;", { ...options });
   let page = Number(req.body.pageNo) || 0;
   let size = Number(req.body.size) || 10;
-  console.log(req.body.name);
+  //   console.log(req.body.name);
   let name = "";
   if (req.body.name) {
     let exp = req.body.name;
     name = new RegExp(exp);
-    console.log("here name", name);
+    // console.log("here name", name);
   }
   let h = "abc";
-  console.log(new RegExp(h));
+  //   console.log(new RegExp(h));
   // console.log("name", name, options);
   // console.log("name", name);
   // let name = 7;
@@ -1323,7 +1323,8 @@ let searchDocsLite = (req, res) => {
     {
       $match: {
         ...options,
-        "basic.name": { $regex: new RegExp(req.body.name), $options: "i" }
+        "basic.name": { $regex: new RegExp(req.body.name), $options: "i" },
+        profileStatus: true
       }
     },
     {
@@ -1340,7 +1341,10 @@ let searchDocsLite = (req, res) => {
         description: 1,
         phone: 1,
         is_superDoc: 1,
-        appointments: 1
+        appointments: 1,
+        city: 1,
+        country: 1,
+        state: 1
       }
     },
     {

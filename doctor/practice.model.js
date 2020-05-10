@@ -85,7 +85,7 @@ const practise = new Schema({
   renewDate: { type: Date },
   passwordToken: { type: String },
   passwordExpires: { type: Date },
-  profileStatus: { type: Boolean }, //shows whether doctor is active or not
+  profileStatus: { type: Boolean, default: true }, //shows whether doctor is active or not
   autoApprove: { type: Boolean }, //Auto approve appointments
   question: [{ type: Schema.Types.ObjectId, ref: "question" }],
   appointmentsString: { type: String }, //holds the payload by the doctor for the appointment in string format
