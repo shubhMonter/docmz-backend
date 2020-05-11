@@ -207,4 +207,11 @@ router.post("/add/identity", idupload.any(), (req, res) => {
   }
 });
 
+//-------------member-----------------
+
+router.post("/member/get", userController.getMember);
+router.post("/member/update", userController.updateMember);
+router.post("/member/delete", userController.deleteMember);
+router.post("/member/add", userController.addMember);
+
 module.exports = router;
