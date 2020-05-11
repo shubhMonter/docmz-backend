@@ -5,8 +5,8 @@ const Schema = mongoose.Schema;
 const schema = new Schema({
   email: { type: String, unique: true },
   role: { type: String },
-  firstname: { type: String },
-  lastname: { type: String },
+  firstName: { type: String },
+  lastName: { type: String },
   phone: { type: String },
   home: { type: String },
   work: { type: String },
@@ -87,6 +87,7 @@ const schema = new Schema({
     date: { type: Date, default: Date.now() }
   },
   meta: { type: Schema.Types.ObjectId, ref: "Usermeta" },
+  referralId: { type: String, required: true },
   favourites: [{ type: Schema.Types.ObjectId, ref: "Practise" }]
 });
 

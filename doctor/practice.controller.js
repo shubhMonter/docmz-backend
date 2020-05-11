@@ -6,7 +6,9 @@ const db = require("_helpers/db"),
   (Practise = db.Practise),
   (Taxonomy = db.Taxonomy),
   (Address = db.Address),
+  (Usermeta = db.Usermeta),
   (Appointment = db.Appointment),
+  (Referral = db.Referral),
   (Specialty = db.Specialty),
   (crypto = require("crypto")),
   (algorithm = "aes-256-cbc");
@@ -24,6 +26,8 @@ let nodemailer = require("nodemailer");
 let ejs = require("ejs");
 let async = require("async");
 let address = require("./address.model");
+const randomstring = require("randomstring");
+const _ = require("underscore");
 //Smptp Config
 let smtpConfig = {
   host: "smtp.gmail.com",
@@ -396,6 +400,8 @@ signUpDoc = (req, res) => {
             cipher.update(req.body.password, "utf8", "hex") +
             cipher.final("hex");
           console.log(encrypted);
+          const referralKey =
+            req.body.firstName + randomstring.generate(5) + "_d";
           let practise = new Practise({
             enumerationType: req.body.enumeration_type,
             npi: req.body.registration_number,
@@ -417,13 +423,108 @@ signUpDoc = (req, res) => {
             state: req.body.state || "NA",
             country: req.body.country || "NA",
             appointmentsString: req.body.appointmentsString || "NA",
-            first_name: req.body.first_name,
-            last_name: req.body.last_name
+            firstName: req.body.firstName,
+            lastName: req.body.lastName,
+            referralId: referralKey
           });
 
           //Saving the Doctor Info
-          practise.save(function(err, doc) {
-            if (err) {
+
+          practise
+            .save()
+            .then(doc => {
+              // console.log("doc", doc);
+
+              Referral.findOne({ email: req.body.email }).then(result => {
+                if (!_.isEmpty(result)) {
+                  result.registered = true;
+                  result.registeredId = doc._id;
+                  result.referredTo = "Practise";
+                  result.save().then(final => {
+                    console.log("final", final);
+                    res.json({
+                      status: true,
+                      message: "Successfully Registered",
+                      data: doc
+                    });
+                  });
+                } else if (req.body.referralId) {
+                  // console.log("in referral");
+                  let refData = new Referral({
+                    firstName: req.body.firstName,
+                    lastName: req.body.lastName,
+                    referredTo: "Practise",
+                    registered: true,
+                    registeredId: doc._id,
+                    referralId: req.body.referralId
+                  });
+                  refData
+                    .save()
+                    .then(ref => {
+                      // console.log("ref created", doc._id, ref);
+                      if (req.body.referralId.split("_") === "d") {
+                        Practise.findOneAndUpdate(
+                          { referralId: req.body.referralId },
+                          { $push: { referrals: ref._id } },
+                          { new: true }
+                        )
+                          .then(final => {
+                            console.log("by link", final);
+                            res.status(200).json({
+                              status: true,
+                              message: "Successfully Registered"
+                            });
+                          })
+                          .catch(err => {
+                            console.log("with referralId", err);
+                            res.status(500).json({
+                              status: false,
+                              message: "Something went wrong",
+                              err: err
+                            });
+                          });
+                      } else {
+                        Usermeta.findOneAndUpdate(
+                          { referralId: req.body.referralId },
+                          { $push: { referrals: ref._id } },
+                          { new: true }
+                        )
+                          .then(final => {
+                            // console.log("by link", final);
+                            res.status(200).json({
+                              status: true,
+                              message: "Successfully Registered"
+                            });
+                          })
+                          .catch(err => {
+                            console.log("with referralId", err);
+                            res.status(500).json({
+                              status: false,
+                              message: "Something went wrong",
+                              err: err
+                            });
+                          });
+                      }
+                    })
+                    .catch(err => {
+                      console.log(err);
+                      res.status(500).json({
+                        status: false,
+                        message: "Something went wrong",
+                        err: err
+                      });
+                    });
+                } else {
+                  console.log("no referral");
+                  res.status(200).json({
+                    status: true,
+                    message: "Successfully Registered",
+                    data: doc
+                  });
+                }
+              });
+            })
+            .catch(err => {
               console.log("error is", { err });
               if (err.name === "MongoError" && err.code === 11000) {
                 console.log("This Doctor already exists");
@@ -432,22 +533,16 @@ signUpDoc = (req, res) => {
                   message: "Doctor with this Npi number already exists"
                 });
               }
-            } else {
-              res.json({
-                status: true,
-                message: "Successfully Registered",
-                data: doc
-              });
-            }
+            });
 
-            // let mailOptions = {
-            //   from: '"DocMz"; <admin@docmz.com>',
-            //   to: req.body.email,
-            //   subject: "Confirm your Email - DocMz",
-            //   text: "You've been succesfully registered as a Doctor on DocMz. "
-            // html="<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-            {
-              /* <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+          // let mailOptions = {
+          //   from: '"DocMz"; <admin@docmz.com>',
+          //   to: req.body.email,
+          //   subject: "Confirm your Email - DocMz",
+          //   text: "You've been succesfully registered as a Doctor on DocMz. "
+          // html="<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+          {
+            /* <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
   <head>
     <title></title>
     <!--[if !mso]><!-->
@@ -1046,9 +1141,9 @@ signUpDoc = (req, res) => {
   
   </body>
 </html>" */
-            }
-            // };
-          });
+          }
+          // };
+          // });
         }
         // smtpTransport.sendMail(mailOptions, function(err) {
         //   if (err) console.log(err);
@@ -1207,20 +1302,20 @@ let searchDocs = (req, res) => {
 
 let searchDocsLite = (req, res) => {
   // console.log(address.collection.name);
-  console.log(req.body);
+  //   console.log(req.body);
   let options = { ...JSON.parse(req.body.match) };
   console.log("options;", { ...options });
   let page = Number(req.body.pageNo) || 0;
   let size = Number(req.body.size) || 10;
-  console.log(req.body.name);
+  //   console.log(req.body.name);
   let name = "";
   if (req.body.name) {
     let exp = req.body.name;
     name = new RegExp(exp);
-    console.log("here name", name);
+    // console.log("here name", name);
   }
   let h = "abc";
-  console.log(new RegExp(h));
+  //   console.log(new RegExp(h));
   // console.log("name", name, options);
   // console.log("name", name);
   // let name = 7;
@@ -1228,7 +1323,8 @@ let searchDocsLite = (req, res) => {
     {
       $match: {
         ...options,
-        "basic.name": { $regex: new RegExp(req.body.name), $options: "i" }
+        "basic.name": { $regex: new RegExp(req.body.name), $options: "i" },
+        profileStatus: true
       }
     },
     {
@@ -1245,7 +1341,10 @@ let searchDocsLite = (req, res) => {
         description: 1,
         phone: 1,
         is_superDoc: 1,
-        appointments: 1
+        appointments: 1,
+        city: 1,
+        country: 1,
+        state: 1
       }
     },
     {

@@ -91,6 +91,8 @@ app.use("/medicine", require("./routes/medicine_route"));
 
 app.use("/admin", require("./routes/admin_routes"));
 
+app.use("/referral", require("./routes/referral_routes"));
+
 app.use(errorHandler);
 
 module.exports = app;

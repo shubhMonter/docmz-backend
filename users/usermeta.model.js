@@ -3,6 +3,10 @@ const Schema = mongoose.Schema;
 
 const Usermeta = new Schema({
   userId: { type: Schema.Types.ObjectId, ref: "Patient" },
+  referralId: { type: String, required: true, unique: true },
+  referrals: [{ type: Schema.Types.ObjectId, ref: "Referral" }],
+  idProof: { type: String },
+  members: [{ type: Schema.Types.ObjectId, ref: "Member" }],
   weight: [
     {
       value: { type: String },

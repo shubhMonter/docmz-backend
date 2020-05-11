@@ -45,5 +45,7 @@ module.exports = {
   Admin: require("../admin/admin.model"),
   Question: require("../questionnaire/question.model"),
   Usermeta: require("../users/usermeta.model"),
-  Medicine: require("../medicine/medicine.model")
+  Medicine: require("../medicine/medicine.model"),
+  Referral: require("../referral/referral.model"),
+  Member: require("../users/member.model")
 };

@@ -85,13 +85,13 @@ const practise = new Schema({
   renewDate: { type: Date },
   passwordToken: { type: String },
   passwordExpires: { type: Date },
-  profileStatus: { type: Boolean }, //shows whether doctor is active or not
+  profileStatus: { type: Boolean, default: true }, //shows whether doctor is active or not
   autoApprove: { type: Boolean }, //Auto approve appointments
   question: [{ type: Schema.Types.ObjectId, ref: "question" }],
   appointmentsString: { type: String }, //holds the payload by the doctor for the appointment in string format
   totalPatient: { type: String }, //Shows total number of patient viewed
-  first_name: { type: String },
-  last_name: { type: String },
+  firstName: { type: String },
+  lastName: { type: String },
   //Document of doctors
   document: {
     idProof: { type: Boolean, default: false },
@@ -101,7 +101,10 @@ const practise = new Schema({
   idProof: { type: String },
   registrationProof: { type: String },
   establishment: { type: String },
-  video: { type: String }
+  video: { type: String },
+
+  referralId: { type: String, required: true },
+  referrals: [{ type: Schema.Types.ObjectId, ref: "Referral" }]
 });
 
 module.exports = mongoose.model("Practise", practise);
