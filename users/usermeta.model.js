@@ -6,6 +6,7 @@ const Usermeta = new Schema({
   referralId: { type: String, required: true, unique: true },
   referrals: [{ type: Schema.Types.ObjectId, ref: "Referral" }],
   idProof: { type: String },
+  members: [{ type: Schema.Types.ObjectId, ref: "Member" }],
   weight: [
     {
       value: { type: String },

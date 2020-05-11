@@ -2,6 +2,7 @@
   db = require("_helpers/db"),
   User = db.User,
   Usermeta = db.Usermeta,
+  Member = db.Member,
   Appointment = db.Appointment,
   Referral = db.Referral,
   express = require("express"),
@@ -683,7 +684,10 @@ let logout = (req, res) => {
 function getProfileDetails(req, res) {
   let { id } = req.params;
   User.findOne({ _id: id })
-    .populate("appointments")
+    .populate({
+      path: "favourites",
+      select: "basic firstName lastName address phone email picture"
+    })
     .populate({
       path: "appointments",
       populate: {
@@ -914,6 +918,7 @@ let getPatient = (req, res) => {
   let { id } = req.body;
   User.findById(id)
     .populate("appointments")
+    .populate("favourite")
     .then(data => {
       res
         .status(200)
@@ -1053,6 +1058,75 @@ addMedicalInfo = async (req, res) => {
       });
     });
 };
+
+//------------------------member-----------------------------------------
+const addMember = (req, res) => {
+  const {
+    firstName,
+    lastName,
+    birthdate,
+    gender,
+    email,
+    relationship,
+    metaId
+  } = req.body;
+  const member = new Member(
+    firstName,
+    lastName,
+    birthdate,
+    gender,
+    email,
+    relationship
+  );
+  member
+    .save()
+    .then(data => {
+      Usermeta.findOneAndUpdate(
+        { _id: metaId },
+        { $push: { member: data._id } }
+      )
+        .then(result => {
+          res.status(200).json({
+            message: "Successfully updated member",
+            status: true
+          });
+        })
+        .catch(err =>
+          res.status(500).json({
+            message: "Something went wrong",
+            status: false,
+            err: err
+          })
+        );
+    })
+    .catch(err =>
+      res.status(500).json({
+        message: "Something went wrong",
+        status: false,
+        err: err
+      })
+    );
+};
+
+const updateMember = (req, res) => {
+  Member.findOneAndUpdate({ _id: req.body }, req.body, { new: true })
+    .then(data => {
+      res.status(200).json({
+        message: "Successfully updated member",
+        status: true
+      });
+    })
+    .catch(err =>
+      res.status(500).json({
+        message: "Something went wrong",
+        status: false,
+        err: err
+      })
+    );
+};
+
+const deleteHandler = (req, res) => {};
+
 //Exporting all the functions
 module.exports = {
   authenticate,
@@ -1066,5 +1140,7 @@ module.exports = {
   attemptQuiz,
   addFavourite,
   removeFavourite,
-  addMedicalInfo
+  addMedicalInfo,
+  addMember,
+  updateMember
 };
