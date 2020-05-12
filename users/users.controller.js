@@ -234,7 +234,7 @@ let register = async (req, res) => {
                         res.status(200).json({
                           status: true,
                           message: "Successfully Registered",
-                          data: doc
+                          data: data
                         });
                       }
                     });
@@ -1175,6 +1175,26 @@ const getMember = (req, res) => {
     );
 };
 
+//-------------------------medicalInfo---------------------
+
+const getMeta = (req, res) => {
+  Usermeta.findOne({ _id: req.body.id })
+    .then(result => {
+      res.status(200).json({
+        message: "Successfully fetched patient meta deta",
+        data: result,
+        status: true
+      });
+    })
+    .catch(err => {
+      res.status(500).json({
+        status: false,
+        message: "Something went wrong",
+        err
+      });
+    });
+};
+
 //Exporting all the functions
 module.exports = {
   authenticate,
@@ -1192,5 +1212,6 @@ module.exports = {
   addMember,
   updateMember,
   deleteMember,
-  getMember
+  getMember,
+  getMeta
 };

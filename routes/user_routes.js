@@ -1,4 +1,5 @@
 const userController = require("../users/users.controller");
+const testController = require("../users/test");
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
@@ -214,4 +215,10 @@ router.post("/member/update", userController.updateMember);
 router.post("/member/delete", userController.deleteMember);
 router.post("/member/add", userController.addMember);
 
+router.post("/test/add", testController.add);
+router.post("/test/get", testController.get);
+router.post("/test/update", testController.update);
+
+//-----------meta---------------------------
+router.post("/meta/get", userController.getMeta);
 module.exports = router;

@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const mongooseFieldEncryption = require("mongoose-field-encryption")
+  .fieldEncryption;
 const Schema = mongoose.Schema;
 
 //Schema Model
@@ -89,6 +91,57 @@ const schema = new Schema({
   meta: { type: Schema.Types.ObjectId, ref: "Usermeta" },
   referralId: { type: String, required: true },
   favourites: [{ type: Schema.Types.ObjectId, ref: "Practise" }]
+});
+
+schema.plugin(mongooseFieldEncryption, {
+  fields: [
+    "email",
+    "role",
+    "firstName",
+    "lastName",
+    "phone",
+    "home",
+    "work",
+    "preferredNumber",
+    "address",
+    "city",
+    "country",
+    "state",
+    "sex",
+    "dob",
+    "active",
+    "wellnessReminder",
+    "appointmentReminderText",
+    "notify",
+    "race",
+    "ethinicity",
+    "zip",
+    "password",
+    "passwordtoken",
+    "verified",
+    "passwordexpires",
+    "createdDate",
+    // 'appointments',
+    "lastLogin",
+    "bloodGroup",
+    "customerProfile",
+    "picture",
+    "records",
+    "weight",
+    "height",
+    "heartRate",
+    "bloodPressure",
+    "temperature",
+    "respiration",
+    "oxygen"
+    // "referralId",
+    // "meta",
+    // "favourites",
+  ],
+  secret: "some secret key",
+  saltGenerator: function(secret) {
+    return "1234567890123456"; // should ideally use the secret to return a string of length 16
+  }
 });
 
 //Exporting the schema

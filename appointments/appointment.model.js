@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const mongooseFieldEncryption = require("mongoose-field-encryption")
+  .fieldEncryption;
 const Schema = mongoose.Schema;
 
 const appointment = new Schema({
@@ -28,6 +30,40 @@ const appointment = new Schema({
   completed: { type: Boolean },
   quiz: { type: Object }, //Stores question answer of patient on doctor quiz
   medicines: { type: Schema.Types.ObjectId, ref: "Medicine" } // Medicines prescribed by doctor
+});
+
+appointment.plugin(mongooseFieldEncryption, {
+  fields: [
+    "forWhom",
+    "bookedOn",
+    // 'patient',
+    // 'doctor',
+    "bookedFor",
+    "cancelledByPatient",
+    "cancelledByDoctor",
+    "transactionId",
+    "reasonForCancellation",
+    "availabilitySelected",
+    "paid",
+    "duration",
+    "available",
+    // "booked",
+    "approved",
+    "viewedByPatient",
+    "viewedByDoctor",
+    "amount",
+    "paidByAdmin",
+    "reasonForVisit",
+    "description",
+    "type",
+    "number",
+    "completed",
+    "quiz"
+  ],
+  secret: "some secret key",
+  saltGenerator: function(secret) {
+    return "1234567890123456"; // should ideally use the secret to return a string of length 16
+  }
 });
 
 module.exports = mongoose.model("Appointments", appointment);

@@ -104,7 +104,8 @@ const practise = new Schema({
   video: { type: String },
 
   referralId: { type: String, required: true },
-  referrals: [{ type: Schema.Types.ObjectId, ref: "Referral" }]
+  referrals: [{ type: Schema.Types.ObjectId, ref: "Referral" }],
+  latestAppointment: [{ type: Schema.Types.ObjectId, ref: "Appointments" }]
 });
 
 module.exports = mongoose.model("Practise", practise);
