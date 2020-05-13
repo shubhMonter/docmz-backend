@@ -269,9 +269,14 @@ function getNpiInfo(req, res) {
 //Functiont to list all the doctors
 function getAllDoctors(req, res) {
   Practise.find()
-    .select("appointments")
+    .populate({
+      path: "appointments"
+      // match: { booked: false },
+    })
+    // .select("appointments")
     .populate("taxonomies")
     .populate("address")
+
     .then(data => res.json({ status: true, data }))
     .catch(error => res.json({ status: false, error }));
 }
@@ -1323,8 +1328,8 @@ let searchDocsLite = (req, res) => {
     {
       $match: {
         ...options,
-        "basic.name": { $regex: new RegExp(req.body.name), $options: "i" },
-        profileStatus: true
+        "basic.name": { $regex: new RegExp(req.body.name), $options: "i" }
+        // profileStatus: true
       }
     },
     {
@@ -1367,6 +1372,7 @@ let searchDocsLite = (req, res) => {
   ])
     .skip(size * page)
     .limit(size)
+
     .then(data => {
       res.status(200).json({
         status: true,

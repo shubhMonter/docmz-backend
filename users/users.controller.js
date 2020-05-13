@@ -234,7 +234,7 @@ let register = async (req, res) => {
                         res.status(200).json({
                           status: true,
                           message: "Successfully Registered",
-                          data: doc
+                          data: data
                         });
                       }
                     });
@@ -1061,7 +1061,8 @@ addMedicalInfo = async (req, res) => {
 
 //------------------------member-----------------------------------------
 const addMember = (req, res) => {
-  const {
+  // console.log(req.body);
+  let {
     firstName,
     lastName,
     birthdate,
@@ -1070,46 +1071,54 @@ const addMember = (req, res) => {
     relationship,
     metaId
   } = req.body;
-  const member = new Member(
+
+  birthdate = new Date(birthdate);
+
+  const member = new Member({
     firstName,
     lastName,
     birthdate,
     gender,
     email,
     relationship
-  );
+  });
+
   member
     .save()
     .then(data => {
       Usermeta.findOneAndUpdate(
         { _id: metaId },
-        { $push: { member: data._id } }
+        { $push: { members: data._id } }
       )
         .then(result => {
+          // console.log(result);
           res.status(200).json({
             message: "Successfully updated member",
-            status: true
+            status: true,
+            data
           });
         })
-        .catch(err =>
+        .catch(err => {
+          console.log(err);
           res.status(500).json({
             message: "Something went wrong",
             status: false,
             err: err
-          })
-        );
+          });
+        });
     })
-    .catch(err =>
+    .catch(err => {
+      console.log(err);
       res.status(500).json({
         message: "Something went wrong",
         status: false,
         err: err
-      })
-    );
+      });
+    });
 };
 
 const updateMember = (req, res) => {
-  Member.findOneAndUpdate({ _id: req.body }, req.body, { new: true })
+  Member.findOneAndUpdate({ _id: req.body.id }, req.body, { new: true })
     .then(data => {
       res.status(200).json({
         message: "Successfully updated member",
@@ -1125,7 +1134,66 @@ const updateMember = (req, res) => {
     );
 };
 
-const deleteHandler = (req, res) => {};
+const deleteMember = (req, res) => {
+  Usermeta.findOneAndUpdate(
+    { _id: req.body.metaId },
+    { $pull: { members: req.body.memberId } },
+    { new: true }
+  )
+    .then(data => {
+      res.status(200).json({
+        message: "Successfully updated member",
+        status: true
+      });
+    })
+    .catch(err =>
+      res.status(500).json({
+        message: "Something went wrong",
+        status: false,
+        err: err
+      })
+    );
+};
+
+const getMember = (req, res) => {
+  Usermeta.findOne({ _id: req.body.metaId })
+    .select("members")
+    .populate("members")
+    .then(data => {
+      res.status(200).json({
+        message: "Successfully updated member",
+        status: true,
+        data
+      });
+    })
+    .catch(err =>
+      res.status(500).json({
+        message: "Something went wrong",
+        status: false,
+        err: err
+      })
+    );
+};
+
+//-------------------------medicalInfo---------------------
+
+const getMeta = (req, res) => {
+  Usermeta.findOne({ _id: req.body.id })
+    .then(result => {
+      res.status(200).json({
+        message: "Successfully fetched patient meta deta",
+        data: result,
+        status: true
+      });
+    })
+    .catch(err => {
+      res.status(500).json({
+        status: false,
+        message: "Something went wrong",
+        err
+      });
+    });
+};
 
 //Exporting all the functions
 module.exports = {
@@ -1142,5 +1210,8 @@ module.exports = {
   removeFavourite,
   addMedicalInfo,
   addMember,
-  updateMember
+  updateMember,
+  deleteMember,
+  getMember,
+  getMeta
 };
