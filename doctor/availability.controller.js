@@ -123,7 +123,8 @@ let getTimeSlots = id => {
         id,
         {
           $set: {
-            appointments: timeSlotsArray
+            appointments: timeSlotsArray,
+            latestAppointment: timeSlotsArray.slice(0, 3)
             // appointmentsString: JSON.stringify(req.body),
           }
         },
