@@ -686,7 +686,9 @@ function getProfileDetails(req, res) {
   User.findOne({ _id: id })
     .populate({
       path: "favourites",
-      select: "basic firstName lastName address phone email picture"
+      select:
+        "basic firstName lastName address phone email picture appointments",
+      populate: "appointments address"
     })
     .populate({
       path: "appointments",
@@ -918,7 +920,7 @@ let getPatient = (req, res) => {
   let { id } = req.body;
   User.findById(id)
     .populate("appointments")
-    .populate("favourite")
+    .populate("favourites")
     .then(data => {
       res
         .status(200)
@@ -1017,38 +1019,6 @@ removeFavourite = (req, res) => {
         message: "Successfully removed from favourites",
         status: true
       });
-    })
-    .catch(err => {
-      res.status(500).json({
-        status: false,
-        err: err,
-        message: "Something went wrong"
-      });
-    });
-};
-
-addMedicalInfo = async (req, res) => {
-  let { id, meta, field, data } = req.body;
-  if (typeof data === "string") {
-    data = JSON.parse(data);
-  }
-
-  let d1 = await User.findOneAndUpdate(
-    { _id: id },
-    { [field]: data },
-    { new: true }
-  );
-  let d2 = await Usermeta.findOneAndUpdate(
-    { _id: meta },
-    { $push: { [field]: data } },
-    { new: true }
-  );
-  Promise.all([d1, d2])
-    .then(result => {
-      console.log(result);
-      res
-        .status(200)
-        .json({ status: true, message: "Successfully updated data" });
     })
     .catch(err => {
       res.status(500).json({
@@ -1195,6 +1165,39 @@ const getMeta = (req, res) => {
     });
 };
 
+addMedicalInfo = async (req, res) => {
+  let { id, meta, field, data } = req.body;
+  if (typeof data === "string") {
+    data = JSON.parse(data);
+  }
+
+  let d1 = await User.findOneAndUpdate(
+    { _id: id },
+    { [field]: data },
+    { new: true }
+  );
+  let d2 = await Usermeta.findOneAndUpdate(
+    { _id: meta },
+    { $push: { [field]: data } },
+    { new: true }
+  );
+  Promise.all([d1, d2])
+    .then(result => {
+      console.log(result);
+      res
+        .status(200)
+        .json({ status: true, message: "Successfully updated data" });
+    })
+    .catch(err => {
+      res.status(500).json({
+        status: false,
+        err: err,
+        message: "Something went wrong"
+      });
+    });
+};
+
+getMedicalInfo = (req, res) => {};
 //Exporting all the functions
 module.exports = {
   authenticate,
