@@ -87,7 +87,10 @@ const practise = new Schema({
   profileStatus: { type: Boolean, default: true }, //shows whether doctor is active or not
   autoApprove: { type: Boolean }, //Auto approve appointments
   question: [{ type: Schema.Types.ObjectId, ref: "question" }],
-  appointmentsString: { type: String }, //holds the payload by the doctor for the appointment in string format
+  appointmentsString: {
+    type: String,
+    default: `{"duration":"15","id":"","weekdaysArr":[{"days":["wednesday","thursday","friday"],"startTime":"02:30","endTime":"11:30","lunchStart":"06:30","lunchEnd":"07:30"},{"days":["monday","tuesday"],"startTime":"03:30","endTime":"12:30","lunchStart":"06:30","lunchEnd":"07:30"}]}`
+  }, //holds the payload by the doctor for the appointment in string format
   totalPatient: { type: String }, //Shows total number of patient viewed
   firstName: { type: String },
   lastName: { type: String },

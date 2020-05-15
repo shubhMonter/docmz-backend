@@ -4,8 +4,27 @@ let Practise = require("./practice.model");
 
 let moment = require("moment");
 
+const data = {
+  duration: "15",
+  weekdaysArr: [
+    {
+      days: ["wednesday", "thursday", "friday"],
+      startTime: "02:30",
+      endTime: "11:30",
+      lunchStart: "06:30",
+      lunchEnd: "07:30"
+    },
+    {
+      days: ["monday", "tuesday"],
+      startTime: "03:30",
+      endTime: "12:30",
+      lunchStart: "06:30",
+      lunchEnd: "07:30"
+    }
+  ]
+};
 // Create time slots for doctor
-let getTimeSlots = (req, res) => {
+let getTimeSlots = id => {
   //USE THIS AS PAYLOAD
   //  {
   //     duration: "15",
@@ -48,7 +67,7 @@ let getTimeSlots = (req, res) => {
 
   //Construct Schedule
   let objArray = [];
-  req.body.weekdaysArr.map(el => {
+  data.weekdaysArr.map(el => {
     console.log({ el });
     let obj = {};
     el.days.map(day => {
@@ -69,7 +88,7 @@ let getTimeSlots = (req, res) => {
   setTimeout(function() {
     testArray = Object.assign({}, ...objArray);
 
-    let { id, duration, interval } = req.body;
+    let { duration, interval } = data;
     const scheduler = new Scheduler();
     const availability = scheduler.getAvailability({
       from: currentDate,
@@ -100,12 +119,22 @@ let getTimeSlots = (req, res) => {
     let RenewDate = availabilityDates.pop();
     console.log({ RenewDate });
     setTimeout(function() {
-      Practise.findByIdAndUpdate(id, {
-        $set: {
-          appointments: timeSlotsArray,
-          appointmentsString: JSON.stringify(req.body)
-        }
-      }).then(console.log("Successs"));
+      Practise.findByIdAndUpdate(
+        id,
+        {
+          $set: {
+            appointments: timeSlotsArray
+            // appointmentsString: JSON.stringify(req.body),
+          }
+        },
+        { new: true }
+      )
+        .then(result => {
+          console.log(result);
+        })
+        .catch(err => {
+          console.log(err);
+        });
 
       Practise.findById(id).then(data => {
         test = data;
@@ -118,7 +147,7 @@ let getTimeSlots = (req, res) => {
       console.log({ timeSlotsArray });
     }, 3000);
 
-    res.json({ status: true, message: "Time Slots Saved", data: availability });
+    // res.json({ status: true, message: "Time Slots Saved", data: availability });
   }, 3000);
 };
 

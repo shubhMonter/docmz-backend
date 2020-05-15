@@ -49,6 +49,8 @@ let fs = require("fs"),
 console.log({ filePath });
 let template = fs.readFileSync(filePath, { encoding: "utf-8" });
 
+const availability = require("./availability.controller");
+
 //Email template for forgot your password
 
 //Function to upload the CPT codes from the CSV file to the MongoDb Database
@@ -383,7 +385,9 @@ signUpDoc = (req, res) => {
     ? doctorInfoBasic.sole_proprietor
     : "not found";
   basic.gender = doctorInfoBasic.gender ? doctorInfoBasic.gender : "not found";
-  basic.name = doctorInfoBasic.name ? doctorInfoBasic.name : "not found";
+  basic.name = doctorInfoBasic.name
+    ? doctorInfoBasic.name
+    : req.body.firstName + " " + req.body.lastName;
 
   setTimeout(function() {
     stripe.customers.create(
@@ -427,7 +431,7 @@ signUpDoc = (req, res) => {
             city: req.body.city || "NA",
             state: req.body.state || "NA",
             country: req.body.country || "NA",
-            appointmentsString: req.body.appointmentsString || "NA",
+
             firstName: req.body.firstName,
             lastName: req.body.lastName,
             referralId: referralKey
@@ -439,6 +443,7 @@ signUpDoc = (req, res) => {
             .save()
             .then(doc => {
               // console.log("doc", doc);
+              availability.getTimeSlots(doc._id);
 
               Referral.findOne({ email: req.body.email }).then(result => {
                 if (!_.isEmpty(result)) {
@@ -477,7 +482,8 @@ signUpDoc = (req, res) => {
                             console.log("by link", final);
                             res.status(200).json({
                               status: true,
-                              message: "Successfully Registered"
+                              message: "Successfully Registered",
+                              data: doc
                             });
                           })
                           .catch(err => {
@@ -498,7 +504,8 @@ signUpDoc = (req, res) => {
                             // console.log("by link", final);
                             res.status(200).json({
                               status: true,
-                              message: "Successfully Registered"
+                              message: "Successfully Registered",
+                              data: doc
                             });
                           })
                           .catch(err => {
@@ -1322,7 +1329,7 @@ let searchDocsLite = (req, res) => {
   let h = "abc";
   //   console.log(new RegExp(h));
   // console.log("name", name, options);
-  // console.log("name", name);
+  console.log("name", name);
   // let name = 7;
   Practise.aggregate([
     {
@@ -1413,7 +1420,7 @@ let searchDocsLite = (req, res) => {
 
 let getDoc = (req, res) => {
   let { id } = req.params;
-  console.log({ id });
+  console.log("this is in get doc", { id });
   Practise.findById(id)
     .populate("appointments")
     .populate("taxonomies")
