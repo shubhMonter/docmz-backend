@@ -35,7 +35,7 @@ let bookAppointment = (req, res) => {
   let { patient, transactionId, timeSlot, practise } = req.body;
 
   Appointment.findByIdAndUpdate(
-    id,
+    timeSlot,
     {
       $set: {
         ...req.body,
@@ -49,6 +49,7 @@ let bookAppointment = (req, res) => {
       $push: { appointments: data._id }
     })
       .then(doctor => {
+        console.log(data);
         res.status(200).json({ status: true, message: "Appointment booked" });
         //   Practise.findByIdAndUpdate(practise, {
         //     $push: { appointments: data._id }

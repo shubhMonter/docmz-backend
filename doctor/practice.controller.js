@@ -284,277 +284,287 @@ function getAllDoctors(req, res) {
 }
 
 //Sign up new doctor through API
-signUpDoc = (req, res) => {
+signUpDoc = async (req, res) => {
   // console.log("i m here");
-  let addressArray = [];
-  if (req.body.addresses) {
-    req.body.addresses.map(el => {
-      let address = new Address({
-        country_code: el.country_code,
-        country_name: el.country_name,
-        address_purpose: el.address_purpose,
-        address_type: el.address_type,
-        address_1: el.address_1,
-        address_2: el.address_2,
-        city: el.city,
-        state: el.state,
-        postal_code: el.postal_code,
-        telephone_number: el.telephone_number
+  let d = await Practise.findOne({ email: req.body.email });
+  if (d !== null) {
+    res
+      .status(500)
+      .json({ message: "This email is already taken", status: false });
+  } else {
+    let addressArray = [];
+    if (req.body.addresses) {
+      req.body.addresses.map(el => {
+        let address = new Address({
+          country_code: el.country_code,
+          country_name: el.country_name,
+          address_purpose: el.address_purpose,
+          address_type: el.address_type,
+          address_1: el.address_1,
+          address_2: el.address_2,
+          city: el.city,
+          state: el.state,
+          postal_code: el.postal_code,
+          telephone_number: el.telephone_number
+        });
+        address.save().catch(console.log);
+        addressArray.push(address._id);
       });
-      address.save().catch(console.log);
-      addressArray.push(address._id);
-    });
-  }
+    }
 
-  let practiceLocationsArray = [];
-  if (req.body.practiceLocations) {
-    req.body.practiceLocations.map(el => {
-      let address = new Address({
-        country_code: el.country_code,
-        country_name: el.country_name,
-        address_purpose: el.address_purpose,
-        address_type: el.address_type,
-        address_1: el.address_1,
-        address_2: el.address_2,
-        city: el.city,
-        state: el.state,
-        postal_code: el.postal_code,
-        telephone_number: el.telephone_number
+    let practiceLocationsArray = [];
+    if (req.body.practiceLocations) {
+      req.body.practiceLocations.map(el => {
+        let address = new Address({
+          country_code: el.country_code,
+          country_name: el.country_name,
+          address_purpose: el.address_purpose,
+          address_type: el.address_type,
+          address_1: el.address_1,
+          address_2: el.address_2,
+          city: el.city,
+          state: el.state,
+          postal_code: el.postal_code,
+          telephone_number: el.telephone_number
+        });
+        address.save().catch(console.log);
+        practiceLocationsArray.push(address._id);
       });
-      address.save().catch(console.log);
-      practiceLocationsArray.push(address._id);
-    });
-  }
+    }
 
-  let taxonomiesArray = [];
-  if (req.body.taxonomies) {
-    req.body.taxonomies.map(el => {
-      let taxonomies = new Taxonomy({
-        code: el.code,
-        desc: el.desc,
-        primary: el.primary,
-        state: el.state,
-        licence: el.licence,
-        taxonomy_group: el.taxonomy_group
+    let taxonomiesArray = [];
+    if (req.body.taxonomies) {
+      req.body.taxonomies.map(el => {
+        let taxonomies = new Taxonomy({
+          code: el.code,
+          desc: el.desc,
+          primary: el.primary,
+          state: el.state,
+          licence: el.licence,
+          taxonomy_group: el.taxonomy_group
+        });
+        taxonomies.save().catch(console.log);
+        taxonomiesArray.push(taxonomies._id);
       });
-      taxonomies.save().catch(console.log);
-      taxonomiesArray.push(taxonomies._id);
-    });
-  }
+    }
 
-  let basic = {};
-  let doctorInfoBasic = req.body.basic;
-  basic.organization_name = doctorInfoBasic.organization_name
-    ? doctorInfoBasic.organization_name
-    : "not found";
-  basic.organizational_subpart = doctorInfoBasic.organizational_subpart
-    ? doctorInfoBasic.organizational_subpart
-    : "not found";
-  basic.enumeration_date = doctorInfoBasic.enumeration_date
-    ? doctorInfoBasic.enumeration_date
-    : "not found";
-  basic.last_updated = doctorInfoBasic.last_updated
-    ? doctorInfoBasic.last_updated
-    : "not found";
-  basic.status = doctorInfoBasic.status ? doctorInfoBasic.status : "not found";
-  basic.credential = doctorInfoBasic.authorized_official_credential
-    ? doctorInfoBasic.authorized_official_credential
-    : doctorInfoBasic.credential;
-  basic.first_name = doctorInfoBasic.authorized_official_first_name
-    ? doctorInfoBasic.authorized_official_first_name
-    : doctorInfoBasic.first_name;
-  basic.last_name = doctorInfoBasic.authorized_official_last_name
-    ? doctorInfoBasic.authorized_official_last_name
-    : doctorInfoBasic.last_name;
-  basic.middle_name = doctorInfoBasic.authorized_official_middle_name
-    ? doctorInfoBasic.authorized_official_middle_name
-    : doctorInfoBasic.middle_name;
-  basic.telephone_number = doctorInfoBasic.authorized_official_telephone_number
-    ? doctorInfoBasic.authorized_official_telephone_number
-    : "not found";
-  basic.title_or_position = doctorInfoBasic.authorized_official_title_or_position
-    ? doctorInfoBasic.authorized_official_title_or_position
-    : "not found";
-  basic.name_prefix = doctorInfoBasic.name_prefix
-    ? doctorInfoBasic.name_prefix
-    : "not found";
-  basic.name_suffix = doctorInfoBasic.name_suffix
-    ? doctorInfoBasic.name_suffix
-    : "not found";
-  basic.sole_proprietor = doctorInfoBasic.sole_proprietor
-    ? doctorInfoBasic.sole_proprietor
-    : "not found";
-  basic.gender = doctorInfoBasic.gender ? doctorInfoBasic.gender : "not found";
-  basic.name = doctorInfoBasic.name
-    ? doctorInfoBasic.name
-    : req.body.firstName + " " + req.body.lastName;
+    let basic = {};
+    let doctorInfoBasic = req.body.basic;
+    basic.organization_name = doctorInfoBasic.organization_name
+      ? doctorInfoBasic.organization_name
+      : "not found";
+    basic.organizational_subpart = doctorInfoBasic.organizational_subpart
+      ? doctorInfoBasic.organizational_subpart
+      : "not found";
+    basic.enumeration_date = doctorInfoBasic.enumeration_date
+      ? doctorInfoBasic.enumeration_date
+      : "not found";
+    basic.last_updated = doctorInfoBasic.last_updated
+      ? doctorInfoBasic.last_updated
+      : "not found";
+    basic.status = doctorInfoBasic.status
+      ? doctorInfoBasic.status
+      : "not found";
+    basic.credential = doctorInfoBasic.authorized_official_credential
+      ? doctorInfoBasic.authorized_official_credential
+      : doctorInfoBasic.credential;
+    basic.first_name = doctorInfoBasic.authorized_official_first_name
+      ? doctorInfoBasic.authorized_official_first_name
+      : doctorInfoBasic.first_name;
+    basic.last_name = doctorInfoBasic.authorized_official_last_name
+      ? doctorInfoBasic.authorized_official_last_name
+      : doctorInfoBasic.last_name;
+    basic.middle_name = doctorInfoBasic.authorized_official_middle_name
+      ? doctorInfoBasic.authorized_official_middle_name
+      : doctorInfoBasic.middle_name;
+    basic.telephone_number = doctorInfoBasic.authorized_official_telephone_number
+      ? doctorInfoBasic.authorized_official_telephone_number
+      : "not found";
+    basic.title_or_position = doctorInfoBasic.authorized_official_title_or_position
+      ? doctorInfoBasic.authorized_official_title_or_position
+      : "not found";
+    basic.name_prefix = doctorInfoBasic.name_prefix
+      ? doctorInfoBasic.name_prefix
+      : "not found";
+    basic.name_suffix = doctorInfoBasic.name_suffix
+      ? doctorInfoBasic.name_suffix
+      : "not found";
+    basic.sole_proprietor = doctorInfoBasic.sole_proprietor
+      ? doctorInfoBasic.sole_proprietor
+      : "not found";
+    basic.gender = doctorInfoBasic.gender
+      ? doctorInfoBasic.gender
+      : "not found";
+    basic.name = doctorInfoBasic.name
+      ? doctorInfoBasic.name
+      : req.body.firstName + " " + req.body.lastName;
 
-  setTimeout(function() {
-    stripe.customers.create(
-      {
-        description: req.body.number + "|" + req.body.email,
-        email: req.body.email
-      },
-      function(error, customer) {
-        if (error) {
-          res.status(400).json({ status: false, message: error });
-        } else if (customer) {
-          console.log({ customer });
-          let cipher = crypto.createCipheriv(
-            algorithm,
-            new Buffer.from(key),
-            iv
-          );
-          var encrypted =
-            cipher.update(req.body.password, "utf8", "hex") +
-            cipher.final("hex");
-          console.log(encrypted);
-          const referralKey =
-            req.body.firstName + randomstring.generate(5) + "_d";
-          let practise = new Practise({
-            enumerationType: req.body.enumeration_type,
-            npi: req.body.registration_number,
-            last_updated_epoch: req.body.last_updated_epoch,
-            created_epoch: req.body.created_epoch,
-            basic,
-            other_names: req.body.other_names,
-            address: addressArray,
-            taxonomies: taxonomiesArray,
-            practiceLocation: practiceLocationsArray,
-            identifiers: req.body.identifiers,
-            email: req.body.email,
-            password: encrypted,
-            steps: [0, 0, 0, 0],
-            specialty: req.body.specialty,
-            phone: req.body.phone,
-            customerProfile: customer.id,
-            city: req.body.city || "NA",
-            state: req.body.state || "NA",
-            country: req.body.country || "NA",
+    setTimeout(function() {
+      stripe.customers.create(
+        {
+          description: req.body.number + "|" + req.body.email,
+          email: req.body.email
+        },
+        function(error, customer) {
+          if (error) {
+            res.status(400).json({ status: false, message: error });
+          } else if (customer) {
+            console.log({ customer });
+            let cipher = crypto.createCipheriv(
+              algorithm,
+              new Buffer.from(key),
+              iv
+            );
+            var encrypted =
+              cipher.update(req.body.password, "utf8", "hex") +
+              cipher.final("hex");
+            console.log(encrypted);
+            const referralKey =
+              req.body.firstName + randomstring.generate(5) + "_d";
+            let practise = new Practise({
+              enumerationType: req.body.enumeration_type,
+              npi: req.body.registration_number,
+              last_updated_epoch: req.body.last_updated_epoch,
+              created_epoch: req.body.created_epoch,
+              basic,
+              other_names: req.body.other_names,
+              address: addressArray,
+              taxonomies: taxonomiesArray,
+              practiceLocation: practiceLocationsArray,
+              identifiers: req.body.identifiers,
+              email: req.body.email,
+              password: encrypted,
+              steps: [0, 0, 0, 0],
+              specialty: req.body.specialty,
+              phone: req.body.phone,
+              customerProfile: customer.id,
+              city: req.body.city || "NA",
+              state: req.body.state || "NA",
+              country: req.body.country || "NA",
 
-            firstName: req.body.firstName,
-            lastName: req.body.lastName,
-            referralId: referralKey
-          });
+              firstName: req.body.firstName,
+              lastName: req.body.lastName,
+              referralId: referralKey
+            });
 
-          //Saving the Doctor Info
+            //Saving the Doctor Info
 
-          practise
-            .save()
-            .then(doc => {
-              // console.log("doc", doc);
-              availability.getTimeSlots(doc._id);
+            practise
+              .save()
+              .then(doc => {
+                // console.log("doc", doc);
+                availability.getTimeSlots(doc._id);
 
-              Referral.findOne({ email: req.body.email }).then(result => {
-                if (!_.isEmpty(result)) {
-                  result.registered = true;
-                  result.registeredId = doc._id;
-                  result.referredTo = "Practise";
-                  result.save().then(final => {
-                    console.log("final", final);
-                    res.json({
+                Referral.findOne({ email: req.body.email }).then(result => {
+                  if (!_.isEmpty(result)) {
+                    result.registered = true;
+                    result.registeredId = doc._id;
+                    result.referredTo = "Practise";
+                    result.save().then(final => {
+                      console.log("final", final);
+                      res.json({
+                        status: true,
+                        message: "Successfully Registered",
+                        data: doc
+                      });
+                    });
+                  } else if (req.body.referralId) {
+                    // console.log("in referral");
+                    let refData = new Referral({
+                      firstName: req.body.firstName,
+                      lastName: req.body.lastName,
+                      referredTo: "Practise",
+                      registered: true,
+                      registeredId: doc._id,
+                      referralId: req.body.referralId
+                    });
+                    refData
+                      .save()
+                      .then(ref => {
+                        // console.log("ref created", doc._id, ref);
+                        if (req.body.referralId.split("_") === "d") {
+                          Practise.findOneAndUpdate(
+                            { referralId: req.body.referralId },
+                            { $push: { referrals: ref._id } },
+                            { new: true }
+                          )
+                            .then(final => {
+                              console.log("by link", final);
+                              res.status(200).json({
+                                status: true,
+                                message: "Successfully Registered",
+                                data: doc
+                              });
+                            })
+                            .catch(err => {
+                              console.log("with referralId", err);
+                              res.status(500).json({
+                                status: false,
+                                message: "Something went wrong",
+                                err: err
+                              });
+                            });
+                        } else {
+                          Usermeta.findOneAndUpdate(
+                            { referralId: req.body.referralId },
+                            { $push: { referrals: ref._id } },
+                            { new: true }
+                          )
+                            .then(final => {
+                              // console.log("by link", final);
+                              res.status(200).json({
+                                status: true,
+                                message: "Successfully Registered",
+                                data: doc
+                              });
+                            })
+                            .catch(err => {
+                              console.log("with referralId", err);
+                              res.status(500).json({
+                                status: false,
+                                message: "Something went wrong",
+                                err: err
+                              });
+                            });
+                        }
+                      })
+                      .catch(err => {
+                        console.log(err);
+                        res.status(500).json({
+                          status: false,
+                          message: "Something went wrong",
+                          err: err
+                        });
+                      });
+                  } else {
+                    console.log("no referral");
+                    res.status(200).json({
                       status: true,
                       message: "Successfully Registered",
                       data: doc
                     });
-                  });
-                } else if (req.body.referralId) {
-                  // console.log("in referral");
-                  let refData = new Referral({
-                    firstName: req.body.firstName,
-                    lastName: req.body.lastName,
-                    referredTo: "Practise",
-                    registered: true,
-                    registeredId: doc._id,
-                    referralId: req.body.referralId
-                  });
-                  refData
-                    .save()
-                    .then(ref => {
-                      // console.log("ref created", doc._id, ref);
-                      if (req.body.referralId.split("_") === "d") {
-                        Practise.findOneAndUpdate(
-                          { referralId: req.body.referralId },
-                          { $push: { referrals: ref._id } },
-                          { new: true }
-                        )
-                          .then(final => {
-                            console.log("by link", final);
-                            res.status(200).json({
-                              status: true,
-                              message: "Successfully Registered",
-                              data: doc
-                            });
-                          })
-                          .catch(err => {
-                            console.log("with referralId", err);
-                            res.status(500).json({
-                              status: false,
-                              message: "Something went wrong",
-                              err: err
-                            });
-                          });
-                      } else {
-                        Usermeta.findOneAndUpdate(
-                          { referralId: req.body.referralId },
-                          { $push: { referrals: ref._id } },
-                          { new: true }
-                        )
-                          .then(final => {
-                            // console.log("by link", final);
-                            res.status(200).json({
-                              status: true,
-                              message: "Successfully Registered",
-                              data: doc
-                            });
-                          })
-                          .catch(err => {
-                            console.log("with referralId", err);
-                            res.status(500).json({
-                              status: false,
-                              message: "Something went wrong",
-                              err: err
-                            });
-                          });
-                      }
-                    })
-                    .catch(err => {
-                      console.log(err);
-                      res.status(500).json({
-                        status: false,
-                        message: "Something went wrong",
-                        err: err
-                      });
-                    });
-                } else {
-                  console.log("no referral");
-                  res.status(200).json({
-                    status: true,
-                    message: "Successfully Registered",
-                    data: doc
+                  }
+                });
+              })
+              .catch(err => {
+                console.log("error is", { err });
+                if (err.name === "MongoError" && err.code === 11000) {
+                  console.log("This Doctor already exists");
+                  res.json({
+                    status: false,
+                    message: "Doctor with this Npi number already exists"
                   });
                 }
               });
-            })
-            .catch(err => {
-              console.log("error is", { err });
-              if (err.name === "MongoError" && err.code === 11000) {
-                console.log("This Doctor already exists");
-                res.json({
-                  status: false,
-                  message: "Doctor with this Npi number already exists"
-                });
-              }
-            });
 
-          // let mailOptions = {
-          //   from: '"DocMz"; <admin@docmz.com>',
-          //   to: req.body.email,
-          //   subject: "Confirm your Email - DocMz",
-          //   text: "You've been succesfully registered as a Doctor on DocMz. "
-          // html="<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-          {
-            /* <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+            // let mailOptions = {
+            //   from: '"DocMz"; <admin@docmz.com>',
+            //   to: req.body.email,
+            //   subject: "Confirm your Email - DocMz",
+            //   text: "You've been succesfully registered as a Doctor on DocMz. "
+            // html="<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+            {
+              /* <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
   <head>
     <title></title>
     <!--[if !mso]><!-->
@@ -1153,16 +1163,17 @@ signUpDoc = (req, res) => {
   
   </body>
 </html>" */
+            }
+            // };
+            // });
           }
-          // };
+          // smtpTransport.sendMail(mailOptions, function(err) {
+          //   if (err) console.log(err);
           // });
         }
-        // smtpTransport.sendMail(mailOptions, function(err) {
-        //   if (err) console.log(err);
-        // });
-      }
-    );
-  }, 3000);
+      );
+    }, 3000);
+  }
 };
 
 // Function to authenticate an user
