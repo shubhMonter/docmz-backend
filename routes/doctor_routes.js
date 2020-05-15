@@ -78,9 +78,10 @@ let upload = multer({
 
 //Uplaod a picture to doctors profile
 router.post("/upload/image", upload.any(), (req, res) => {
+  console.log("I am in image");
   console.log(req.files);
 
-  if (req.files) {
+  if (req.files.length > 0) {
     let { id } = req.body;
     Practise.findOneAndUpdate(
       { _id: id },
@@ -95,6 +96,8 @@ router.post("/upload/image", upload.any(), (req, res) => {
       .catch(error => {
         res.status(200).json({ status: false, message: error });
       });
+  } else {
+    res.status(500).json({ message: "Please select an image", status: false });
   }
 });
 

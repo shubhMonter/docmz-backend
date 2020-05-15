@@ -35,7 +35,7 @@ let bookAppointment = (req, res) => {
   let { patient, transactionId, timeSlot, practise } = req.body;
 
   Appointment.findByIdAndUpdate(
-    timeSlot,
+    id,
     {
       $set: {
         ...req.body,
@@ -45,19 +45,25 @@ let bookAppointment = (req, res) => {
     },
     { new: true }
   ).then(data => {
-    Patient.findByIdAndUpdate(patient, { $push: { appointments: data._id } })
+    Patient.findByIdAndUpdate(patient, {
+      $push: { appointments: data._id }
+    })
       .then(doctor => {
-        Practise.findByIdAndUpdate(practise, {
-          $push: { appointments: data._id }
-        })
-          .then(patient => {
-            res
-              .status(200)
-              .json({ status: true, message: "Appointment Booked" });
-          })
-          .catch(error => {
-            res.status(404).json({ status: false, message: error });
-          });
+        res.status(200).json({ status: true, message: "Appointment booked" });
+        //   Practise.findByIdAndUpdate(practise, {
+        //     $push: { appointments: data._id }
+        //   })
+        //     .then(patient => {
+        //       res
+        //         .status(200)
+        //         .json({ status: true, message: "Appointment Booked" });
+        //     })
+        //     .catch(error => {
+        //       res.status(404).json({ status: false, message: error });
+        //     });
+        // })
+        // .catch(err => {
+        //   res.status(404).json({ status: false, message: err });
       })
       .catch(err => {
         res.status(404).json({ status: false, message: err });

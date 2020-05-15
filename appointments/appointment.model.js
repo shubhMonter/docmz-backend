@@ -5,6 +5,7 @@ const Schema = mongoose.Schema;
 
 const appointment = new Schema({
   forWhom: { type: String }, //Determine for whom this appointment is booked
+  patientInfo: { type: Object },
   bookedOn: { type: Date },
   patient: { type: Schema.Types.ObjectId, ref: "Patient" },
   doctor: { type: Schema.Types.ObjectId, ref: "Practise" },
