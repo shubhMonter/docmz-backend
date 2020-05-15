@@ -1346,6 +1346,7 @@ let searchDocsLite = (req, res) => {
         description: 1,
         phone: 1,
         is_superDoc: 1,
+        latestAppointment: 1,
         appointments: 1,
         city: 1,
         country: 1,
@@ -1355,7 +1356,7 @@ let searchDocsLite = (req, res) => {
     {
       $lookup: {
         from: Appointment.collection.name,
-        localField: "appointments",
+        localField: "latestAppointment",
         foreignField: "_id",
         as: "output"
       }
@@ -1365,7 +1366,8 @@ let searchDocsLite = (req, res) => {
     // { $match: { output: { $exists: true, $not: { $size: 0 } } } },
     {
       $project: {
-        appointments: 0
+        appointments: 0,
+        latestAppointment: 0
         // next: { $slice: ["$output", 3] },
       }
     }

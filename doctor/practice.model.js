@@ -31,7 +31,7 @@ const practise = new Schema({
 
   practise: { type: String },
   organizationName: { type: String },
-  description: { type: String },
+  description: { type: String, default: "NA" },
   identifiers: { type: Object },
   steps: { type: Array },
   email: { type: String },
@@ -76,7 +76,6 @@ const practise = new Schema({
   state: { type: String },
   identityProof: { type: String },
   medicalProof: { type: String },
-  availability: [],
   createdOn: { type: Date, default: Date.now },
   availDate: { type: Date },
   savedCards: { type: Object },
