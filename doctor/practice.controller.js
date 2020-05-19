@@ -1635,6 +1635,27 @@ function setPassword(req, res) {
     }
   );
 }
+
+nextAppointment = (req, res) => {
+  // console.
+  Practise.findById(req.body.docId)
+    .populate({
+      path: "appointments",
+      match: { bookedFor: { $lt: req.body.date } }
+    })
+    .then(result => {
+      res.status(200).json({
+        status: true,
+        message: "Successfully fetched appointment",
+        data: result
+      });
+    })
+    .catch(err => {
+      res
+        .status(500)
+        .json({ status: false, message: "Something went wrong", err });
+    });
+};
 //Exporting all the functions
 module.exports = {
   getNpiInfo,
@@ -1647,5 +1668,6 @@ module.exports = {
   searchDocs,
   searchDocsLite,
   getDoc,
-  tokenForgetPassword
+  tokenForgetPassword,
+  nextAppointment
 };
