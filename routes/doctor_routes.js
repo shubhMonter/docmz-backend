@@ -216,5 +216,7 @@ router.post("/upload/document", dupload.any(), (req, res) => {
     res.status(500).json({ status: false, message: "Please select a file" });
   }
 });
+
+router.post("/appointment/next", npiController.nextAppointment);
 // exporting them
 module.exports = router;
