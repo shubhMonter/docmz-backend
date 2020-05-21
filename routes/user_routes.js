@@ -63,7 +63,12 @@ router.post("/upload/image", upload.any(), (req, res, next) => {
   }
   User.findOneAndUpdate(
     { _id: id },
-    { $push: { picture: req.files[0].path } },
+    {
+      $set: {
+        picture: req.files[0].path
+        // __enc_picture: false,
+      }
+    },
     { new: true }
   )
     .then(data => {

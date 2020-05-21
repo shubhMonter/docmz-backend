@@ -10,7 +10,7 @@
   crypto = require("crypto"),
   algorithm = "aes-256-cbc";
 let key = "abcdefghijklmnopqrstuvwxyztgbhgf";
-
+const jwt = require("jsonwebtoken");
 let iv = "1234567891234567";
 let async = require("async");
 let nodemailer = require("nodemailer");
@@ -438,17 +438,23 @@ let authenticate = (req, res) => {
       if (!user) {
         res.status(404).json({ status: false, message: "User Not Found!" });
       } else if (encrypted != user.password) {
-        res.json({ status: false, error: "Password Entered is Incorrect" });
+        res
+          .status(500)
+          .json({ status: false, error: "Password Entered is Incorrect" });
       } else {
-        if (user) {
-          req.session.user = user;
-          req.session.Auth = user;
-          res.status(200).json({
-            status: true,
-            user: req.session.Auth
-          });
-        }
+        let token = jwt.sign(user.toJSON(), "catchmeifyoucan", {
+          expiresIn: 604800
+        });
+        req.session.user = user;
+        req.session.Auth = user;
+        res.status(200).json({
+          status: true,
+          user: req.session.Auth,
+          token
+        });
       }
+    } else {
+      res.json({ status: false, error: "Password Entered is Incorrect" });
     }
   });
   // }

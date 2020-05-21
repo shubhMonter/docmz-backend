@@ -10,10 +10,15 @@ const appointment = new Schema({
   patient: { type: Schema.Types.ObjectId, ref: "Patient" },
   doctor: { type: Schema.Types.ObjectId, ref: "Practise" },
   bookedFor: { type: Date, default: Date.now() },
-  cancelledByPatient: { type: Boolean, default: false },
-  cancelledByDoctor: { type: Boolean, default: false },
+
+  cancelledBy: {
+    cancelledByPatient: { type: Boolean, default: false },
+    cancelledByDoctor: { type: Boolean, default: false },
+    patientId: { type: Schema.Types.ObjectId, ref: "Patient" },
+    reason: { type: String }
+  },
+
   transactionId: { type: String },
-  reasonForCancellation: { type: String },
   availabilitySelected: { type: String },
   paid: { type: Boolean, default: false },
   duration: { type: String },
