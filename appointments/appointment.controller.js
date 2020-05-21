@@ -2,6 +2,7 @@ const db = require("_helpers/db"),
   express = require("express"),
   app = express(),
   Practise = db.Practise;
+User = db.User;
 Appointment = db.Appointment;
 Patient = db.User;
 let moment = require("moment");
@@ -140,24 +141,51 @@ let approveAppointment = (req, res) => {
 
 //Cancel appointment by Doctor
 let cancelAppointment = (req, res) => {
-  let { id, byDoctor, byPatient, reason } = req.body;
+  let { id, byDoctor, byPatient, reason, patientId } = req.body;
+  console.log(req.body);
   Appointment.findByIdAndUpdate(
     id,
     {
       $set: {
-        cancelledByPatient: byPatient,
-        cancelledByDoctor: byDoctor,
-        reasonForCancellation: reason
+        "cancelledBy.Patient": byPatient,
+        "cancelledBy.Doctor": byDoctor,
+        "cancelledBy.reason": reason,
+        booked: false,
+        forWhom: "",
+        patientInfo: ""
       }
     },
     { new: true }
   )
     .then(appointment => {
-      res.status(200).json({
-        status: true,
-        message: "Appointment Cancelled",
-        data: appointment
-      });
+      if (byPatient) {
+        User.findOneAndUpdate(
+          { _id: patientId },
+          {
+            $push: { cancelledAppointments: id },
+            $pull: { appointments: id }
+          },
+          { new: true }
+        )
+          .then(result => {
+            res.status(200).json({
+              status: true,
+              message: "Successfully cancelled appointment",
+              data: result
+            });
+          })
+          .catch(err => {
+            res
+              .status(500)
+              .json({ status: false, message: "Something went wrong", err });
+          });
+      } else {
+        res.status(200).json({
+          status: true,
+          message: "Appointment Cancelled",
+          data: appointment
+        });
+      }
     })
     .catch(error => {
       res.status(400).json({ status: false, message: error });

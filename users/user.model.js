@@ -32,10 +32,11 @@ const schema = new Schema({
   passwordexpires: { type: Date },
   createdDate: { type: Date, default: Date.now },
   appointments: [{ type: Schema.Types.ObjectId, ref: "Appointments" }],
+  cancelledAppointments: [{ type: Schema.Types.ObjectId, ref: "Appointments" }],
   lastLogin: { type: Date, default: Date.now },
   bloodGroup: { type: String },
   customerProfile: { type: String },
-  picture: { type: Array },
+  picture: { type: String },
   records: [{ type: Object }],
   weight: {
     value: { type: String },
