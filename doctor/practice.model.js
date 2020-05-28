@@ -94,6 +94,7 @@ const practise = new Schema({
   totalPatient: { type: String }, //Shows total number of patient viewed
   firstName: { type: String },
   lastName: { type: String },
+  name: { type: String },
   //Document of doctors
   document: {
     idProof: { type: Boolean, default: false },
@@ -105,9 +106,10 @@ const practise = new Schema({
   establishment: { type: String },
   video: { type: String },
 
-  referralId: { type: String, required: true },
+  referralId: { type: String },
   referrals: [{ type: Schema.Types.ObjectId, ref: "Referral" }],
-  latestAppointment: [{ type: Schema.Types.ObjectId, ref: "Appointments" }]
+  latestAppointment: [{ type: Schema.Types.ObjectId, ref: "Appointments" }],
+  payment: { type: Boolean, default: true } //whether doctor asks for payment or not
 });
 
 module.exports = mongoose.model("Practise", practise);

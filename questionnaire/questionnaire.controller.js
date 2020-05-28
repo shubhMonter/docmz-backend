@@ -22,13 +22,14 @@ const addQuestion = async (req, res) => {
   if (req.body.parent === undefined) {
     qus
       .save()
-      .then(() => {
+      .then(question => {
         practice
           .findByIdAndUpdate(req.body.id, { $push: { question: qus._id } })
-          .then(() => {
+          .then(result => {
             res.status(200).json({
               status: true,
-              message: "successfully added question"
+              message: "successfully added question",
+              data: question
             });
           })
           .catch(err => {
@@ -69,14 +70,14 @@ const addQuestion = async (req, res) => {
       .then(() => {
         question
           .findOneAndUpdate(
-            { _id: req.body.parent, "option.text": req.body.optionText },
+            { _id: req.body.parent, "option._id": req.body.optionId },
             {
               $push: { "option.$.linkedQuestion": qus._id }
             }
           )
           .then(() => {
             res.json({
-              status: false,
+              status: true,
               message: "all done succesfully added with link"
             });
           })
@@ -104,16 +105,17 @@ const updateQuestion = async (req, res) => {
 
   question
     .findOneAndUpdate({ _id: req.body.id }, req.body)
-    .then(() => {
-      res.json({
+    .then(result => {
+      res.status(200).json({
         message: "question updated successfully",
-        code: 0
+        status: true,
+        data: result
       });
     })
     .catch(err => {
-      res.json({
+      res.status(500).json({
         message: err,
-        code: 1
+        status: false
       });
     });
 };
@@ -218,11 +220,13 @@ const deleteQuestion = async (req, res) => {
     .then(result => {
       // console.log(result);
       res.status(200).json({
+        status: true,
         message: "successfully deleted question"
       });
     })
     .catch(err => {
       res.status(500).json({
+        status: false,
         message: err
       });
     });
