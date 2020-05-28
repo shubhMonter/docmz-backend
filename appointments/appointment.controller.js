@@ -15,8 +15,8 @@ let smtpConfig = {
   secure: true, // use SSL,
   // you can try with TLS, but port is then 587
   auth: {
-    user: "anas3rde@gmail.com", // Your email id
-    pass: "8123342590" // Your password
+    user: "code.rockzo@gmail.com", // Your email id
+    pass: "Rockzo!@77" // Your password
   },
   tls: {
     rejectUnauthorized: false
@@ -35,6 +35,8 @@ let template = fs.readFileSync(filePath, { encoding: "utf-8" });
 let bookAppointment = (req, res) => {
   let { patient, transactionId, timeSlot, practise } = req.body;
 
+  // let html = ejs.render(template, fields);
+
   Appointment.findByIdAndUpdate(
     timeSlot,
     {
@@ -49,7 +51,27 @@ let bookAppointment = (req, res) => {
     Patient.findByIdAndUpdate(patient, {
       $push: { appointments: data._id }
     })
-      .then(doctor => {
+      .then(result => {
+        console.log(result.email);
+        let transporter = nodemailer.createTransport(smtpConfig);
+        let mailOptions = {
+          from: "code.rockzo@gmail.com", // sender address
+          to: result.email, // list of receivers
+          subject: "Appointment booked - DocMz", // Subject line
+          text: "this is some text" //, // plaintext body
+          // html,
+        };
+        console.log({ mailOptions });
+        transporter.sendMail(mailOptions, function(error, info) {
+          if (error) {
+            // return false;
+            console.log({ error });
+          } else {
+            console.log("Message sent: " + info.response);
+            // return true;
+          }
+          console.log("Message sent");
+        });
         console.log(data);
         res.status(200).json({ status: true, message: "Appointment booked" });
         //   Practise.findByIdAndUpdate(practise, {
@@ -68,6 +90,7 @@ let bookAppointment = (req, res) => {
         //   res.status(404).json({ status: false, message: err });
       })
       .catch(err => {
+        console.log(err);
         res.status(404).json({ status: false, message: err });
       });
   });
@@ -116,7 +139,7 @@ let approveAppointment = (req, res) => {
     .then(data => {
       let transporter = nodemailer.createTransport(smtpConfig);
       let mailOptions = {
-        from: "anas3rde@gmail.com", // sender address
+        from: "code.rockzo@gmail.com", // sender address
         to: email, // list of receivers
         subject: "Appointment Confirmed - DocMz", // Subject line
         // text: 'this is some text', //, // plaintext body
@@ -168,6 +191,24 @@ let cancelAppointment = (req, res) => {
           { new: true }
         )
           .then(result => {
+            let transporter = nodemailer.createTransport(smtpConfig);
+            let mailOptions = {
+              from: "code.rockzo@gmail.com", // sender address
+              to: result.email, // list of receivers
+              subject: "Appointment Cancelled - DocMz", // Subject line
+              text: "this is some text" //, // plaintext body
+              // html,
+            };
+
+            transporter.sendMail(mailOptions, function(error, info) {
+              if (error) {
+                // return false;
+                console.log({ error });
+              } else {
+                console.log("Message sent: " + info.response);
+              }
+            });
+
             res.status(200).json({
               status: true,
               message: "Successfully cancelled appointment",
@@ -175,6 +216,7 @@ let cancelAppointment = (req, res) => {
             });
           })
           .catch(err => {
+            console.log(err);
             res
               .status(500)
               .json({ status: false, message: "Something went wrong", err });
