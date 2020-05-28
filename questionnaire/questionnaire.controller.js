@@ -70,14 +70,14 @@ const addQuestion = async (req, res) => {
       .then(() => {
         question
           .findOneAndUpdate(
-            { _id: req.body.parent, "option.text": req.body.optionText },
+            { _id: req.body.parent, "option._id": req.body.optionId },
             {
               $push: { "option.$.linkedQuestion": qus._id }
             }
           )
           .then(() => {
             res.json({
-              status: false,
+              status: true,
               message: "all done succesfully added with link"
             });
           })
