@@ -28,6 +28,7 @@ let async = require("async");
 let address = require("./address.model");
 const randomstring = require("randomstring");
 const _ = require("underscore");
+const send = require("../mail/mail");
 //Smptp Config
 let smtpConfig = {
   host: "smtp.gmail.com",
@@ -512,6 +513,7 @@ signUpDoc = async (req, res) => {
                           )
                             .then(final => {
                               // console.log("by link", final);
+                              send("Welcome to DocMz");
                               res.status(200).json({
                                 status: true,
                                 message: "Successfully Registered",
