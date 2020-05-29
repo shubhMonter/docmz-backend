@@ -210,7 +210,7 @@ const deleteQuestion = async (req, res) => {
   let d1 = await question.deleteOne({ _id: req.body.id });
 
   let d2 = await question.findOneAndUpdate(
-    { _id: req.body.parent, "option.text": req.body.optionText },
+    { _id: req.body.parent, "option._id": req.body.optionId },
     {
       $pull: { "option.$.linkedQuestion": req.body.id }
     }
