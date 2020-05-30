@@ -60,18 +60,18 @@ let getTimeSlots = id => {
   let futureMonth = moment.addRealMonth(moment()).format("YYYY-MM-DD");
 
   //Current Date
-  console.log(currentDate);
+  // console.log(currentsDate);
 
   //Future Month
-  console.log(futureMonth);
+  // console.log(futureMonth);
 
   //Construct Schedule
   let objArray = [];
   data.weekdaysArr.map(el => {
-    console.log({ el });
+    // console.log({ el });
     let obj = {};
     el.days.map(day => {
-      console.log({ day });
+      // console.log({ day });
       obj.from = el.startTime;
       obj.to = el.endTime;
       obj.unavailability = [
@@ -102,7 +102,7 @@ let getTimeSlots = id => {
       let dash = availability[key];
       dash.map(el => {
         let timeString = key + " " + el.time + ":00";
-        console.log({ timeString });
+        // console.log({ timeString });
         const myDate = moment(timeString);
         let timeModel = new AppointmentModel({
           bookedFor: myDate,
@@ -111,13 +111,13 @@ let getTimeSlots = id => {
         });
 
         timeModel.save();
-        console.log({ timeModel, myDate, el });
+        // console.log({ timeModel, myDate, el });
         timeSlotsArray.push(timeModel._id);
       });
     });
 
     let RenewDate = availabilityDates.pop();
-    console.log({ RenewDate });
+    // console.log({ RenewDate });
     setTimeout(function() {
       Practise.findByIdAndUpdate(
         id,
@@ -131,7 +131,7 @@ let getTimeSlots = id => {
         { new: true }
       )
         .then(result => {
-          console.log(result);
+          // console.log(result);
         })
         .catch(err => {
           console.log(err);
@@ -145,7 +145,7 @@ let getTimeSlots = id => {
       // let date123 = new Date("2019-11-18T04:00:00.000Z")
       // console.log({"read this":date123.toLocaleTimeString()})
 
-      console.log({ timeSlotsArray });
+      // console.log({ timeSlotsArray });
     }, 3000);
 
     // res.json({ status: true, message: "Time Slots Saved", data: availability });

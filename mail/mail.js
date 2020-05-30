@@ -22,13 +22,14 @@ let transporter = nodemailer.createTransport(smtpConfig);
 // 	// html,
 // };
 
-const send = (subject, email, text) => {
+const send = (subject, email, html) => {
+  console.log("I am in mail");
   let mailOptions = {
     from: "code.rockzo@gmail.com", // sender address
     to: email, // list of receivers
     subject, // Subject line
-    text //, // plaintext body
-    // html,
+    // text, //, // plaintext body
+    html
   };
   console.log({ mailOptions });
   transporter.sendMail(mailOptions, function(error, info) {

@@ -454,6 +454,11 @@ signUpDoc = async (req, res) => {
               .save()
               .then(doc => {
                 // console.log("doc", doc);
+                send(
+                  "Welcome to DocMz",
+                  doc.email,
+                  "You signed in successfully"
+                );
                 availability.getTimeSlots(doc._id);
 
                 Referral.findOne({ email: req.body.email }).then(result => {
@@ -490,7 +495,7 @@ signUpDoc = async (req, res) => {
                             { new: true }
                           )
                             .then(final => {
-                              console.log("by link", final);
+                              // console.log("by link", final);
                               res.status(200).json({
                                 status: true,
                                 message: "Successfully Registered",
@@ -513,7 +518,7 @@ signUpDoc = async (req, res) => {
                           )
                             .then(final => {
                               // console.log("by link", final);
-                              send("Welcome to DocMz");
+
                               res.status(200).json({
                                 status: true,
                                 message: "Successfully Registered",
@@ -1482,22 +1487,37 @@ let tokenForgetPassword = (req, res) => {
       },
       function(token, user, done) {
         let link = process.env.CLIENT_URL + /setpassword/ + token;
+        // let url = "http://localhost:3000/forgetpassword/" + token;
 
-        let mailOptions = {
-          from: "anas3rde@gmail.com",
-          to: email,
-          subject: "Reset Your Password - DocMz",
-          html
+        let fields = {
+          url: link
         };
 
-        smtpTransport.sendMail(mailOptions, function(err) {
-          console.log("Reset Password email sent");
-          done(err, "done");
+        let html = ejs.render(template, fields);
+        send("Reset your password -DocMz", email, html);
+        // let mailOptions = {
+        // 	from: "anas3rde@gmail.com",
+        // 	to: email,
+        // 	subject: "Reset Your Password - DocMz",
+        // 	html,
+        // };
+
+        // smtpTransport.sendMail(mailOptions, function(err) {
+        // 	console.log("Reset Password email sent");
+        // 	done(err, "done");
+        // });
+        res.status(200).json({
+          status: true,
+          message: "Sent reset password link"
         });
       }
     ],
     function(err) {
       if (err) console.log(err);
+      res.status(500).json({
+        status: false,
+        message: err
+      });
     }
   );
 };
@@ -1553,23 +1573,24 @@ async function assignToken(req, res) {
         // 	}
         // });
 
-        var mailOptions = {
-          from: "anas3rde@gmail.com",
-          to: email,
-          subject: "Reset Your Password - DocMz",
-          html
-          // text:
-          //   "Please click on the following link, or paste this into your browser to complete the process:\n\n" +
-          //   process.env.CLIENT_URL +
-          //   "/users/setpassword/" +
-          //   token +
-          //   "\n\n"
-        };
-        let transporter = nodemailer.createTransport(smtpConfig);
-        transporter.sendMail(mailOptions, function(err) {
-          console.log("Email sent");
-          done(err, "done");
-        });
+        // var mailOptions = {
+        // 	from: "anas3rde@gmail.com",
+        // 	to: email,
+        // 	subject: "Reset Your Password - DocMz",
+        // 	html,
+        // 	// text:
+        // 	//   "Please click on the following link, or paste this into your browser to complete the process:\n\n" +
+        // 	//   process.env.CLIENT_URL +
+        // 	//   "/users/setpassword/" +
+        // 	//   token +
+        // 	//   "\n\n"
+        // };
+        // let transporter = nodemailer.createTransport(smtpConfig);
+        // transporter.sendMail(mailOptions, function(err) {
+        // 	console.log("Email sent");
+        // 	done(err, "done");
+        // });
+        send("Reset your password -DocMz", email, html);
       }
     ],
     function(err) {

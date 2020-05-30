@@ -206,6 +206,29 @@ const getQuestion = (req, res) => {
   // 	});
 };
 
+const deleteRoot = (req, res) => {
+  practice
+    .findOneAndUpdate(
+      { _id: req.body.docId },
+      { $pull: { question: req.body.questionId } },
+      { new: true }
+    )
+    .then(result => {
+      console.log(result);
+      res.status(200).json({
+        status: true,
+        message: "Delete root question"
+      });
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({
+        status: false,
+        message: err
+      });
+    });
+};
+
 const deleteQuestion = async (req, res) => {
   let d1 = await question.deleteOne({ _id: req.body.id });
 
@@ -249,5 +272,6 @@ module.exports = {
   addQuestion,
   getQuestion,
   updateQuestion,
-  deleteQuestion
+  deleteQuestion,
+  deleteRoot
 };
