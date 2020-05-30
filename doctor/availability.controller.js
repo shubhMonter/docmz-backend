@@ -131,7 +131,8 @@ let getTimeSlots = id => {
         { new: true }
       )
         .then(result => {
-          // console.log(result);
+          console.log("in timeslot");
+          console.log(result);
         })
         .catch(err => {
           console.log(err);

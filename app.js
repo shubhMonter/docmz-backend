@@ -36,7 +36,7 @@ app.use(
 );
 app.use(express.static("public"));
 
-// const readfile = require("./readfile");
+const readfile = require("./readfile");
 // var socket = require('socket.io');
 
 // start server

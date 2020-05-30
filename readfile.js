@@ -24,63 +24,59 @@ const availability = require("./doctor/availability.controller");
 // console.log(__filename);
 // fs.readFile("/home/dev-aman7/Desktop/xl/media/image1.jpeg", function(
 // 	err,
-// 	data
+// 	data[i]
 // ) {
 // 	if (err) {
 // 		console.log(err);
 // 	} else {
 // 		var newPath = __dirname + "/public/image123.jpeg";
-// 		fs.writeFile(newPath, data, function(err) {
+// 		fs.writeFile(newPath, data[i], function(err) {
 // 			console.log(err);
 // 		});
 // 	}
-// 	console.log(data);
+// 	console.log(data[i]);
 // });
 // File path.
-readXlsxFile("doclist.xlsx").then(async rows => {
-  console.log(rows);
-  for await (const data of rows) {
-    if (data[0] === null) {
-      continue;
-    } else {
-      let d1 = await fs.readFile(
-        "/home/dev-aman7/Desktop/xl/media/image" + data[0] + ".jpeg",
-        async function(err, file) {
-          if (err) {
-            console.log(err);
-          } else {
-            let imageName = "image" + Date.now() + ".jpeg";
-            var newPath = __dirname + "/public/doctors/image/" + imageName;
-            let d2 = await fs.writeFile(newPath, file, async function(err) {
-              if (err) {
-                console.log(err);
-              } else {
-                console.log(data);
-                let doc = {
-                  npi: faker.random.number(),
-                  name: data[2],
-                  phone: data[3],
-                  email: data[4],
-                  payToAddress: data[5],
-                  picture: ["/doctors/image/image" + data[0] + ".jpeg"],
-                  city: faker.address.city()
-                };
-
-                let doctor = new Practise(doc);
-                let d = await doctor
-                  .save()
-                  .then(result => {
-                    availability.getTimeSlots(result._id);
-                    console.log(result);
-                  })
-                  .catch(err => {
-                    console.log(err);
-                  });
-              }
-            });
-          }
-        }
+readXlsxFile("doclist.xlsx").then(async data => {
+  console.log(data);
+  let i = 0;
+  for (let i = 1; i < data.length; i++) {
+    console.log(i);
+    if (data[i] !== undefined && data[i][0] !== null) {
+      let file = fs.readFileSync(
+        "/home/dev-aman7/Desktop/xl/media/image" + data[i][0] + ".jpeg"
       );
+
+      let imageName = "image" + Date.now() + ".jpeg";
+
+      let newPath = __dirname + "/public/doctors/image/" + imageName;
+
+      let d2 = fs.writeFileSync(newPath, file);
+
+      console.log(data[i]);
+
+      let doc = {
+        npi: faker.random.number(),
+        name: data[i][2],
+        phone: data[i][3],
+        email: data[i][4],
+        payToAddress: data[i][5],
+        picture: ["/doctors/image/image" + data[i][0] + ".jpeg"],
+        city: faker.address.city()
+      };
+
+      console.log("doctor");
+      let doctor = new Practise(doc);
+      let d = await doctor
+        .save()
+        .then(result => {
+          console.log("in doctor");
+          availability.getTimeSlots(result._id);
+          // console.log(result);
+        })
+        .catch(err => {
+          console.log(err);
+        });
     }
   }
 });
