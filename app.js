@@ -36,7 +36,8 @@ app.use(
 );
 app.use(express.static("public"));
 
-const readfile = require("./readfile");
+// const readfile = require("./readfile"); //Uncomment this while reading from excel file
+
 // var socket = require('socket.io');
 
 // start server
@@ -95,6 +96,8 @@ app.use("/medicine", require("./routes/medicine_route"));
 app.use("/admin", require("./routes/admin_routes"));
 
 app.use("/referral", require("./routes/referral_routes"));
+
+app.use("/team", require("./routes/teams_route"));
 
 app.use(errorHandler);
 
