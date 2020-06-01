@@ -109,7 +109,11 @@ const practise = new Schema({
   referralId: { type: String },
   referrals: [{ type: Schema.Types.ObjectId, ref: "Referral" }],
   latestAppointment: [{ type: Schema.Types.ObjectId, ref: "Appointments" }],
-  payment: { type: Boolean, default: true } //whether doctor asks for payment or not
+  payment: { type: Boolean, default: true }, //whether doctor asks for payment or not
+  isAssistant: { type: Boolean, default: false }, //denotes whether the account is assistent or not
+  rights: [{ type: String }], // Array of rights that assistent have
+  assistants: [{ type: Schema.Types.ObjectId, ref: "Practise" }], // if doctor, list of all assistents
+  parent: { type: Schema.Types.ObjectId, ref: "Practise" }
 });
 
 module.exports = mongoose.model("Practise", practise);

@@ -12,5 +12,7 @@ router.post("/update", questionnaireController.updateQuestion);
 
 router.post("/delete", questionnaireController.deleteQuestion);
 
+router.post("/delete/root", questionnaireController.deleteRoot);
+
 // exporting them
 module.exports = router;

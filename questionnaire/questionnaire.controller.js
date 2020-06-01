@@ -102,6 +102,9 @@ const updateQuestion = async (req, res) => {
   // let d = await question.findOne({ _id: req.body.id });
   // console.log(d);
   // res.send(d);
+  if (typeof req.body.option === "string") {
+    req.body.option = JSON.parse(req.body.option);
+  }
 
   question
     .findOneAndUpdate({ _id: req.body.id }, req.body)
@@ -206,11 +209,34 @@ const getQuestion = (req, res) => {
   // 	});
 };
 
+const deleteRoot = (req, res) => {
+  practice
+    .findOneAndUpdate(
+      { _id: req.body.docId },
+      { $pull: { question: req.body.questionId } },
+      { new: true }
+    )
+    .then(result => {
+      console.log(result);
+      res.status(200).json({
+        status: true,
+        message: "Delete root question"
+      });
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({
+        status: false,
+        message: err
+      });
+    });
+};
+
 const deleteQuestion = async (req, res) => {
   let d1 = await question.deleteOne({ _id: req.body.id });
 
   let d2 = await question.findOneAndUpdate(
-    { _id: req.body.parent, "option.text": req.body.optionText },
+    { _id: req.body.parent, "option._id": req.body.optionId },
     {
       $pull: { "option.$.linkedQuestion": req.body.id }
     }
@@ -249,5 +275,6 @@ module.exports = {
   addQuestion,
   getQuestion,
   updateQuestion,
-  deleteQuestion
+  deleteQuestion,
+  deleteRoot
 };
