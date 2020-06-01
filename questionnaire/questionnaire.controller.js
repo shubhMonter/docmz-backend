@@ -102,6 +102,9 @@ const updateQuestion = async (req, res) => {
   // let d = await question.findOne({ _id: req.body.id });
   // console.log(d);
   // res.send(d);
+  if (typeof req.body.option === "string") {
+    req.body.option = JSON.parse(req.body.option);
+  }
 
   question
     .findOneAndUpdate({ _id: req.body.id }, req.body)
