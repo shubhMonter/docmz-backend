@@ -3,9 +3,10 @@ const mongooseFieldEncryption = require("mongoose-field-encryption")
   .fieldEncryption;
 const Schema = mongoose.Schema;
 
+//All required fields are encrypted. According to hippa guidelines. For understanding the library. Check on npm
 const appointment = new Schema({
   forWhom: { type: String }, //Determine for whom this appointment is booked
-  patientInfo: { type: Object },
+  patientInfo: { type: Object }, //All details for patient,
   bookedOn: { type: Date },
   patient: { type: Schema.Types.ObjectId, ref: "Patient" },
   doctor: { type: Schema.Types.ObjectId, ref: "Practise" },

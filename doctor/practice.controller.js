@@ -1330,6 +1330,7 @@ let searchDocs = (req, res) => {
   // });
 };
 
+//its a dynamic api, it filters data on the basis of what sent in match object. For search by name. You need to pass another variable name, not in match.
 let searchDocsLite = (req, res) => {
   // console.log(address.collection.name);
   //   console.log(req.body);
@@ -1659,6 +1660,7 @@ function setPassword(req, res) {
   );
 }
 
+//Gives next 3 appointments
 nextAppointment = (req, res) => {
   // console.
   Practise.findById(req.body.docId)

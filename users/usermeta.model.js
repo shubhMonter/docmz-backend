@@ -6,9 +6,10 @@ const Schema = mongoose.Schema;
 const Usermeta = new Schema({
   userId: { type: Schema.Types.ObjectId, ref: "Patient" },
   referralId: { type: String, required: true, unique: true },
-  referrals: [{ type: Schema.Types.ObjectId, ref: "Referral" }],
-  idProof: { type: String },
-  members: [{ type: Schema.Types.ObjectId, ref: "Member" }],
+  referrals: [{ type: Schema.Types.ObjectId, ref: "Referral" }], // list of all users/doc referred by this user
+  idProof: { type: String }, //Any identity proof for valdation
+  members: [{ type: Schema.Types.ObjectId, ref: "Member" }], //list of all family/friend
+  //Below field shows full history of medical info
   weight: [
     {
       value: { type: String },

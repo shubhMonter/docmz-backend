@@ -38,6 +38,7 @@ const schema = new Schema({
   customerProfile: { type: String },
   picture: { type: String },
   records: [{ type: Object }],
+  //Below fields shows the latest medical info
   weight: {
     value: { type: String },
     practiseName: { type: String },
@@ -89,9 +90,10 @@ const schema = new Schema({
     modifiedBy: { type: String },
     date: { type: Date, default: Date.now() }
   },
-  meta: { type: Schema.Types.ObjectId, ref: "Usermeta" },
+
+  meta: { type: Schema.Types.ObjectId, ref: "Usermeta" }, // All data which are not required on the dashboard
   referralId: { type: String, required: true },
-  favourites: [{ type: Schema.Types.ObjectId, ref: "Practise" }]
+  favourites: [{ type: Schema.Types.ObjectId, ref: "Practise" }] //List of favourite doctors
 });
 
 schema.plugin(mongooseFieldEncryption, {
