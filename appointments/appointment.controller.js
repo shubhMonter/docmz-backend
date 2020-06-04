@@ -99,6 +99,7 @@ let bookAppointment = (req, res) => {
 //Confirm appointment
 let approveAppointment = (req, res) => {
   let { timeSlot, email, patient, time, date, address, doctor } = req.body;
+  docume;
   let fields = {
     patient,
     time,

@@ -6,8 +6,8 @@ const expressValidator = require("express-validator");
 // app.use(expressValidator());
 const cors = require("cors");
 
-// const cron = require("./cron/cron");
-// const appointcron = require("./cron/appointmentCron");
+const cron = require("./cron/cron");
+const appointcron = require("./cron/appointmentCron");
 
 const jwt = require("_helpers/jwt");
 const errorHandler = require("_helpers/error-handler");
