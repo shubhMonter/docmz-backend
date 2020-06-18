@@ -5,6 +5,7 @@
   Member = db.Member,
   Appointment = db.Appointment,
   Referral = db.Referral,
+  Specialty = db.Specialty,
   express = require("express"),
   app = express(),
   crypto = require("crypto"),
@@ -1208,8 +1209,31 @@ addMedicalInfo = async (req, res) => {
 };
 
 getMedicalInfo = (req, res) => {};
+
+getSpecialty = (req, res) => {
+  console.log(req.body);
+  let pageNo = Number(req.body.pageNo) || 0;
+  let size = Number(req.body.size) || 10;
+  Specialty.find({})
+    .skip(pageNo * size)
+    .limit(size)
+    .then(result => {
+      res.status(200).json({
+        status: true,
+        message: "Successfully fetched specialities",
+        data: result
+      });
+    })
+    .catch(err => {
+      res.status(500).json({
+        status: false,
+        message: err
+      });
+    });
+};
 //Exporting all the functions
 module.exports = {
+  getSpecialty,
   authenticate,
   register,
   updateProfile,

@@ -227,4 +227,6 @@ router.post("/test/update", testController.update);
 //-----------meta---------------------------
 router.post("/meta/get", userController.getMeta);
 
+router.post("/specialty/get", userController.getSpecialty);
+
 module.exports = router;
