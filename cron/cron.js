@@ -5,6 +5,7 @@ let { Scheduler } = require("@ssense/sscheduler");
 const db = require("_helpers/db");
 const Practise = db.Practise;
 const AppointmentModel = db.Appointment;
+//Removes previous appointments that aren't booked and create new appointments for next day.
 
 //Payload structure for scheduler
 // const data = {

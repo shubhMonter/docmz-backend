@@ -5,6 +5,8 @@ const Referral = db.Referral,
   User = db.User;
 const _ = require("underscore");
 
+//when someone fills a form for some user who is not on platform yet
+
 const add = (req, res) => {
   const { referrerType, referralId, email } = req.body;
   const referral = new Referral({ ...req.body });

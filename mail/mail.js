@@ -7,8 +7,8 @@ let smtpConfig = {
   secure: true, // use SSL,
   // you can try with TLS, but port is then 587
   auth: {
-    user: "code.rockzo@gmail.com", // Your email id
-    pass: "Rockzo!@77" // Your password
+    user: "*********", // Your email id
+    pass: "********" // Your password
   },
   tls: {
     rejectUnauthorized: false
@@ -21,6 +21,8 @@ let transporter = nodemailer.createTransport(smtpConfig);
 // 	text: "this is some text", //, // plaintext body
 // 	// html,
 // };
+
+//Centralised mailing for all, just use the function send and pass the required data
 
 const send = (subject, email, html) => {
   console.log("I am in mail");

@@ -1330,6 +1330,7 @@ let searchDocs = (req, res) => {
   // });
 };
 
+//its a dynamic api, it filters data on the basis of what sent in match object. For search by name. You need to pass another variable name, not in match.
 let searchDocsLite = (req, res) => {
   // console.log(address.collection.name);
   //   console.log(req.body);
@@ -1659,6 +1660,7 @@ function setPassword(req, res) {
   );
 }
 
+//Gives next 3 appointments
 nextAppointment = (req, res) => {
   // console.
   Practise.findById(req.body.docId)
@@ -1679,6 +1681,110 @@ nextAppointment = (req, res) => {
         .json({ status: false, message: "Something went wrong", err });
     });
 };
+
+getByDate = (req, res) => {
+  let dates = req.body.dates;
+  if (typeof dates === "string") {
+    dates = JSON.parse(req.body.dates);
+  }
+  // console.log(dates);
+  let dateArray = [];
+  dates.forEach(elem => {
+    dateArray.push({
+      bookedFor: { $gte: new Date(elem[0]), $lt: new Date(elem[1]) }
+    });
+  });
+  // console.log(dateArray);
+  Appointment.aggregate([
+    {
+      $match: {
+        $and: [{ $or: dateArray }, { booked: false }]
+
+        // [
+        // 	{
+        // 		bookedFor: {
+        // 			$gte: new Date("2020-06-03"),
+        // 			$lt: new Date("2020-06-04"),
+        // 		},
+        // 	},
+        // 	{
+        // 		bookedFor: {
+        // 			$gte: new Date("2020-06-05"),
+        // 			$lt: new Date("2020-06-06"),
+        // 		},
+        // 	},
+        // 	{
+        // 		bookedFor: {
+        // 			$gte: new Date("2020-06-08"),
+        // 			$lt: new Date("2020-06-09"),
+        // 		},
+        // 	},
+        // 	// { bookedFor: "2020-06-03T04:00:00.000Z" },
+        // 	// { bookedFor: "2020-06-03T05:00:00.000Z" },
+        // ],
+      }
+    },
+    {
+      $group: {
+        _id: { $dateToString: { format: "%Y-%m-%d", date: "$bookedFor" } },
+        appointments: { $push: "$$ROOT" }
+      }
+    },
+    { $sort: { appointments: 1 } }
+  ])
+    .then(result => {
+      res.status(200).json({
+        status: true,
+        message: "Successfully fetched appointment",
+        data: result
+      });
+    })
+    .catch(err => {
+      res
+        .status(500)
+        .json({ status: false, message: "Something went wrong", err });
+    });
+
+  // Appointment.find({
+  // 	$or: [
+  // 		{
+  // 			bookedFor: { $gte: "2020-06-03", $lt: "2020-06-04" },
+  // 		},
+  // 		{ bookedFor: { $gte: "2020-06-05", $lt: "2020-06-06" } },
+  // 		{ bookedFor: { $gte: "2020-06-08", $lt: "2020-06-09" } },
+  // 		// { bookedFor: "2020-06-03T04:00:00.000Z" },
+  // 		// { bookedFor: "2020-06-03T05:00:00.000Z" },
+  // 	],
+  // })
+  // 	// .populate({
+  // 	// 	path: "appointments",
+  // 	// 	match: {
+  // 	// 		$or: [
+  // 	// 			{
+  // 	// 				bookedFor: { $gte: "2020-06-03", $lt: "2020-06-04" },
+  // 	// 			},
+  // 	// 			{ bookedFor: { $gte: "2020-06-05", $lt: "2020-06-06" } },
+  // 	// 			{ bookedFor: { $gte: "2020-06-08", $lt: "2020-06-09" } },
+  // 	// 			// { bookedFor: "2020-06-03T04:00:00.000Z" },
+  // 	// 			// { bookedFor: "2020-06-03T05:00:00.000Z" },
+  // 	// 		],
+  // 	// 	},
+  // 	// })
+  // 	// .limit(5)
+  // 	.then((result) => {
+  // 		res.status(200).json({
+  // 			status: true,
+  // 			message: "Successfully fetched appointment",
+  // 			data: result,
+  // 		});
+  // 	})
+  // 	.catch((err) => {
+  // 		res
+  // 			.status(500)
+  // 			.json({ status: false, message: "Something went wrong", err });
+  // 	});
+};
+
 //Exporting all the functions
 module.exports = {
   getNpiInfo,
@@ -1692,5 +1798,6 @@ module.exports = {
   searchDocsLite,
   getDoc,
   tokenForgetPassword,
-  nextAppointment
+  nextAppointment,
+  getByDate
 };

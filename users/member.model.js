@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
+//THis model is used for holding data of family/friend of a user
 const Member = new Schema({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },

@@ -5,6 +5,8 @@ let { Scheduler } = require("@ssense/sscheduler");
 const db = require("_helpers/db");
 const Practise = db.Practise;
 const AppointmentModel = db.Appointment;
+
+//In every 5 mins it adds latest 3 appointments in latestappointment array of doctor
 console.log("appointmentcron");
 cron.schedule("*/5 * * * *", async () => {
   Practise.find()

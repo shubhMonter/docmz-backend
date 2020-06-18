@@ -1,6 +1,9 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-
+//This model is created for question. As option can be of different types. Therefore, we have kept optionType in option instead of question.
+//Root question denotes whether its the first question or not
+//Parent denotes the question from which its linked with
+//Specilty and category denotes type of questionnaire.
 const question = new Schema(
   {
     title: { type: String },

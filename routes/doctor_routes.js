@@ -218,5 +218,7 @@ router.post("/upload/document", dupload.any(), (req, res) => {
 });
 
 router.post("/appointment/next", npiController.nextAppointment);
+
+router.post("/appointment/date", npiController.getByDate);
 // exporting them
 module.exports = router;
