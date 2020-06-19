@@ -1638,20 +1638,27 @@ function setPassword(req, res) {
       // });
       console.log({ user });
       if (user) {
-        let mailOptions = {
-          to: user.email,
-          from: "anas3rde@gmail.com",
-          subject: "Password Changed - DocMz",
-          text:
-            "Your password has been successfully changed" +
+        // let mailOptions = {
+        //   to: user.email,
+        //   from: "anas3rde@gmail.com",
+        //   subject: "Password Changed - DocMz",
+        //   text:
+        //     "Your password has been successfully changed" +
+        //     "\n\n" +
+        //     "Feel free to log in with your newly set password."
+        // };
+
+        // let transporter = nodemailer.createTransport(smtpConfig);
+        // transporter.sendMail(mailOptions, function(err) {
+        //   done(err);
+        // });
+        send(
+          "Password changed DocMz",
+          user.email,
+          "Your password has been successfully changed" +
             "\n\n" +
             "Feel free to log in with your newly set password."
-        };
-
-        let transporter = nodemailer.createTransport(smtpConfig);
-        transporter.sendMail(mailOptions, function(err) {
-          done(err);
-        });
+        );
         res.status(200).json({ status: true, message: "Password Set" });
       } else {
         res.status(404).json({ status: false, message: "Token Expired" });
