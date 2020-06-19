@@ -61,7 +61,7 @@ const updateAppointment = async (availability, id) => {
 };
 
 const updateDoctor = async (appointmentsArray, id) => {
-  console.log("got array is", appointmentsArray, "id", id);
+  // console.log("got array is", appointmentsArray, "id", id);
   return Practise.findOneAndUpdate(
     { _id: id },
     { $push: { appointments: { $each: appointmentsArray } } },
@@ -90,25 +90,25 @@ const removeSlots = async (yesterday, today) => {
     },
     { $project: { result: 1 } }
   ]);
-  console.log("data is", data);
+  // console.log("data is", data);
   for await (const doc of data) {
     // console.log("the doc", doc);
     resultId = doc.result.map(elem => {
       return elem._id;
     });
-    console.log(resultId);
+    // console.log(resultId);
     let d = await Practise.findOneAndUpdate(
       { _id: doc._id },
       { $pullAll: { appointments: resultId } },
       { upsert: true }
     );
-    console.log(d);
+    // console.log(d);
 
     let d2 = await AppointmentModel.remove({ _id: { $in: resultId } });
-    console.log(d2);
+    // console.log(d2);
   }
 
-  console.log("over");
+  // console.log("over");
 };
 const main = async () => {
   // Practise.update(

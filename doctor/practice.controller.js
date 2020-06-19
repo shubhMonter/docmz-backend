@@ -1474,6 +1474,7 @@ let tokenForgetPassword = (req, res) => {
         });
       },
       function(token, done) {
+        console.log(token);
         Practise.findOneAndUpdate(
           { email },
           {
@@ -1481,8 +1482,10 @@ let tokenForgetPassword = (req, res) => {
               passwordToken: token,
               passwordExpires: Date.now() + 3600000
             }
-          }
+          },
+          { new: true }
         ).exec(function(err, user) {
+          console.log(user);
           done(err, token, user);
         });
       },
@@ -1540,7 +1543,7 @@ async function assignToken(req, res) {
           { email: email },
           {
             $set: {
-              passwordtoken: token,
+              passwordToken: token,
               passwordExpires: Date.now() + 3600000
             }
           },
@@ -1614,7 +1617,7 @@ function setPassword(req, res) {
 
   Practise.findOneAndUpdate(
     {
-      passwordtoken: token,
+      passwordToken: token,
       passwordExpires: { $gt: Date.now() }
     },
     {
@@ -1625,33 +1628,8 @@ function setPassword(req, res) {
       }
     },
     function(err, user) {
-      // var smtptransport2 = nodemailer.createTransport({
-      // 	host: 'smtp.gmail.com',
-      // 	port: 587,
-      // 	secure: false,
-      // 	// port: 465,
-      // 	// secure: true, // use SSL
-      // 	auth: {
-      // 		user: 'anas3rde@gmail.com',
-      // 		pass: '8123342590'
-      // 	}
-      // });
       console.log({ user });
       if (user) {
-        // let mailOptions = {
-        //   to: user.email,
-        //   from: "anas3rde@gmail.com",
-        //   subject: "Password Changed - DocMz",
-        //   text:
-        //     "Your password has been successfully changed" +
-        //     "\n\n" +
-        //     "Feel free to log in with your newly set password."
-        // };
-
-        // let transporter = nodemailer.createTransport(smtpConfig);
-        // transporter.sendMail(mailOptions, function(err) {
-        //   done(err);
-        // });
         send(
           "Password changed DocMz",
           user.email,
@@ -1806,5 +1784,6 @@ module.exports = {
   getDoc,
   tokenForgetPassword,
   nextAppointment,
-  getByDate
+  getByDate,
+  setPassword
 };

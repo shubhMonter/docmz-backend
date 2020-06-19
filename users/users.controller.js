@@ -20,6 +20,8 @@ const keySecret = "	sk_test_hoVy16mRDhxHCoNAOAEJYJ4N00pzRH8xK2";
 const stripe = require("stripe")(keySecret);
 const randomstring = require("randomstring");
 const _ = require("underscore");
+
+const send = require("../mail/mail");
 //SMTP Config
 let smtpConfig = {
   host: "smtp.gmail.com",
@@ -720,198 +722,6 @@ function getProfileDetails(req, res) {
 
 //Forget password
 
-function tokenForgetPassword(email) {
-  console.log("Reset password token function executed");
-  async.waterfall(
-    [
-      function(done) {
-        crypto.randomBytes(20, function(err, buf) {
-          let token = buf.toString("hex");
-          done(err, token);
-        });
-      },
-      function(token, done) {
-        User.findOneAndUpdate(
-          { email },
-          {
-            $set: {
-              passwordToken: token,
-              passwordExpires: Date.now() + 3600000
-            }
-          }
-        ).exec(function(err, user) {
-          done(err, token, user);
-        });
-      },
-      function(token, user, done) {
-        console.log({ user });
-
-        let url = "http://localhost:3000/forgetpassword/";
-
-        let fields = {
-          url
-        };
-
-        let html = ejs.render(template, fields);
-
-        let mailOptions = {
-          from: "anas3rde@gmail.com",
-          to: email,
-          subject: "Reset Password - DocMz",
-          text:
-            "Please click on the following link to reset your password:\n\n" +
-            process.enc.CLIENT_URL +
-            "/setpassword/" +
-            token +
-            "\n\n"
-        };
-
-        smtpTransport.sendMail(mailOptions, function(err) {
-          console.log("Reset Password email sent");
-          done(err, "done");
-        });
-      }
-    ],
-    function(err) {
-      if (err) console.log(err);
-    }
-  );
-}
-
-//Function to assign token
-async function assignToken(req, res) {
-  let { email } = req.body;
-  console.log("token function executed");
-  async.waterfall(
-    [
-      function(done) {
-        crypto.randomBytes(20, function(err, buf) {
-          var token = buf.toString("hex");
-          done(err, token);
-        });
-      },
-      function(token, done) {
-        User.findOneAndUpdate(
-          { email: email },
-          {
-            $set: {
-              passwordtoken: token,
-              passwordexpires: Date.now() + 3600000
-            }
-          },
-          { new: true }
-        ).exec(function(err, user) {
-          console.log("1");
-          done(err, token, user);
-          console.log("2");
-        });
-      },
-      function(token, user, done) {
-        console.log({ user });
-
-        let url = "http://localhost:3000/forgetpassword/" + token;
-
-        let fields = {
-          url
-        };
-
-        let html = ejs.render(template, fields);
-
-        // var smtpTransport = nodemailer.createTransport({
-        // 	host: 'smtp.gmail.com',
-        // 	port: 587,
-        // 	secure: false,
-        // 	// port: 465,
-        // 	// secure: true, // use SSL
-        // 	auth: {
-        // 		user: 'anas3rde@gmail.com',
-        // 		pass: '8123342590'
-        // 	}
-        // });
-
-        var mailOptions = {
-          from: "anas3rde@gmail.com",
-          to: email,
-          subject: "Reset Your Password - DocMz",
-          html
-          // text:
-          //   "Please click on the following link, or paste this into your browser to complete the process:\n\n" +
-          //   process.env.CLIENT_URL +
-          //   "/users/setpassword/" +
-          //   token +
-          //   "\n\n"
-        };
-        let transporter = nodemailer.createTransport(smtpConfig);
-        transporter.sendMail(mailOptions, function(err) {
-          console.log("Email sent");
-          done(err, "done");
-        });
-      }
-    ],
-    function(err) {
-      if (err) console.log(err);
-      res.status(200).json({ status: true, message: "Email Sent" });
-    }
-  );
-}
-
-//Function to set the password
-function setPassword(req, res) {
-  console.log(req.body);
-  let { token, password } = req.body;
-
-  let cipher = crypto.createCipheriv(algorithm, new Buffer.from(key), iv);
-  var encrypted = cipher.update(password, "utf8", "hex") + cipher.final("hex");
-  // var hashp = bcrypt.hashSync(password, 10);
-
-  User.findOneAndUpdate(
-    {
-      passwordtoken: token,
-      passwordexpires: { $gt: Date.now() }
-    },
-    {
-      $set: {
-        password: encrypted,
-        passwordToken: undefined,
-        passwordExpires: undefined
-      }
-    },
-    function(err, user) {
-      // var smtptransport2 = nodemailer.createTransport({
-      // 	host: 'smtp.gmail.com',
-      // 	port: 587,
-      // 	secure: false,
-      // 	// port: 465,
-      // 	// secure: true, // use SSL
-      // 	auth: {
-      // 		user: 'anas3rde@gmail.com',
-      // 		pass: '8123342590'
-      // 	}
-      // });
-      console.log({ user });
-      if (user) {
-        let mailOptions = {
-          to: user.email,
-          from: "anas3rde@gmail.com",
-          subject: "Password Changed - DocMz",
-          text:
-            "Your password has been successfully changed" +
-            "\n\n" +
-            "Feel free to log in with your newly set password."
-        };
-
-        let transporter = nodemailer.createTransport(smtpConfig);
-        transporter.sendMail(mailOptions, function(err) {
-          done(err);
-        });
-        res.status(200).json({ status: true, message: "Password Set" });
-      } else {
-        res.status(404).json({ status: false, message: "Token Expired" });
-      }
-    }
-  );
-}
-
 //Function to update profile
 let updateProfile = (req, res) => {
   delete req.body.email; //should not  be sent from frontend
@@ -1231,13 +1041,116 @@ getSpecialty = (req, res) => {
       });
     });
 };
+
+let tokenForgetPassword = (req, res) => {
+  let { email } = req.body;
+  const emailToSearchWith = new User({ email });
+  emailToSearchWith.encryptFieldsSync();
+
+  console.log("Reset password token for Doctor Executed");
+
+  async.waterfall(
+    [
+      function(done) {
+        crypto.randomBytes(20, function(err, buf) {
+          let token = buf.toString("hex");
+          done(err, token);
+        });
+      },
+      function(token, done) {
+        console.log(token);
+        User.findOneAndUpdate(
+          { email: emailToSearchWith.email },
+          {
+            $set: {
+              passwordToken: token,
+              passwordExpires: Date.now() + 3600000
+            }
+          },
+          { new: true }
+        ).exec(function(err, user) {
+          console.log(user);
+          done(err, token, user);
+        });
+      },
+      function(token, user, done) {
+        let link = process.env.CLIENT_URL + /setpassword/ + token;
+        // let url = "http://localhost:3000/forgetpassword/" + token;
+
+        let fields = {
+          url: link
+        };
+
+        let html = ejs.render(template, fields);
+        send("Reset your password -DocMz", email, html);
+
+        res.status(200).json({
+          status: true,
+          message: "Sent reset password link"
+          // user,
+        });
+      }
+    ],
+    function(err) {
+      if (err) console.log(err);
+      res.status(500).json({
+        status: false,
+        message: err
+      });
+    }
+  );
+};
+
+//Function to assign token to Doctor to reset the password
+
+//
+
+//Function to set the password
+function setPassword(req, res) {
+  console.log(req.body);
+  let { token, password } = req.body;
+
+  let cipher = crypto.createCipheriv(algorithm, new Buffer.from(key), iv);
+  var encrypted = cipher.update(password, "utf8", "hex") + cipher.final("hex");
+  // var hashp = bcrypt.hashSync(password, 10);
+
+  User.findOneAndUpdate(
+    {
+      passwordToken: token,
+      passwordExpires: { $gt: Date.now() }
+    },
+    {
+      $set: {
+        password: encrypted,
+        passwordToken: undefined,
+        passwordExpires: undefined
+      }
+    },
+    function(err, user) {
+      console.log({ user });
+      if (user) {
+        send(
+          "Password changed DocMz",
+          user.email,
+          "Your password has been successfully changed" +
+            "\n\n" +
+            "Feel free to log in with your newly set password."
+        );
+        res.status(200).json({ status: true, message: "Password Set" });
+      } else {
+        res.status(404).json({ status: false, message: "Token Expired" });
+      }
+    }
+  );
+}
+
 //Exporting all the functions
 module.exports = {
   getSpecialty,
   authenticate,
   register,
   updateProfile,
-  assignToken,
+  tokenForgetPassword,
   setPassword,
   getProfileDetails,
   getPatient,
