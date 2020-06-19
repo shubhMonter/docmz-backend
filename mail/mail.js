@@ -7,8 +7,8 @@ let smtpConfig = {
   secure: true, // use SSL,
   // you can try with TLS, but port is then 587
   auth: {
-    user: "*********", // Your email id
-    pass: "********" // Your password
+    user: "code.rockzo@gmail.com", // Your email id
+    pass: "Rockzo!@77" // Your password
   },
   tls: {
     rejectUnauthorized: false
