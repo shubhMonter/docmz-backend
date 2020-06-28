@@ -1,7 +1,8 @@
 const db = require("_helpers/db"),
-  express = require("express"),
-  app = express(),
-  request = require("request");
+  mongoose = require("mongoose");
+(express = require("express")),
+  (app = express()),
+  (request = require("request"));
 (csvParser = require("csv-parse")),
   (Practise = db.Practise),
   (Taxonomy = db.Taxonomy),
@@ -1668,6 +1669,23 @@ nextAppointment = (req, res) => {
 };
 
 getByDate = (req, res) => {
+  // Practise.aggregate([
+  // 	{
+  // 		$match: { _id: mongoose.Types.ObjectId("5ef86700966e7d17909fe3f9") },
+  // 	},
+  // ])
+  // 	.then((result) => {
+  // 		res.status(200).json({
+  // 			data: result,
+  // 		});
+  // 	})
+  // 	.catch((err) => {
+  // 		console.log(err);
+  // 		res
+  // 			.status(500)
+  // 			.json({ status: false, message: "Something went wrong", err });
+  // 	});
+
   let dates = req.body.dates;
   if (typeof dates === "string") {
     dates = JSON.parse(req.body.dates);
@@ -1679,11 +1697,16 @@ getByDate = (req, res) => {
       bookedFor: { $gte: new Date(elem[0]), $lt: new Date(elem[1]) }
     });
   });
+  console.log(req.body);
   // console.log(dateArray);
   Appointment.aggregate([
     {
       $match: {
-        $and: [{ $or: dateArray }, { booked: false }]
+        $and: [
+          { $or: dateArray },
+          { booked: false },
+          { doctor: mongoose.Types.ObjectId(req.body.id) }
+        ]
 
         // [
         // 	{

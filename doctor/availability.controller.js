@@ -110,7 +110,10 @@ let getTimeSlots = id => {
           doctor: id
         });
 
-        timeModel.save();
+        timeModel.save().then(app => {
+          console.log("appointments");
+          console.log(app);
+        });
         // console.log({ timeModel, myDate, el });
         timeSlotsArray.push(timeModel._id);
       });
