@@ -111,8 +111,8 @@ let getTimeSlots = id => {
         });
 
         timeModel.save().then(app => {
-          console.log("appointments");
-          console.log(app);
+          // console.log("appointments");
+          // console.log(app);
         });
         // console.log({ timeModel, myDate, el });
         timeSlotsArray.push(timeModel._id);
