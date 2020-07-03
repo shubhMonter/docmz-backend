@@ -1,7 +1,8 @@
 const db = require("_helpers/db"),
-  express = require("express"),
-  app = express(),
-  request = require("request");
+  mongoose = require("mongoose");
+(express = require("express")),
+  (app = express()),
+  (request = require("request"));
 (csvParser = require("csv-parse")),
   (Practise = db.Practise),
   (Taxonomy = db.Taxonomy),
@@ -1474,6 +1475,7 @@ let tokenForgetPassword = (req, res) => {
         });
       },
       function(token, done) {
+        console.log(token);
         Practise.findOneAndUpdate(
           { email },
           {
@@ -1481,8 +1483,10 @@ let tokenForgetPassword = (req, res) => {
               passwordToken: token,
               passwordExpires: Date.now() + 3600000
             }
-          }
+          },
+          { new: true }
         ).exec(function(err, user) {
+          console.log(user);
           done(err, token, user);
         });
       },
@@ -1540,7 +1544,7 @@ async function assignToken(req, res) {
           { email: email },
           {
             $set: {
-              passwordtoken: token,
+              passwordToken: token,
               passwordExpires: Date.now() + 3600000
             }
           },
@@ -1614,7 +1618,7 @@ function setPassword(req, res) {
 
   Practise.findOneAndUpdate(
     {
-      passwordtoken: token,
+      passwordToken: token,
       passwordExpires: { $gt: Date.now() }
     },
     {
@@ -1625,33 +1629,8 @@ function setPassword(req, res) {
       }
     },
     function(err, user) {
-      // var smtptransport2 = nodemailer.createTransport({
-      // 	host: 'smtp.gmail.com',
-      // 	port: 587,
-      // 	secure: false,
-      // 	// port: 465,
-      // 	// secure: true, // use SSL
-      // 	auth: {
-      // 		user: 'anas3rde@gmail.com',
-      // 		pass: '8123342590'
-      // 	}
-      // });
       console.log({ user });
       if (user) {
-        // let mailOptions = {
-        //   to: user.email,
-        //   from: "anas3rde@gmail.com",
-        //   subject: "Password Changed - DocMz",
-        //   text:
-        //     "Your password has been successfully changed" +
-        //     "\n\n" +
-        //     "Feel free to log in with your newly set password."
-        // };
-
-        // let transporter = nodemailer.createTransport(smtpConfig);
-        // transporter.sendMail(mailOptions, function(err) {
-        //   done(err);
-        // });
         send(
           "Password changed DocMz",
           user.email,
@@ -1690,6 +1669,23 @@ nextAppointment = (req, res) => {
 };
 
 getByDate = (req, res) => {
+  // Practise.aggregate([
+  // 	{
+  // 		$match: { _id: mongoose.Types.ObjectId("5ef86700966e7d17909fe3f9") },
+  // 	},
+  // ])
+  // 	.then((result) => {
+  // 		res.status(200).json({
+  // 			data: result,
+  // 		});
+  // 	})
+  // 	.catch((err) => {
+  // 		console.log(err);
+  // 		res
+  // 			.status(500)
+  // 			.json({ status: false, message: "Something went wrong", err });
+  // 	});
+
   let dates = req.body.dates;
   if (typeof dates === "string") {
     dates = JSON.parse(req.body.dates);
@@ -1701,11 +1697,16 @@ getByDate = (req, res) => {
       bookedFor: { $gte: new Date(elem[0]), $lt: new Date(elem[1]) }
     });
   });
+  console.log(req.body);
   // console.log(dateArray);
   Appointment.aggregate([
     {
       $match: {
-        $and: [{ $or: dateArray }, { booked: false }]
+        $and: [
+          { $or: dateArray },
+          { booked: false },
+          { doctor: mongoose.Types.ObjectId(req.body.id) }
+        ]
 
         // [
         // 	{
@@ -1806,5 +1807,6 @@ module.exports = {
   getDoc,
   tokenForgetPassword,
   nextAppointment,
-  getByDate
+  getByDate,
+  setPassword
 };

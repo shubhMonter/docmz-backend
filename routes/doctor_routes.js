@@ -220,5 +220,9 @@ router.post("/upload/document", dupload.any(), (req, res) => {
 router.post("/appointment/next", npiController.nextAppointment);
 
 router.post("/appointment/date", npiController.getByDate);
+
+router.post("/forgetpassword", npiController.tokenForgetPassword);
+
+router.post("/setpassword", npiController.setPassword);
 // exporting them
 module.exports = router;

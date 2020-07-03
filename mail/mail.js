@@ -25,7 +25,7 @@ let transporter = nodemailer.createTransport(smtpConfig);
 //Centralised mailing for all, just use the function send and pass the required data
 
 const send = (subject, email, html) => {
-  console.log("I am in mail");
+  // console.log("I am in mail");
   let mailOptions = {
     from: "code.rockzo@gmail.com", // sender address
     to: email, // list of receivers
@@ -33,16 +33,16 @@ const send = (subject, email, html) => {
     // text, //, // plaintext body
     html
   };
-  console.log({ mailOptions });
+  // console.log({ mailOptions });
   transporter.sendMail(mailOptions, function(error, info) {
     if (error) {
       // return false;
-      console.log({ error });
+      // console.log({ error });
     } else {
-      console.log("Message sent: " + info.response);
+      // console.log("Message sent: " + info.response);
       // return true;
     }
-    console.log("Message sent");
+    // console.log("Message sent");
   });
 };
 

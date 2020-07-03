@@ -43,7 +43,7 @@ router.post("/authenticate", userController.authenticate);
 router.post("/update", userController.updateProfile);
 
 //Forget password route
-router.post("/forgetpassword", userController.assignToken);
+router.post("/forgetpassword", userController.tokenForgetPassword);
 
 //Set password Route
 router.post("/setpassword", userController.setPassword);

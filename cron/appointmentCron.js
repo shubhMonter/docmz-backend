@@ -7,7 +7,7 @@ const Practise = db.Practise;
 const AppointmentModel = db.Appointment;
 
 //In every 5 mins it adds latest 3 appointments in latestappointment array of doctor
-console.log("appointmentcron");
+// console.log("appointmentcron");
 cron.schedule("*/5 * * * *", async () => {
   Practise.find()
     .populate({
@@ -23,14 +23,14 @@ cron.schedule("*/5 * * * *", async () => {
           { new: true }
         )
           .then(result => {
-            console.log(result);
+            // console.log(result);
           })
           .catch(err => {
-            console.log(err);
+            // console.log(err);
           });
       }
     })
     .catch(err => {
-      console.log(err);
+      // console.log(err);
     });
 });
