@@ -78,7 +78,16 @@ const Usermeta = new Schema({
       type: Schema.Types.ObjectId,
       ref: "Medicine"
     }
-  ]
+  ],
+  surgeries: {
+    type: Array
+  },
+  family_history: {
+    type: Array
+  },
+  reports: {
+    type: Array
+  }
 });
 
 Usermeta.plugin(mongooseFieldEncryption, {
@@ -90,7 +99,11 @@ Usermeta.plugin(mongooseFieldEncryption, {
     "temperature",
     "respiration",
     "oxygen",
-    "idProof"
+    "idProof",
+    "surgeries",
+    "family_history",
+    "reports",
+    "medicines"
   ],
   secret: "some secret key",
   saltGenerator: function(secret) {

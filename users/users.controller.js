@@ -994,7 +994,7 @@ addMedicalInfo = async (req, res) => {
   User.findOneAndUpdate({ _id: id }, { [field]: data }, { new: true })
     .then(async res1 => {
       if (req.body.hasOwnProperty("meta")) {
-        const res2 = await Usermeta.findById(meta);
+        const res2 = await Usermeta.findOne({ _id: meta });
         res2[`${field}`].push(data);
         res2.save(function(err) {
           if (err)
@@ -1149,6 +1149,66 @@ function setPassword(req, res) {
     }
   );
 }
+let addFamilyHistory = async (req, res) => {
+  try {
+    let { data, id } = req.body;
+    if (typeof data === "string") {
+      data = JSON.parse(data);
+    }
+    let usermeta = await Usermeta.findById(id);
+    console.log(usermeta);
+
+    usermeta.family_history.push(data);
+    usermeta.save(function(err) {
+      if (err) {
+        res.status(500).json({
+          status: false,
+          err: err,
+          message: "Something went wrong"
+        });
+      }
+      res
+        .status(200)
+        .json({ status: true, message: "Successfully updated data" });
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: false,
+      err: err,
+      message: "Something went wrong"
+    });
+  }
+};
+let addSurgeries = async (req, res) => {
+  try {
+    let { data, id } = req.body;
+    if (typeof data === "string") {
+      data = JSON.parse(data);
+    }
+    let usermeta = await Usermeta.findById(id);
+    console.log(usermeta);
+
+    usermeta.surgeries.push(data);
+    usermeta.save(function(err) {
+      if (err) {
+        res.status(500).json({
+          status: false,
+          err: err,
+          message: "Something went wrong"
+        });
+      }
+      res
+        .status(200)
+        .json({ status: true, message: "Successfully updated data" });
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: false,
+      err: err,
+      message: "Something went wrong"
+    });
+  }
+};
 
 //Exporting all the functions
 module.exports = {
@@ -1169,5 +1229,7 @@ module.exports = {
   updateMember,
   deleteMember,
   getMember,
-  getMeta
+  getMeta,
+  addFamilyHistory,
+  addSurgeries
 };
