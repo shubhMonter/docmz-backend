@@ -993,20 +993,27 @@ addMedicalInfo = async (req, res) => {
   }
   User.findOneAndUpdate({ _id: id }, { [field]: data }, { new: true })
     .then(async res1 => {
-      const res2 = await Usermeta.findById(meta);
-      res2[`${field}`].push(data);
-      res2.save(function(err) {
-        if (err)
-          res.status(500).json({
-            status: false,
-            err: err,
-            message: "Something went wrong"
-          });
+      if (req.body.hasOwnProperty("meta")) {
+        const res2 = await Usermeta.findById(meta);
+        res2[`${field}`].push(data);
+        res2.save(function(err) {
+          if (err)
+            res.status(500).json({
+              status: false,
+              err: err,
+              message: "Something went wrong"
+            });
 
-        res
-          .status(200)
-          .json({ status: true, message: "Successfully updated data" });
-      });
+          res
+            .status(200)
+            .json({ status: true, message: "Successfully updated data" });
+        });
+      } else {
+        res.status(500).json({
+          status: false,
+          message: "Something went wrong"
+        });
+      }
     })
     .catch(err => {
       res.status(500).json({
