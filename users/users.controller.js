@@ -991,23 +991,22 @@ addMedicalInfo = async (req, res) => {
   if (typeof data === "string") {
     data = JSON.parse(data);
   }
+  User.findOneAndUpdate({ _id: id }, { [field]: data }, { new: true })
+    .then(async res1 => {
+      const res2 = await Usermeta.findById(meta);
+      res2[`${field}`].push(data);
+      res2.save(function(err) {
+        if (err)
+          res.status(500).json({
+            status: false,
+            err: err,
+            message: "Something went wrong"
+          });
 
-  let d1 = await User.findOneAndUpdate(
-    { _id: id },
-    { [field]: data },
-    { new: true }
-  );
-  let d2 = await Usermeta.findOneAndUpdate(
-    { _id: meta },
-    { $push: { [field]: data } },
-    { new: true }
-  );
-  Promise.all([d1, d2])
-    .then(result => {
-      console.log(result);
-      res
-        .status(200)
-        .json({ status: true, message: "Successfully updated data" });
+        res
+          .status(200)
+          .json({ status: true, message: "Successfully updated data" });
+      });
     })
     .catch(err => {
       res.status(500).json({
