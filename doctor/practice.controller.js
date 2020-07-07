@@ -1652,8 +1652,12 @@ nextAppointment = (req, res) => {
   Practise.findById(req.body.docId)
     .populate({
       path: "appointments",
-      match: { bookedFor: { $lt: req.body.date } }
+      match: { bookedFor: { $lt: req.body.date } },
+      populate: {
+        path: "patient"
+      }
     })
+
     .then(result => {
       res.status(200).json({
         status: true,
