@@ -271,19 +271,27 @@ function getNpiInfo(req, res) {
 }
 
 //Functiont to list all the doctors
-function getAllDoctors(req, res) {
-  Practise.find()
-    .populate({
-      path: "appointments"
-      // match: { booked: false },
-    })
-    // .select("appointments")
-    .populate("taxonomies")
-    .populate("address")
+getAllDoctors = async (req, res) => {
+  try {
+    let doc = await Practise.find()
+      .populate({
+        path: "appointments"
+        // match: { booked: false },
+      })
+      // .select("appointments")
+      .populate("taxonomies")
+      .populate("address")
+      .limit(5)
+      .exec();
 
-    .then(data => res.json({ status: true, data }))
-    .catch(error => res.json({ status: false, error }));
-}
+    res.send(doc);
+  } catch (error) {
+    res.send(error);
+  }
+
+  // .then(data => res.json({ status: true, data }))
+  // .catch(error => res.json({ status: false, error }));
+};
 
 //Sign up new doctor through API
 signUpDoc = async (req, res) => {

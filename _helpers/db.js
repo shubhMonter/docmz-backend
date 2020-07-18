@@ -47,5 +47,6 @@ module.exports = {
   Usermeta: require("../users/usermeta.model"),
   Medicine: require("../medicine/medicine.model"),
   Referral: require("../referral/referral.model"),
-  Member: require("../users/member.model")
+  Member: require("../users/member.model"),
+  Otp: require("../otp/otp.model")
 };
