@@ -987,22 +987,30 @@ const getMeta = (req, res) => {
 };
 
 addMedicalInfo = async (req, res) => {
+  console.log(req.body);
   let { id, meta, field, data } = req.body;
   if (typeof data === "string") {
     data = JSON.parse(data);
   }
-  User.findOneAndUpdate({ _id: id }, { [field]: data }, { new: true })
+  User.findOneAndUpdate(
+    { _id: id },
+    { [field]: data },
+    { returnNewDocument: true }
+  )
     .then(async res1 => {
-      if (req.body.hasOwnProperty("meta")) {
+      console.log(res1);
+      if (req.body.meta == res1.meta) {
         const res2 = await Usermeta.findOne({ _id: meta });
+        console.log(res2);
         res2[`${field}`].push(data);
         res2.save(function(err) {
-          if (err)
+          if (err) {
             res.status(500).json({
               status: false,
               err: err,
               message: "Something went wrong"
             });
+          }
 
           res
             .status(200)
