@@ -987,7 +987,6 @@ const getMeta = (req, res) => {
 };
 
 addMedicalInfo = async (req, res) => {
-  console.log(req.body);
   let { id, meta, field, data } = req.body;
   if (typeof data === "string") {
     data = JSON.parse(data);
@@ -999,7 +998,7 @@ addMedicalInfo = async (req, res) => {
   )
     .then(async res1 => {
       console.log(res1);
-      if (req.body.meta == res1.meta) {
+      if (meta == res1.meta) {
         const res2 = await Usermeta.findOne({ _id: meta });
         console.log(res2);
         res2[`${field}`].push(data);
