@@ -104,7 +104,14 @@ function jwt() {
       "/appointment/get",
       "/appointment/approve",
       { url: /\/getdoc\/([^\/]*)$/, methods: ["GET", "POST"] },
-      { url: /\/doctors\/upload\/([^\/]*)$/, methods: ["GET", "POST"] }
+      { url: /\/doctors\/upload\/([^\/]*)$/, methods: ["GET", "POST"] },
+      "/patient/familyhistory/add",
+      "/patient/surgeries/add",
+      "/patient/reports/add",
+      "/payment/add",
+      "/razorpay/createorder",
+      "/otp/create",
+      "/otp/verify"
     ]
   });
 }

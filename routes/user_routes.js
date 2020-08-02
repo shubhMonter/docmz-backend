@@ -228,5 +228,47 @@ router.post("/test/update", testController.update);
 router.post("/meta/get", userController.getMeta);
 
 router.post("/specialty/get", userController.getSpecialty);
+router.post("/familyhistory/add", userController.addFamilyHistory);
+router.post("/surgeries/add", userController.addSurgeries);
+
+router.post("/reports/add", upload.any(), async (req, res) => {
+  try {
+    let { data, id } = req.body;
+    const file = req.files;
+    if (!file) {
+      const error = new Error("Please upload a file");
+      error.httpStatusCode = 400;
+      return next(error);
+    }
+    if (typeof data === "string") {
+      data = JSON.parse(data);
+    }
+    data.report_img = req.files[0].path;
+    console.log(data);
+
+    let usermeta = await Usermeta.findById(id);
+    console.log(usermeta);
+
+    usermeta.reports.push(data);
+    usermeta.save(function(err) {
+      if (err) {
+        res.status(500).json({
+          status: false,
+          err: err,
+          message: "Something went wrong"
+        });
+      }
+      res
+        .status(200)
+        .json({ status: true, message: "Successfully updated data" });
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: false,
+      err: err,
+      message: "Something went wrong"
+    });
+  }
+});
 
 module.exports = router;
