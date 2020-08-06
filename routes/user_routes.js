@@ -271,4 +271,7 @@ router.post("/reports/add", upload.any(), async (req, res) => {
   }
 });
 
+router.get("/familyhistory/get/:id", userController.getFamilyHistory);
+router.get("/surgeries/get/:id", userController.getSurgeries);
+router.get("/reports/get/:id", userController.getReports);
 module.exports = router;

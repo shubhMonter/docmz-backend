@@ -48,5 +48,6 @@ module.exports = {
   Medicine: require("../medicine/medicine.model"),
   Referral: require("../referral/referral.model"),
   Member: require("../users/member.model"),
-  Otp: require("../otp/otp.model")
+  Otp: require("../otp/otp.model"),
+  Clinic: require("../clinic/clinic.model")
 };
