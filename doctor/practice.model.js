@@ -114,7 +114,20 @@ const practise = new Schema({
   rights: [{ type: String }], // Array of rights that assistent have
   assistants: [{ type: Schema.Types.ObjectId, ref: "Practise" }], // if doctor, list of all assistents
   parent: { type: Schema.Types.ObjectId, ref: "Practise" },
-  charity: { type: Boolean, default: false } //if this key is true. Doctor will not be charging any consultation fee
+  charity: { type: Boolean, default: false }, //if this key is true. Doctor will not be charging any consultation fee
+  eductation: [
+    {
+      degree: { type: String },
+      university: { type: String },
+      year: { type: Number }
+    }
+  ],
+  registration: {
+    regNo: { type: String },
+    regCouncil: { type: String },
+    regYear: { type: Number }
+  },
+  clinic: [{ type: Schema.Types.ObjectId, ref: "clinics" }]
 });
 
 module.exports = mongoose.model("Practise", practise);

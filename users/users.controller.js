@@ -1217,6 +1217,69 @@ let addSurgeries = async (req, res) => {
   }
 };
 
+let getFamilyHistory = async (req, res) => {
+  try {
+    let { id } = req.params;
+
+    let usermeta = await Usermeta.findById(id);
+    console.log(usermeta);
+    res
+      .status(200)
+      .json({
+        status: true,
+        data: usermeta.family_history,
+        message: "Successfully fetch data"
+      });
+  } catch (err) {
+    res.status(500).json({
+      status: false,
+      err: err,
+      message: "Something went wrong"
+    });
+  }
+};
+let getSurgeries = async (req, res) => {
+  try {
+    let { id } = req.params;
+
+    let usermeta = await Usermeta.findById(id);
+    console.log(usermeta);
+    res
+      .status(200)
+      .json({
+        status: true,
+        data: usermeta.surgeries,
+        message: "Successfully fetch data"
+      });
+  } catch (err) {
+    res.status(500).json({
+      status: false,
+      err: err,
+      message: "Something went wrong"
+    });
+  }
+};
+let getReports = async (req, res) => {
+  try {
+    let { id } = req.params;
+    let usermeta = await Usermeta.findById(id);
+    console.log(usermeta);
+    res
+      .status(200)
+      .json({
+        status: true,
+        data: usermeta.reports,
+        message: "Successfully fetch data"
+      });
+  } catch (err) {
+    res.status(500).json({
+      status: false,
+      err: err,
+      message: "Something went wrong"
+    });
+  }
+};
+
 //Exporting all the functions
 module.exports = {
   getSpecialty,
@@ -1238,5 +1301,8 @@ module.exports = {
   getMember,
   getMeta,
   addFamilyHistory,
-  addSurgeries
+  getFamilyHistory,
+  addSurgeries,
+  getSurgeries,
+  getReports
 };

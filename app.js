@@ -106,6 +106,8 @@ app.use("/team", require("./routes/teams_route"));
 
 app.use("/otp", require("./routes/otp_routes"));
 
+app.use("/clinic", require("./routes/clinic_routes"));
+
 app.use(errorHandler);
 
 module.exports = app;

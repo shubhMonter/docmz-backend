@@ -106,12 +106,20 @@ function jwt() {
       { url: /\/getdoc\/([^\/]*)$/, methods: ["GET", "POST"] },
       { url: /\/doctors\/upload\/([^\/]*)$/, methods: ["GET", "POST"] },
       "/patient/familyhistory/add",
+      { url: /\/patient\/familyhistory\/get\/([^\/]*)$/, methods: ["GET"] },
       "/patient/surgeries/add",
+      { url: /\/patient\/surgeries\/get\/([^\/]*)$/, methods: ["GET"] },
       "/patient/reports/add",
+      { url: /\/patient\/reports\/get\/([^\/]*)$/, methods: ["GET"] },
       "/payment/add",
       "/razorpay/createorder",
       "/otp/create",
-      "/otp/verify"
+      "/otp/verify",
+      "/clinic/add",
+      "/clinic/edit",
+      { url: /\/clinic\/getclinic\/([^\/]*)$/, methods: ["GET"] },
+      "/clinic/getallclinic",
+      { url: /\/clinic\/bydoctor\/([^\/]*)$/, methods: ["GET"] }
     ]
   });
 }
