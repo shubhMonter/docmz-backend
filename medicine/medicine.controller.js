@@ -120,13 +120,26 @@ const deleteMedicine = async (req, res) => {
   try {
     const { id, medid } = req.body;
     const med = await Medicine.deleteOne({ _id: medid });
-    const usermeta = await Usermeta.updateOne(
-      { userId: id },
-      { $pull: { medicines: [medid] } }
-    );
-    res.status(200).json({
-      status: true,
-      message: "Successfully fetch data"
+    const usermeta = await Usermeta.findOne({ userId: id });
+    const index = await usermeta.medicines.indexOf(medid);
+    if (index > -1) {
+      usermeta.medicines.splice(index, 1);
+    }
+    console.log(usermeta, index);
+
+    usermeta.save(function(err) {
+      if (err) {
+        return res.status(500).json({
+          status: false,
+          message: "Something went wrong",
+          err: { err }
+        });
+      } else {
+        return res.status(200).json({
+          status: true,
+          message: "Successfully fetch data"
+        });
+      }
     });
   } catch (error) {
     console.log(error);
