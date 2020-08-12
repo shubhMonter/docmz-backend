@@ -22,7 +22,7 @@ let upload = multer({
   storage: storage,
   fileFilter: function(req, file, callback) {
     var ext = path.extname(file.originalname);
-    if (ext !== ".png" && ext !== ".jpg" && ext !== ".jpeg") {
+    if (ext !== ".png" && ext !== ".jpg" && ext !== ".jpeg" && ext !== ".pdf") {
       req.fileValidationError = "Forbidden extension";
       return callback(null, false, req.fileValidationError);
     }
@@ -233,12 +233,15 @@ router.post("/surgeries/add", userController.addSurgeries);
 
 router.post("/reports/add", upload.any(), async (req, res) => {
   try {
+    console.log(req.body);
     let { data, id } = req.body;
     const file = req.files;
+
     if (!file) {
-      const error = new Error("Please upload a file");
-      error.httpStatusCode = 400;
-      return next(error);
+      return res.status(400).json({
+        status: false,
+        message: "Please upload a file"
+      });
     }
     if (typeof data === "string") {
       data = JSON.parse(data);
@@ -263,6 +266,7 @@ router.post("/reports/add", upload.any(), async (req, res) => {
         .json({ status: true, message: "Successfully updated data" });
     });
   } catch (err) {
+    console.log(err);
     res.status(500).json({
       status: false,
       err: err,
