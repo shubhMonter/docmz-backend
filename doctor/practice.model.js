@@ -95,6 +95,8 @@ const practise = new Schema({
   firstName: { type: String },
   lastName: { type: String },
   name: { type: String },
+  bio: { type: String },
+  onBoarding: { type: Boolean, default: false },
   //Document of doctors
   document: {
     idProof: { type: Boolean, default: false },

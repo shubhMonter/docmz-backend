@@ -796,34 +796,40 @@ let attemptQuiz = (req, res) => {
     );
 };
 
-addFavourite = (req, res) => {
-  const { id, docId } = req.body;
-  User.findOneAndUpdate(
-    { _id: id, favourites: { $ne: docId } },
-    { $push: { favourites: docId } },
-    { new: true }
-  )
-    .then(result => {
-      // console.log(result);
-      if (result !== null) {
+addFavourite = async (req, res) => {
+  try {
+    const { id, docId } = req.body;
+    const user = await User.findOne({ _id: id });
+    const index = user.favourites.indexOf(docId);
+
+    if (index >= 0) {
+      return res.status(201).json({
+        status: false,
+        message: "Already in favourites"
+      });
+    } else {
+      user.favourites.push(docId);
+      user.save(function(error) {
+        if (error)
+          return res.status(500).json({
+            status: false,
+            err: error,
+            message: "Something went wrong"
+          });
         res.status(200).json({
           message: "Successfully added to favourites",
           status: true
         });
-      } else {
-        res.status(201).json({
-          status: false,
-          message: "Already in favourites"
-        });
-      }
-    })
-    .catch(err => {
-      res.status(500).json({
-        status: false,
-        err: err,
-        message: "Something went wrong"
       });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      status: false,
+      err: error,
+      message: "Something went wrong"
     });
+  }
 };
 
 removeFavourite = (req, res) => {
@@ -1223,13 +1229,11 @@ let getFamilyHistory = async (req, res) => {
 
     let usermeta = await Usermeta.findById(id);
     console.log(usermeta);
-    res
-      .status(200)
-      .json({
-        status: true,
-        data: usermeta.family_history,
-        message: "Successfully fetch data"
-      });
+    res.status(200).json({
+      status: true,
+      data: usermeta.family_history,
+      message: "Successfully fetch data"
+    });
   } catch (err) {
     res.status(500).json({
       status: false,
@@ -1244,13 +1248,11 @@ let getSurgeries = async (req, res) => {
 
     let usermeta = await Usermeta.findById(id);
     console.log(usermeta);
-    res
-      .status(200)
-      .json({
-        status: true,
-        data: usermeta.surgeries,
-        message: "Successfully fetch data"
-      });
+    res.status(200).json({
+      status: true,
+      data: usermeta.surgeries,
+      message: "Successfully fetch data"
+    });
   } catch (err) {
     res.status(500).json({
       status: false,
@@ -1264,13 +1266,11 @@ let getReports = async (req, res) => {
     let { id } = req.params;
     let usermeta = await Usermeta.findById(id);
     console.log(usermeta);
-    res
-      .status(200)
-      .json({
-        status: true,
-        data: usermeta.reports,
-        message: "Successfully fetch data"
-      });
+    res.status(200).json({
+      status: true,
+      data: usermeta.reports,
+      message: "Successfully fetch data"
+    });
   } catch (err) {
     res.status(500).json({
       status: false,
