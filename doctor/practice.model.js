@@ -129,7 +129,8 @@ const practise = new Schema({
     regCouncil: { type: String },
     regYear: { type: Number }
   },
-  clinic: [{ type: Schema.Types.ObjectId, ref: "clinics" }]
+  clinic: [{ type: Schema.Types.ObjectId, ref: "clinics" }],
+  meta: { type: Schema.Types.ObjectId, ref: "Practisemeta" }
 });
 
 module.exports = mongoose.model("Practise", practise);

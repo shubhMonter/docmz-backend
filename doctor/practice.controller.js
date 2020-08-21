@@ -11,6 +11,7 @@ const db = require("_helpers/db"),
   (Appointment = db.Appointment),
   (Referral = db.Referral),
   (Specialty = db.Specialty),
+  (practiceMeta = db.practiceMeta),
   (crypto = require("crypto")),
   (algorithm = "aes-256-cbc");
 
@@ -52,6 +53,7 @@ console.log({ filePath });
 let template = fs.readFileSync(filePath, { encoding: "utf-8" });
 
 const availability = require("./availability.controller");
+//const { Practicemeta } = require("../_helpers/db");
 
 //Email template for forgot your password
 
@@ -458,7 +460,9 @@ signUpDoc = async (req, res) => {
             });
 
             //Saving the Doctor Info
-
+            let practicemeta = new practiceMeta({
+              practiceId: practise._id
+            });
             practise
               .save()
               .then(doc => {
@@ -469,6 +473,14 @@ signUpDoc = async (req, res) => {
                   "You signed in successfully"
                 );
                 availability.getTimeSlots(doc._id);
+                practicemeta.save(function(err) {
+                  if (err) console.log(err);
+                  Practise.findOneAndUpdate(
+                    { _id: practise._id },
+                    { meta: practicemeta._id },
+                    { new: true }
+                  ).catch(err => console.log(error));
+                });
 
                 Referral.findOne({ email: req.body.email }).then(result => {
                   if (!_.isEmpty(result)) {
