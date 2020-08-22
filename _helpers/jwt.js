@@ -38,6 +38,8 @@ function jwt() {
       "/doctors/upload/document",
       "/patient/upload/records",
       "/doctors/video",
+      "/doctors/addrecentpatient",
+      { url: /\/doctors\/recentpatients\/([^\/]*)$/, methods: ["GET"] },
       "/admin/questionnaire/question/add",
       "/admin/questionnaire/question/update",
       "/admin/questionnaire/question/get",

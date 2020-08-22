@@ -1,5 +1,6 @@
 const npiController = require("../doctor/practice.controller");
 const doctorController = require("../doctor/doctor.controller");
+const doctormetaController = require("../doctor/practicemeta.controller");
 const express = require("express");
 const router = express.Router();
 const db = require("_helpers/db");
@@ -7,6 +8,7 @@ const Practise = db.Practise;
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const practicemetaController = require("../doctor/practicemeta.controller");
 // Fetch info about an doctor through a NPI Number
 router.get("/getInfo/:npi", npiController.getNpiInfo);
 
@@ -224,5 +226,8 @@ router.post("/appointment/date", npiController.getByDate);
 router.post("/forgetpassword", npiController.tokenForgetPassword);
 
 router.post("/setpassword", npiController.setPassword);
+
+router.post("/addrecentpatient", practicemetaController.addrecentpatient);
+router.get("/recentpatients/:id", practicemetaController.recentpatients);
 // exporting them
 module.exports = router;
