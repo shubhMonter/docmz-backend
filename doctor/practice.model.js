@@ -79,7 +79,7 @@ const practise = new Schema({
   createdOn: { type: Date, default: Date.now },
   availDate: { type: Date },
   savedCards: { type: Object },
-  fee: { type: String },
+  fee: { type: Number },
   customerProfile: { type: String },
   renewDate: { type: Date },
   passwordToken: { type: String },
@@ -95,6 +95,7 @@ const practise = new Schema({
   firstName: { type: String },
   lastName: { type: String },
   name: { type: String },
+  gender: { type: String, enum: ["male", "female"] },
   bio: { type: String },
   onBoarding: { type: Boolean, default: false },
   //Document of doctors

@@ -34,6 +34,8 @@ function jwt() {
       "/patient/medicalInfo/add",
       "/patient/favourite/remove",
       "/patient/favourite/add",
+      "/patient/addrecentdoctor",
+      { url: /\/patient\/recentdoctors\/([^\/]*)$/, methods: ["GET"] },
       "/doctors/upload/image",
       "/doctors/upload/document",
       "/patient/upload/records",

@@ -24,22 +24,31 @@ const addrecentpatient = async (req, res) => {
 
     if (practice.meta) {
       const meta = await practiceMeta.findOne({ _id: practice.meta });
-      console.log(meta);
-      const index = meta.recentPatients
-        .map(x => {
-          return x.patient;
-        })
-        .indexOf(patientid);
-      if (index >= 0) {
-        meta.recentPatients.splice(index, 1);
-      }
-      meta.recentPatients.push({ patient: patientid });
-      meta.save(function(error) {
-        if (error) console.log(error);
+      if (meta) {
+        const index = meta.recentPatients
+          .map(x => {
+            return x.patient;
+          })
+          .indexOf(patientid);
+        if (index >= 0) {
+          meta.recentPatients.splice(index, 1);
+        }
+        meta.recentPatients.push({ patient: patientid, createdAt: Date.now() });
+        meta.save(function(error) {
+          if (error) console.log(error);
+          return res
+            .status(200)
+            .json({ status: true, message: "patient added to list" });
+        });
+      } else {
         return res
-          .status(200)
-          .json({ status: true, message: "patient added to list" });
-      });
+          .status(400)
+          .json({ status: false, message: "doctor meta not found!" });
+      }
+    } else {
+      return res
+        .status(400)
+        .json({ status: false, message: "doctor not Found!" });
     }
   } catch (error) {
     res.send(error);
