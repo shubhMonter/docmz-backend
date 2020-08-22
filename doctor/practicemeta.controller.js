@@ -31,7 +31,7 @@ const addrecentpatient = async (req, res) => {
         })
         .indexOf(patientid);
       if (index >= 0) {
-        meta.recentPatients.splice(index);
+        meta.recentPatients.splice(index, 1);
       }
       meta.recentPatients.push({ patient: patientid });
       meta.save(function(error) {
