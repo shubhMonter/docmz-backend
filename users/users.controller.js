@@ -1279,6 +1279,75 @@ let getReports = async (req, res) => {
     });
   }
 };
+const addRecentDoctor = async (req, res) => {
+  try {
+    const { id, doctorid } = req.body;
+    const user = await User.findOne({ _id: id });
+
+    if (user.meta) {
+      const meta = await Usermeta.findOne({ _id: user.meta });
+      if (meta) {
+        const index = meta.recentDoctors
+          .map(x => {
+            return x.doctor;
+          })
+          .indexOf(doctorid);
+        if (index >= 0) {
+          meta.recentDoctors.splice(index, 1);
+        }
+        meta.recentDoctors.push({ doctor: doctorid, createdAt: Date.now() });
+        meta.save(function(error) {
+          if (error) console.log(error);
+          return res
+            .status(200)
+            .json({ status: true, message: "doctor added to list" });
+        });
+      } else {
+        return res.status(400).json({
+          status: false,
+          message: "User meta not found"
+        });
+      }
+    } else {
+      return res.status(400).json({
+        status: false,
+        message: "User not found"
+      });
+    }
+  } catch (error) {
+    return res.status(400).json({
+      status: false,
+      message: "something wrong!",
+      error: { error }
+    });
+  }
+};
+
+const recentDoctors = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findOne({ _id: id });
+    if (user) {
+      const meta = await Usermeta.findOne({ _id: user.meta }).populate(
+        "recentDoctors.doctor"
+      );
+      if (meta) {
+        return res.status(200).json({ status: true, data: meta.recentDoctors });
+      } else {
+        return res
+          .status(400)
+          .json({ status: false, message: "doctor meta not found!" });
+      }
+    } else {
+      return res
+        .status(400)
+        .json({ status: false, message: "doctor not found!" });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json(error);
+  }
+};
 
 //Exporting all the functions
 module.exports = {
@@ -1304,5 +1373,7 @@ module.exports = {
   getFamilyHistory,
   addSurgeries,
   getSurgeries,
-  getReports
+  getReports,
+  addRecentDoctor,
+  recentDoctors
 };

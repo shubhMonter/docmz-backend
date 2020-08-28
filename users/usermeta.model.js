@@ -10,6 +10,12 @@ const Usermeta = new Schema({
   idProof: { type: String }, //Any identity proof for valdation
   members: [{ type: Schema.Types.ObjectId, ref: "Member" }], //list of all family/friend
   //Below field shows full history of medical info
+  recentDoctors: [
+    {
+      doctor: { type: Schema.Types.ObjectId, ref: "Practise" },
+      createdAt: { type: Date, default: Date.now() }
+    }
+  ],
   weight: [
     {
       value: { type: String },
