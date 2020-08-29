@@ -53,6 +53,7 @@ console.log({ filePath });
 let template = fs.readFileSync(filePath, { encoding: "utf-8" });
 
 const availability = require("./availability.controller");
+
 //const { Practicemeta } = require("../_helpers/db");
 
 //Email template for forgot your password
@@ -1260,7 +1261,7 @@ let profileUpdate = (req, res) => {
   delete req.body.password; //Shouldn't be sent from frontend
   let { id } = req.body;
   if (req.body.id) {
-    Practise.findByIdAndUpdate(id, req.body, { new: true })
+    Practise.findOneAndUpdate({ _id: id }, req.body, { new: true })
       .then(doctor => {
         res.json({
           status: true,
@@ -1269,6 +1270,7 @@ let profileUpdate = (req, res) => {
         });
       })
       .catch(error => {
+        console.log(error);
         res.json({ status: false, message: error });
       });
   }
@@ -1816,7 +1818,25 @@ getByDate = (req, res) => {
   // 			.json({ status: false, message: "Something went wrong", err });
   // 	});
 };
-
+const toggleBlock = async (req, res) => {
+  try {
+    const { id } = req.body;
+    const prac = await Practise.findOne({ _id: id });
+    if (prac) {
+      if (prac.block) {
+        prac.block = false;
+      } else {
+        prac.block = true;
+      }
+      prac.save(function(error) {
+        if (error) return res.send({ status: false, error: error });
+        return res.send({ status: true, data: prac });
+      });
+    }
+  } catch (error) {
+    return res.send({ status: false, error: error });
+  }
+};
 //Exporting all the functions
 module.exports = {
   getNpiInfo,
@@ -1832,5 +1852,6 @@ module.exports = {
   tokenForgetPassword,
   nextAppointment,
   getByDate,
-  setPassword
+  setPassword,
+  toggleBlock
 };

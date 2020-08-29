@@ -229,5 +229,6 @@ router.post("/setpassword", npiController.setPassword);
 
 router.post("/addrecentpatient", practicemetaController.addrecentpatient);
 router.get("/recentpatients/:id", practicemetaController.recentpatients);
+router.post("/toggleblock", npiController.toggleBlock);
 // exporting them
 module.exports = router;

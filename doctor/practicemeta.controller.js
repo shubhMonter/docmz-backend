@@ -1,20 +1,7 @@
 const db = require("_helpers/db"),
   mongoose = require("mongoose");
 const { Router } = require("express");
-(express = require("express")),
-  (app = express()),
-  (request = require("request"));
-(csvParser = require("csv-parse")),
-  (Practise = db.Practise),
-  (Taxonomy = db.Taxonomy),
-  (Address = db.Address),
-  (Usermeta = db.Usermeta),
-  (Appointment = db.Appointment),
-  (Referral = db.Referral),
-  (Specialty = db.Specialty),
-  (practiceMeta = db.practiceMeta),
-  (crypto = require("crypto")),
-  (algorithm = "aes-256-cbc");
+const { Review, practiceMeta } = require("../_helpers/db");
 
 const addrecentpatient = async (req, res) => {
   try {
@@ -80,6 +67,45 @@ const recentpatients = async (req, res) => {
   } catch (error) {
     console.log(error);
     return res.status(400).json(error);
+  }
+};
+
+const addReview = async (req, res) => {
+  try {
+    const { doctorid, patientid, appointmentid, rating, note } = req.body;
+    const review = new Review({ doctorid, patientid, rating, note });
+    review.save(async function(error) {
+      if (error)
+        return res
+          .status(400)
+          .json({
+            status: false,
+            message: "somthing went wrong!",
+            error: { error }
+          });
+      const meta = await practiceMeta.findOne({ practiceId: doctorid });
+      meta.review.push(rewiew._id);
+      meta.save(function(error) {
+        if (error)
+          return res
+            .status(400)
+            .json({
+              status: false,
+              message: "somthing went wrong!",
+              error: { error }
+            });
+        return res.status(200).json({ status: true, message: "review added!" });
+      });
+    });
+    //const meta = await practiceMeta.findOne({practiceId:doctorid});
+  } catch (error) {
+    return res
+      .status(400)
+      .json({
+        status: false,
+        message: "somthing went wrong!",
+        error: { error }
+      });
   }
 };
 module.exports = {
