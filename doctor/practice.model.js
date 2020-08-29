@@ -118,7 +118,7 @@ const practise = new Schema({
   assistants: [{ type: Schema.Types.ObjectId, ref: "Practise" }], // if doctor, list of all assistents
   parent: { type: Schema.Types.ObjectId, ref: "Practise" },
   charity: { type: Boolean, default: false }, //if this key is true. Doctor will not be charging any consultation fee
-  eductation: [
+  education: [
     {
       degree: { type: String },
       university: { type: String },
@@ -131,7 +131,37 @@ const practise = new Schema({
     regYear: { type: Number }
   },
   clinic: [{ type: Schema.Types.ObjectId, ref: "clinics" }],
-  meta: { type: Schema.Types.ObjectId, ref: "Practisemeta" }
+  meta: { type: Schema.Types.ObjectId, ref: "Practisemeta" },
+  block: { type: Boolean, default: false }
 });
-
+practise.pre(
+  "findOneAndUpdate",
+  { document: true, query: false },
+  async function(next) {
+    // if (isNumber(this.a) && isNumber(this.b)) this.sum = this.a + this.b;
+    // next();
+    const docToUpdate = await this.findOne(this.getQuery());
+    if (!docToUpdate.onBoarding) {
+      // console.log({1:docToUpdate.gender,
+      //   2:docToUpdate.practiceLocation.length>=1,
+      //   3:docToUpdate.specialty,
+      //   4:docToUpdate.education.length>=1,
+      //   5:docToUpdate.registration.regNo,
+      //   6:docToUpdate.experience,
+      //   7:docToUpdate.clinic.length>=1});
+      if (
+        docToUpdate.gender &&
+        docToUpdate.practiceLocation.length >= 1 &&
+        docToUpdate.specialty &&
+        docToUpdate.education.length >= 1 &&
+        docToUpdate.registration.regNo &&
+        docToUpdate.experience &&
+        docToUpdate.clinic.length >= 1
+      ) {
+        docToUpdate.onBoarding = true;
+        docToUpdate.save();
+      }
+    }
+  }
+);
 module.exports = mongoose.model("Practise", practise);

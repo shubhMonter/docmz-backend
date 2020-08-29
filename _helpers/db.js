@@ -50,5 +50,6 @@ module.exports = {
   Member: require("../users/member.model"),
   Otp: require("../otp/otp.model"),
   Clinic: require("../clinic/clinic.model"),
-  practiceMeta: require("../doctor/practicemeta.model")
+  practiceMeta: require("../doctor/practicemeta.model"),
+  Review: require("../reviews/reviews.model")
 };

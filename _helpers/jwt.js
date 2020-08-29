@@ -126,7 +126,8 @@ function jwt() {
       "/clinic/edit",
       { url: /\/clinic\/getclinic\/([^\/]*)$/, methods: ["GET"] },
       "/clinic/getallclinic",
-      { url: /\/clinic\/bydoctor\/([^\/]*)$/, methods: ["GET"] }
+      { url: /\/clinic\/bydoctor\/([^\/]*)$/, methods: ["GET"] },
+      "/doctors/toggleblock"
     ]
   });
 }

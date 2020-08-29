@@ -8,6 +8,10 @@ const practiceMeta = new Schema({
       patient: { type: Schema.Types.ObjectId, ref: "Patient" },
       createdAt: { type: Date, default: Date.now() }
     }
-  ]
+  ],
+  reviews: [{ type: Schema.Types.ObjectId, ref: "Review" }]
 });
+// practiceMeta.virtuals("total_rating",function(){
+//   if(reviews.length>0) return reviews.rating
+// })
 module.exports = mongoose.model("Practisemeta", practiceMeta);

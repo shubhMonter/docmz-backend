@@ -1,5 +1,6 @@
 const db = require("../_helpers/db");
 const Clinic = db.Clinic;
+const Practise = db.Practise;
 
 const addClinic = async (req, res) => {
   try {
@@ -25,11 +26,23 @@ const addClinic = async (req, res) => {
       ClinicNumber,
       Fees
     });
-    newClinic.save(function(err) {
+    newClinic.save(async function(err) {
       if (err)
         return res
           .status(500)
           .json({ status: false, err: err, message: "something went wrong!" });
+      const prac = await Practise.findOne({ _id: doctor });
+      prac.clinic.push(newClinic._id);
+      prac.save(function() {
+        if (err)
+          return res
+            .status(500)
+            .json({
+              status: false,
+              err: err,
+              message: "something went wrong!"
+            });
+      });
       return res
         .status(200)
         .json({ status: true, data: newClinic, message: "New clinic Added" });
@@ -69,13 +82,11 @@ const editClinic = async (req, res) => {
       },
       { new: true }
     );
-    res
-      .status(200)
-      .json({
-        status: true,
-        data: updateClinic,
-        message: "Update clinic data"
-      });
+    res.status(200).json({
+      status: true,
+      data: updateClinic,
+      message: "Update clinic data"
+    });
   } catch (error) {
     res
       .status(500)
