@@ -11,7 +11,7 @@ const db = require("_helpers/db"),
   (Appointment = db.Appointment),
   (Referral = db.Referral),
   (Specialty = db.Specialty),
-  (practiceMeta = db.practiceMeta),
+  (practiseMeta = db.practiseMeta),
   (crypto = require("crypto")),
   (algorithm = "aes-256-cbc");
 
@@ -461,7 +461,7 @@ signUpDoc = async (req, res) => {
             });
 
             //Saving the Doctor Info
-            let practicemeta = new practiceMeta({
+            let practicemeta = new practiseMeta({
               practiceId: practise._id
             });
             practise

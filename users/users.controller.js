@@ -1328,9 +1328,12 @@ const recentDoctors = async (req, res) => {
     const { id } = req.params;
     const user = await User.findOne({ _id: id });
     if (user) {
-      const meta = await Usermeta.findOne({ _id: user.meta }).populate(
-        "recentDoctors.doctor"
-      );
+      const meta = await Usermeta.findOne({ _id: user.meta })
+        .populate("recentDoctors.doctor", "firstName lastName specialty")
+        .populate(
+          "recentDoctors.appointment",
+          "forWhom bookedFor reasonForVisit"
+        );
       if (meta) {
         return res.status(200).json({ status: true, data: meta.recentDoctors });
       } else {

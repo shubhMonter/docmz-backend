@@ -1,10 +1,12 @@
 const db = require("_helpers/db"),
   express = require("express"),
   app = express(),
-  Practise = db.Practise;
-User = db.User;
-Appointment = db.Appointment;
-Patient = db.User;
+  Practise = db.Practise,
+  User = db.User,
+  Usermeta = db.Usermeta,
+  Appointment = db.Appointment,
+  Patient = db.User;
+const { practiseMeta } = db;
 let moment = require("moment");
 let nodemailer = require("nodemailer");
 let ejs = require("ejs");
@@ -51,8 +53,54 @@ let bookAppointment = (req, res) => {
     Patient.findByIdAndUpdate(patient, {
       $push: { appointments: data._id }
     })
-      .then(result => {
+      .then(async result => {
         console.log(result.email);
+
+        const usermeta = await Usermeta.findOne({ userId: patient });
+        if (usermeta) {
+          const index = usermeta.recentDoctors
+            .map(x => {
+              return x.doctor;
+            })
+            .indexOf(data.doctor);
+          if (index >= 0) {
+            usermeta.recentDoctors.splice(index, 1);
+          }
+          usermeta.recentDoctors.push({
+            doctor: data.doctor,
+            appointment: data._id,
+            createdAt: Date.now()
+          });
+          usermeta.save(function(error) {
+            if (error) console.log(error);
+          });
+        }
+        console.log(data.doctor);
+        const practisemeta = await practiseMeta.findOne({
+          practiseId: data.doctor
+        });
+        let index;
+        if (practisemeta) {
+          index = practisemeta.recentPatients
+            .map(x => {
+              return x.patient;
+            })
+            .indexOf(data.patient);
+
+          if (index >= 0) {
+            //practisemeta.recentPatient.splice(index, 1);
+            practisemeta.recentPatients[index].appointment.push(data._id);
+          }
+          practisemeta.recentPatients.push({
+            patient: data.doctor,
+            appointment: data._id,
+            createdAt: Date.now()
+          });
+          practisemeta.save(function(error) {
+            if (error) console.log(error);
+          });
+        }
+
         let transporter = nodemailer.createTransport(smtpConfig);
         let mailOptions = {
           from: "code.rockzo@gmail.com", // sender address

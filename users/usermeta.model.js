@@ -13,6 +13,7 @@ const Usermeta = new Schema({
   recentDoctors: [
     {
       doctor: { type: Schema.Types.ObjectId, ref: "Practise" },
+      appointment: { type: Schema.Types.ObjectId, ref: "Appointments" },
       createdAt: { type: Date, default: Date.now() }
     }
   ],

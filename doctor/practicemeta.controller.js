@@ -1,7 +1,7 @@
 const db = require("_helpers/db"),
   mongoose = require("mongoose");
 const { Router } = require("express");
-const { Review, practiceMeta } = require("../_helpers/db");
+const { Review, practiseMeta } = require("../_helpers/db");
 
 const addrecentpatient = async (req, res) => {
   try {
@@ -10,7 +10,7 @@ const addrecentpatient = async (req, res) => {
     const practice = await Practise.findOne({ _id: id });
 
     if (practice.meta) {
-      const meta = await practiceMeta.findOne({ _id: practice.meta });
+      const meta = await practiseMeta.findOne({ _id: practice.meta });
       if (meta) {
         const index = meta.recentPatients
           .map(x => {
@@ -45,24 +45,20 @@ const addrecentpatient = async (req, res) => {
 const recentpatients = async (req, res) => {
   try {
     const { id } = req.params;
-    const practice = await Practise.findOne({ _id: id });
-    if (practice) {
-      const meta = await practiceMeta
-        .findOne({ _id: practice.meta })
-        .populate("recentPatients.patient");
-      if (meta) {
-        return res
-          .status(200)
-          .json({ status: true, data: meta.recentPatients });
-      } else {
-        return res
-          .status(400)
-          .json({ status: false, message: "doctor meta not found!" });
-      }
+
+    const meta = await practiseMeta
+      .findOne({ practiseId: id })
+      .populate("recentPatients.patient", "firstName lastName")
+      .populate(
+        "recentPatients.appointment",
+        "bookedFor forWhom reasonForVisit patientInfo"
+      );
+    if (meta) {
+      return res.status(200).json({ status: true, data: meta.recentPatients });
     } else {
       return res
         .status(400)
-        .json({ status: false, message: "doctor not found!" });
+        .json({ status: false, message: "doctor meta not found!" });
     }
   } catch (error) {
     console.log(error);
@@ -76,36 +72,30 @@ const addReview = async (req, res) => {
     const review = new Review({ doctorid, patientid, rating, note });
     review.save(async function(error) {
       if (error)
-        return res
-          .status(400)
-          .json({
+        return res.status(400).json({
+          status: false,
+          message: "somthing went wrong!",
+          error: { error }
+        });
+      const meta = await practiseMeta.findOne({ practiceId: doctorid });
+      meta.review.push(rewiew._id);
+      meta.save(function(error) {
+        if (error)
+          return res.status(400).json({
             status: false,
             message: "somthing went wrong!",
             error: { error }
           });
-      const meta = await practiceMeta.findOne({ practiceId: doctorid });
-      meta.review.push(rewiew._id);
-      meta.save(function(error) {
-        if (error)
-          return res
-            .status(400)
-            .json({
-              status: false,
-              message: "somthing went wrong!",
-              error: { error }
-            });
         return res.status(200).json({ status: true, message: "review added!" });
       });
     });
-    //const meta = await practiceMeta.findOne({practiceId:doctorid});
+    //const meta = await practiseMeta.findOne({practiceId:doctorid});
   } catch (error) {
-    return res
-      .status(400)
-      .json({
-        status: false,
-        message: "somthing went wrong!",
-        error: { error }
-      });
+    return res.status(400).json({
+      status: false,
+      message: "somthing went wrong!",
+      error: { error }
+    });
   }
 };
 module.exports = {
