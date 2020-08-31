@@ -48,9 +48,12 @@ const addMedicine = (req, res) => {
 const addMedicineByPatient = async (req, res) => {
   try {
     let { metaId, medicines } = req.body;
-    if (typeof medicines === "string") {
+    console.log(medicines, typeof medicines);
+    if (typeof medicines == "string") {
       medicines = JSON.parse(medicines);
+      console.log(medicines);
     }
+
     const data = {
       medicines: medicines
     };

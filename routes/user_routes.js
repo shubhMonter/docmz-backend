@@ -50,6 +50,8 @@ router.post("/setpassword", userController.setPassword);
 
 //get patient details
 router.get("/getinfo/:id", userController.getProfileDetails);
+//get full patient details
+router.get("/getfullinfo/:id", userController.getfullProfileDetails);
 
 router.post("/upload/image", upload.any(), (req, res, next) => {
   console.log("it came here");

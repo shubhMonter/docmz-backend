@@ -719,6 +719,37 @@ function getProfileDetails(req, res) {
       res.status(404).json({ status: false, message: error });
     });
 }
+//Get full profile with meta  details
+function getfullProfileDetails(req, res) {
+  let { id } = req.params;
+  User.findOne({ _id: id })
+    .populate({
+      path: "favourites",
+      select: "firstName lastName address phone email picture appointments",
+      populate: "appointments address"
+    })
+    .populate({
+      path: "appointments",
+      populate: {
+        path: "doctor",
+        select: "firstName lastName address phone email picture"
+      }
+    })
+    .populate({
+      path: "meta",
+      populate: {
+        path: "medicines"
+      }
+    })
+    .then(data => {
+      res
+        .status(200)
+        .json({ status: true, message: "Profile Details fetched", data });
+    })
+    .catch(error => {
+      res.status(404).json({ status: false, message: error });
+    });
+}
 
 //Forget password
 
@@ -1361,6 +1392,7 @@ module.exports = {
   tokenForgetPassword,
   setPassword,
   getProfileDetails,
+  getfullProfileDetails,
   getPatient,
   uploadImage,
   attemptQuiz,
