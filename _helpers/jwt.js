@@ -79,6 +79,8 @@ function jwt() {
       { url: /\/patient\/getfullinfo\/([^\/]*)$/, methods: ["GET"] },
       "/users/token",
       { url: /\/doctors\/getinfo\/([^\/]*)$/, methods: ["GET", "POST"] },
+      { url: /\/doctors\/appointments\/([^\/]*)$/, methods: ["GET"] },
+      { url: /\/patient\/appointments\/([^\/]*)$/, methods: ["GET"] },
       "/users/login",
       "/codes/upload/cpt",
       "/codes/upload/cptindex",

@@ -37,6 +37,7 @@ let smtpConfig = {
   }
 };
 const multer = require("multer");
+const { RSA_NO_PADDING } = require("constants");
 let fs = require("fs"),
   path = require("path"),
   filePath = path.join(__dirname, "/forgotPassword.html");
@@ -1383,6 +1384,22 @@ const recentDoctors = async (req, res) => {
   }
 };
 
+const getAppointment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await Appointment.find({ patient: id, booked: true });
+    if (user.length >= 1) {
+      return res.json({ status: true, data: user });
+    } else {
+      return res
+        .status(400)
+        .json({ status: false, message: "user appointment not found" });
+    }
+  } catch (error) {
+    return res.status(400).json({ status: false, error: error });
+  }
+};
+
 //Exporting all the functions
 module.exports = {
   getSpecialty,
@@ -1410,5 +1427,6 @@ module.exports = {
   getSurgeries,
   getReports,
   addRecentDoctor,
-  recentDoctors
+  recentDoctors,
+  getAppointment
 };

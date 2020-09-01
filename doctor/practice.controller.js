@@ -8,7 +8,6 @@ const db = require("_helpers/db"),
   (Taxonomy = db.Taxonomy),
   (Address = db.Address),
   (Usermeta = db.Usermeta),
-  (Appointment = db.Appointment),
   (Referral = db.Referral),
   (Specialty = db.Specialty),
   (practiseMeta = db.practiseMeta),
@@ -53,6 +52,7 @@ console.log({ filePath });
 let template = fs.readFileSync(filePath, { encoding: "utf-8" });
 
 const availability = require("./availability.controller");
+const { Appointment } = require("../_helpers/db");
 
 //const { Practicemeta } = require("../_helpers/db");
 
@@ -1837,6 +1837,22 @@ const toggleBlock = async (req, res) => {
     return res.send({ status: false, error: error });
   }
 };
+
+const getAppointment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const doc = await Appointment.find({ doctor: id, booked: true });
+    if (doc.length >= 1) {
+      return res.json({ status: true, data: doc });
+    } else {
+      return res
+        .status(400)
+        .json({ status: false, message: "Doctor appointment not found" });
+    }
+  } catch (error) {
+    return res.status(400).json({ status: false, error: error });
+  }
+};
 //Exporting all the functions
 module.exports = {
   getNpiInfo,
@@ -1853,5 +1869,6 @@ module.exports = {
   nextAppointment,
   getByDate,
   setPassword,
-  toggleBlock
+  toggleBlock,
+  getAppointment
 };

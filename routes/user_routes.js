@@ -283,4 +283,6 @@ router.get("/reports/get/:id", userController.getReports);
 
 router.post("/addrecentdoctor", userController.addRecentDoctor);
 router.get("/recentdoctors/:id", userController.recentDoctors);
+
+router.get("/appointments/:id", userController.getAppointment);
 module.exports = router;
