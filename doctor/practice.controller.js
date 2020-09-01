@@ -1841,7 +1841,9 @@ const toggleBlock = async (req, res) => {
 const getAppointment = async (req, res) => {
   try {
     const { id } = req.params;
-    const doc = await Appointment.find({ doctor: id, booked: true });
+    const doc = await Appointment.find({ doctor: id, booked: true })
+      .populate("patient")
+      .populate("doctor");
     if (doc.length >= 1) {
       return res.json({ status: true, data: doc });
     } else {

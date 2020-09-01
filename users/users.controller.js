@@ -1387,7 +1387,9 @@ const recentDoctors = async (req, res) => {
 const getAppointment = async (req, res) => {
   try {
     const { id } = req.params;
-    const user = await Appointment.find({ patient: id, booked: true });
+    const user = await Appointment.find({ patient: id, booked: true })
+      .populate("doctor")
+      .populate("patient");
     if (user.length >= 1) {
       return res.json({ status: true, data: user });
     } else {
