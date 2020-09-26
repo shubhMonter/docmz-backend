@@ -2,6 +2,7 @@ const db = require("_helpers/db"),
   mongoose = require("mongoose");
 const { Router } = require("express");
 const { Review, practiseMeta } = require("../_helpers/db");
+const { populate } = require("../otp/otp.model");
 
 const addrecentpatient = async (req, res) => {
   try {
@@ -48,13 +49,34 @@ const recentpatients = async (req, res) => {
 
     const meta = await practiseMeta
       .findOne({ practiseId: id })
-      .populate("recentPatients.patient", "firstName lastName")
+      .populate({
+        path: "recentPatients.patient",
+        select: "-appointments -password ",
+        populate: "meta"
+      })
       .populate(
         "recentPatients.appointment",
         "bookedFor forWhom reasonForVisit patientInfo"
       );
     if (meta) {
-      return res.status(200).json({ status: true, data: meta.recentPatients });
+      let appoint = meta.recentPatients.map(async (z, i) => {
+        const appoint = await Appointment.findOne({ _id: z.appointment });
+        console.log(appoint);
+        if (appoint) {
+          let { forWhom, bookedFor, reasonForVisit } = appoint;
+          let ap = {
+            createdAt: z.createdAt,
+            _id: z._id,
+            patient: z.patient,
+            appointment: { forWhom, bookedFor, reasonForVisit }
+            //appointment:appoint
+          };
+          return ap;
+        }
+      });
+      const list = await Promise.all(appoint);
+      return res.status(200).json({ status: true, data: list });
+      // return res.status(200).json({ status: true, data: meta.recentPatients });
     } else {
       return res
         .status(400)

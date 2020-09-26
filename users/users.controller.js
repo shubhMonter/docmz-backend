@@ -20,6 +20,7 @@ const keySecret = "	sk_test_hoVy16mRDhxHCoNAOAEJYJ4N00pzRH8xK2";
 const stripe = require("stripe")(keySecret);
 const randomstring = require("randomstring");
 const _ = require("underscore");
+const fieldEncryption = require("mongoose-field-encryption");
 
 const send = require("../mail/mail");
 //SMTP Config
@@ -1360,14 +1361,25 @@ const recentDoctors = async (req, res) => {
     const { id } = req.params;
     const user = await User.findOne({ _id: id });
     if (user) {
-      const meta = await Usermeta.findOne({ _id: user.meta })
-        .populate("recentDoctors.doctor", "firstName lastName specialty")
-        .populate(
-          "recentDoctors.appointment",
-          "forWhom bookedFor reasonForVisit"
-        );
+      let meta = await Usermeta.findOne({ _id: user.meta }).populate(
+        "recentDoctors.doctor",
+        "firstName lastName specialty"
+      );
+
       if (meta) {
-        return res.status(200).json({ status: true, data: meta.recentDoctors });
+        let appoint = meta.recentDoctors.map(async (z, i) => {
+          const appoint = await Appointment.findOne({ _id: z.appointment });
+          let { forWhom, bookedFor, reasonForVisit } = appoint;
+          let ap = {
+            createdAt: z.createdAt,
+            _id: z._id,
+            doctor: z.doctor,
+            appointment: { forWhom, bookedFor, reasonForVisit }
+          };
+          return ap;
+        });
+        const list = await Promise.all(appoint);
+        return res.status(200).json({ status: true, data: list });
       } else {
         return res
           .status(400)
