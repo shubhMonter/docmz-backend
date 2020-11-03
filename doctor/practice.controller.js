@@ -1399,7 +1399,8 @@ let searchDocsLite = (req, res) => {
         appointments: 1,
         city: 1,
         country: 1,
-        state: 1
+        state: 1,
+        bio: 1
       }
     },
     {

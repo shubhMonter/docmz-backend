@@ -39,6 +39,7 @@ let smtpConfig = {
 };
 const multer = require("multer");
 const { RSA_NO_PADDING } = require("constants");
+const { findOne } = require("../otp/otp.model");
 let fs = require("fs"),
   path = require("path"),
   filePath = path.join(__dirname, "/forgotPassword.html");
@@ -122,9 +123,10 @@ let register = async (req, res) => {
         //Creating the user model
         let referralId = req.body.firstName + randomstring.generate(5);
         let meta = new Usermeta({ referralId });
-
-        meta.save().then(metadata => {
+        meta.save().then(async metadata => {
           console.log("meta", metadata);
+          // let userMetaD = await Usermeta.findOne({_id:metadata._id});
+          //  console.log("decrypted",userMetaD);
           const user = new User({
             firstName,
             lastName,
@@ -138,10 +140,12 @@ let register = async (req, res) => {
           });
 
           //Saving the user
+
           user
             .save()
             .then(async data => {
-              // console.log("User", data);
+              console.log("User", data);
+              let userData = await User.findOne({ _id: data._id });
               Usermeta.findOneAndUpdate(
                 { _id: data.meta },
                 { userId: data._id },
@@ -233,7 +237,7 @@ let register = async (req, res) => {
                       res.status(200).json({
                         status: true,
                         message: "Successfully Registered",
-                        data: data
+                        data: userData
                       });
                     }
                   });
@@ -436,7 +440,7 @@ let authenticate = (req, res) => {
     app.get(sessionChecker, (req, res) => {
       console.log({ status: "session stored" });
     });
-
+    console.log(user);
     //Checking if User exits or not
     if (user) {
       console.log(user);
