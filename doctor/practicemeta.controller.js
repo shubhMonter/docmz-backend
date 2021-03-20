@@ -46,9 +46,9 @@ const addrecentpatient = async (req, res) => {
 const recentpatients = async (req, res) => {
   try {
     const { id } = req.params;
-
+    console.log(id);
     const meta = await practiseMeta
-      .findOne({ practiseId: id })
+      .findOne({ _id: id })
       .populate({
         path: "recentPatients.patient",
         select: "-appointments -password ",
@@ -58,6 +58,7 @@ const recentpatients = async (req, res) => {
         "recentPatients.appointment",
         "bookedFor forWhom reasonForVisit patientInfo"
       );
+    console.log(meta);
     if (meta) {
       let appoint = meta.recentPatients.map(async (z, i) => {
         const appoint = await Appointment.findOne({ _id: z.appointment });

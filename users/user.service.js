@@ -273,7 +273,7 @@
 // 						token +
 // 						'\n\n'
 //         };
-        
+
 // 				smtpTransport.sendMail(mailOptions, function(err) {
 // 					console.log('Reset password email sent');
 // 					done(err, 'done');
@@ -337,7 +337,7 @@
 // 						token +
 // 						'\n\n'
 //         };
-      
+
 // 				smtpTransport.sendMail(mailOptions, function(err) {
 // 					console.log('Email sent');
 // 					done(err, 'done');
@@ -380,7 +380,7 @@
 // 			// 		pass: '8123342590'
 // 			// 	}
 //       // });
-      
+
 //       if(forget){
 //         var mailOptions = {
 //           to: user.email,
@@ -407,7 +407,7 @@
 // 					' or your email - ' +
 // 					user.email
 //       };}
-    
+
 // 			smtpTransport.sendMail(mailOptions, function(err) {
 // 				done(err);
 // 				res.json({ status: 'Registration complete' });

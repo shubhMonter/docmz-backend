@@ -75,11 +75,11 @@ const addQuestion = async (req, res) => {
               $push: { "option.$.linkedQuestion": qus._id }
             }
           )
-          .then((data) => {
+          .then(data => {
             res.json({
               status: true,
               message: "all done succesfully added with link",
-               data
+              data
             });
           })
           .catch(err => {

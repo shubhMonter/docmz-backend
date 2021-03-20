@@ -35,13 +35,11 @@ const addClinic = async (req, res) => {
       prac.clinic.push(newClinic._id);
       prac.save(function() {
         if (err)
-          return res
-            .status(500)
-            .json({
-              status: false,
-              err: err,
-              message: "something went wrong!"
-            });
+          return res.status(500).json({
+            status: false,
+            err: err,
+            message: "something went wrong!"
+          });
       });
       return res
         .status(200)

@@ -464,6 +464,7 @@ signUpDoc = async (req, res) => {
             let practicemeta = new practiseMeta({
               practiceId: practise._id
             });
+            practicemeta.save();
             practise
               .save()
               .then(doc => {
@@ -1356,9 +1357,9 @@ let searchDocs = (req, res) => {
 //its a dynamic api, it filters data on the basis of what sent in match object. For search by name. You need to pass another variable name, not in match.
 let searchDocsLite = (req, res) => {
   // console.log(address.collection.name);
-  //   console.log(req.body);
+  console.log(req.body);
   let options = { ...JSON.parse(req.body.match) };
-  console.log("options;", { ...options });
+  console.log("options:", { ...options });
   let page = Number(req.body.pageNo) || 0;
   let size = Number(req.body.size) || 10;
   //   console.log(req.body.name);

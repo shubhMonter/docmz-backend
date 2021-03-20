@@ -4,10 +4,10 @@ const Schema = mongoose.Schema;
 //Students Schema
 const schema = new Schema({
   password: { type: String },
-  username: {type: String},
+  username: { type: String },
   firstName: { type: String, default: " " },
   lastName: { type: String, default: " " },
-  email: { type: String, default:"" },
+  email: { type: String, default: "" },
   phoneNumber: { type: String, default: " " },
   discipline: [],
   parents: [{ type: Schema.Types.ObjectId, ref: "User" }],

@@ -25,6 +25,7 @@ const data = {
 };
 // Create time slots for doctor
 let getTimeSlots = id => {
+  console.log(id);
   //USE THIS AS PAYLOAD
   //  {
   //     duration: "15",

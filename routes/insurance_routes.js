@@ -6,10 +6,10 @@ const router = express.Router();
 router.get("/addToDatabase/carriers", carrierController.addCarriersToDatabase);
 
 //Fetch all the carriers from the database
-router.get("/get/carriers", carrierController.allCarriers)
+router.get("/get/carriers", carrierController.allCarriers);
 
 //Delete all the carriers from the database
-router.get("/delete/carriers", carrierController.deleteAll)
+router.get("/delete/carriers", carrierController.deleteAll);
 
 // exporting them
 module.exports = router;

@@ -698,9 +698,7 @@ let addCarriersToDatabase = () => {
   let planIds = [];
   console.log(carriers.length);
   carriers.map(carrier_el => {
-    let firstRequest = `https://www.zocdoc.com/api/1/carriers/${
-      carrier_el[0]
-    }/plans`;
+    let firstRequest = `https://www.zocdoc.com/api/1/carriers/${carrier_el[0]}/plans`;
 
     request.get(firstRequest, function(err, resp, body) {
       if (resp.body) {
@@ -722,9 +720,7 @@ let addCarriersToDatabase = () => {
         }
       }
       //Second request to zocDoc
-      let secondRequest = `https://www.zocdoc.com/api/1/carriers/${
-        carrier_el[0]
-      }/plans?tier=1`;
+      let secondRequest = `https://www.zocdoc.com/api/1/carriers/${carrier_el[0]}/plans?tier=1`;
       console.log({ secondRequest });
       request.get(secondRequest, function(err, res, body) {
         console.log(res.body);
